@@ -36,3 +36,6 @@ apps/api/prisma/migrations/dev.db*
 # Misc
 .cache/
 .turbo/
+
+# Docs (internal only)
+docs/
