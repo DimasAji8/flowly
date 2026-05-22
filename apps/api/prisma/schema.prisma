@@ -1,0 +1,196 @@
+// Flowly — Prisma Schema
+// Reference: docs/instructions/08-database-schema.md
+//
+// Multi-tenant: hampir semua tabel ter-scope ke workspace_id.
+// Wajib enforce filter workspace_id di service/guard layer.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================
+// Enums
+// =====================================================
+
+enum WorkspaceRole {
+  owner
+  member
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+enum RecurringFrequency {
+  daily
+  weekly
+  monthly
+}
+
+// =====================================================
+// User
+// =====================================================
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  memberships     WorkspaceMember[]
+  transactions    Transaction[]
+
+  @@map("users")
+}
+
+// =====================================================
+// Workspace
+// =====================================================
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  ownerId   String   @map("owner_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner                 User                   @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members               WorkspaceMember[]
+  wallets               Wallet[]
+  categories            Category[]
+  transactions          Transaction[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([ownerId])
+  @@map("workspaces")
+}
+
+// =====================================================
+// Workspace Member
+// =====================================================
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String        @map("workspace_id")
+  userId      String        @map("user_id")
+  role        WorkspaceRole @default(member)
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+enum CategoryGroup {
+  needs
+  wants
+  savings
+}
+
+
+
+model Wallet {
+  id          String   @id @default(cuid())
+  workspaceId String   @map("workspace_id")
+  name        String
+  balance     Decimal  @default(0) @db.Decimal(18, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  workspace             Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  transactions          Transaction[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([workspaceId])
+  @@map("wallets")
+}
+
+// =====================================================
+// Category
+// =====================================================
+
+model Category {
+  id          String          @id @default(cuid())
+  workspaceId String          @map("workspace_id")
+  name        String
+  type        TransactionType
+  color       String          @db.VarChar(9)
+  icon        String          @default("📦") @db.VarChar(8)
+  group       CategoryGroup?  // null untuk income categories
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+  workspace             Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  transactions          Transaction[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([workspaceId])
+  @@index([workspaceId, type])
+  @@map("categories")
+}
+
+// =====================================================
+// Transaction
+// =====================================================
+
+model Transaction {
+  id              String          @id @default(cuid())
+  workspaceId     String          @map("workspace_id")
+  walletId        String          @map("wallet_id")
+  categoryId      String          @map("category_id")
+  userId          String          @map("user_id")
+  type            TransactionType
+  amount          Decimal         @db.Decimal(18, 2)
+  note            String?
+  transactionDate DateTime        @map("transaction_date") @db.Date
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  wallet    Wallet    @relation(fields: [walletId], references: [id], onDelete: Restrict)
+  category  Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@index([workspaceId, transactionDate])
+  @@index([workspaceId, type])
+  @@index([walletId])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+// =====================================================
+// Recurring Transaction
+// =====================================================
+
+model RecurringTransaction {
+  id          String             @id @default(cuid())
+  workspaceId String             @map("workspace_id")
+  walletId    String             @map("wallet_id")
+  categoryId  String             @map("category_id")
+  type        TransactionType
+  amount      Decimal            @db.Decimal(18, 2)
+  frequency   RecurringFrequency
+  note        String?
+  nextRunAt   DateTime           @map("next_run_at")
+  isActive    Boolean            @default(true) @map("is_active")
+  createdAt   DateTime           @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  wallet    Wallet    @relation(fields: [walletId], references: [id], onDelete: Restrict)
+  category  Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@index([isActive, nextRunAt])
+  @@map("recurring_transactions")
+}
