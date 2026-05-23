@@ -7,7 +7,6 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { SpendingInsights } from "@/components/dashboard/spending-insights";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
-import { DeleteTransactionModal } from "@/components/transaction/delete-transaction-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
@@ -35,9 +34,16 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
+  const [greeting] = useState(() => {
+    const h = new Date().getHours();
+    if (h < 11) return "Selamat pagi";
+    if (h < 15) return "Selamat siang";
+    if (h < 18) return "Selamat sore";
+    return "Selamat malam";
+  });
+
   const [addOpen, setAddOpen] = useState(false);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
-  const [deleteTxId, setDeleteTxId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -62,13 +68,17 @@ export default function DashboardPage() {
       .then(([s, all]) => {
         if (cancelled) return;
         setSummary(s);
-        setRecent(all.data.slice(0, 5));
+        setRecent(all.data
+          .slice()
+          .sort((a, b) => b.transactionDate.localeCompare(a.transactionDate))
+          .slice(0, 5)
+        );
         setAllTx(all.data);
         setError(null);
       })
       .catch((e: unknown) => {
         if (cancelled) return;
-        setError(e instanceof ApiError ? e.message : "Failed to load dashboard");
+        setError(e instanceof ApiError ? e.message : "Gagal memuat dashboard");
       })
       .finally(() => { if (!cancelled) setLoading(false); });
 
@@ -115,13 +125,7 @@ export default function DashboardPage() {
         <img src="/img/logo-light.webp" alt="Flowly" height={32} className="h-8 w-auto hidden dark:block md:dark:hidden" />
         {/* Desktop: greeting */}
         <p className="hidden md:block text-xl font-semibold text-foreground" style={{ fontFamily: "var(--font-playfair), serif" }} suppressHydrationWarning>
-          {(() => {
-            const h = new Date().getHours();
-            if (h < 11) return "Selamat pagi";
-            if (h < 15) return "Selamat siang";
-            if (h < 18) return "Selamat sore";
-            return "Selamat malam";
-          })()}, {user?.name?.split(" ")[0] ?? "..."}
+          {greeting}, {user?.name?.split(" ")[0] ?? "..."}
         </p>
         <div className="flex items-center gap-2.5">
           <h1 className="text-sm font-semibold text-foreground md:hidden" suppressHydrationWarning>
@@ -209,15 +213,6 @@ export default function DashboardPage() {
         onSuccess={load}
         transaction={editTx ?? undefined}
       />
-
-      {deleteTxId && (
-        <DeleteTransactionModal
-          open={Boolean(deleteTxId)}
-          onClose={() => setDeleteTxId(null)}
-          onSuccess={load}
-          transactionId={deleteTxId}
-        />
-      )}
     </div>
   );
 }

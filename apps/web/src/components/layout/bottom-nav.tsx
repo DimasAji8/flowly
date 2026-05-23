@@ -106,7 +106,10 @@ export function BottomNav() {
               type="button"
               onClick={() => setAddOpen(true)}
               aria-label="Add transaction"
-              className="relative -top-4 flex size-14 items-center justify-center rounded-full bg-[var(--color-accent)] shadow-lg shadow-[var(--color-accent)]/30 transition-transform active:scale-95"
+              className="relative -top-4 flex size-14 items-center justify-center rounded-full bg-[var(--color-accent)] transition-transform active:scale-95 hover:scale-105"
+              style={{
+                boxShadow: "0 4px 20px -2px rgba(37,99,235,0.5), 0 0 0 4px rgba(37,99,235,0.15)",
+              }}
             >
               <Plus className="size-6 text-white" strokeWidth={2.5} aria-hidden />
             </button>

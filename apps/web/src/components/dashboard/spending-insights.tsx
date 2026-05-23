@@ -38,7 +38,13 @@ const STATUS_STYLE = {
   safe:    { bar: "var(--color-success)", text: "var(--color-success)", label: "Dalam batas" },
   warning: { bar: "var(--color-warning)", text: "var(--color-warning)", label: "Mendekati batas" },
   over:    { bar: "var(--color-danger)",  text: "var(--color-danger)",  label: "Melebihi rekomendasi" },
+  under:   { bar: "var(--color-danger)",  text: "var(--color-danger)",  label: "Di bawah target" },
 };
+
+function getStatusStyle(status: ReturnType<typeof getStatus>, isMin: boolean) {
+  if (status === "over" && isMin) return STATUS_STYLE.under;
+  return STATUS_STYLE[status];
+}
 
 export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsightsProps) {
   if (totalIncome <= 0 || categorySpends.length === 0) return null;
@@ -68,9 +74,11 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
         {hasGroupData && (Object.entries(GROUP_CONFIG) as [keyof typeof GROUP_CONFIG, typeof GROUP_CONFIG[keyof typeof GROUP_CONFIG]][]).map(([key, cfg]) => {
           const amount = groupTotals[key] ?? 0;
           const pct = Math.round((amount / totalIncome) * 100);
+          const displayPct = amount > 0 && pct === 0 ? "<1" : `${pct}`;
           const barPct = Math.min(pct, 100);
-          const status = getStatus(pct, cfg.target, "isMin" in cfg);
-          const style = STATUS_STYLE[status];
+          const isMin = "isMin" in cfg;
+          const status = getStatus(pct, cfg.target, isMin);
+          const style = getStatusStyle(status, isMin);
 
           return (
             <div key={key} className="px-4 py-3.5">
@@ -80,12 +88,12 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
                   <span className="ml-2 text-xs text-[var(--color-text-muted)]">{cfg.targetLabel}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs tabular-nums" style={{ color: style.text }}>{pct}%</span>
+                  <span className="text-xs tabular-nums" style={{ color: style.text }}>{displayPct}%</span>
                   <span className="text-xs text-[var(--color-text-muted)] tabular-nums">{formatCurrency(amount)}</span>
                 </div>
               </div>
               {/* Progress bar */}
-              <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)]">
+              <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)] overflow-hidden">
                 <div
                   className="h-2 rounded-full transition-all duration-500"
                   style={{

@@ -69,7 +69,7 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
               {Math.round((Number(expense) / Number(income)) * 100)}%
             </p>
           </div>
-          <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)]">
+          <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)] overflow-hidden">
             <div
               className="h-2 rounded-full transition-all duration-700"
               style={{
