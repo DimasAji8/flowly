@@ -1,12 +1,15 @@
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Gender } from '@prisma/client';
 
 export class RegisterDto {
   @ApiProperty({ example: 'Dimas Aji', minLength: 2, maxLength: 60 })
@@ -33,4 +36,9 @@ export class RegisterDto {
   @MinLength(8)
   @MaxLength(72)
   password!: string;
+
+  @ApiPropertyOptional({ enum: Gender, example: 'm' })
+  @IsOptional()
+  @IsEnum(Gender)
+  gender?: Gender;
 }

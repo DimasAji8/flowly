@@ -10,6 +10,7 @@ export const registerSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(72, "Password is too long"),
+  gender: z.enum(["m", "f"]).optional(),
 });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;

@@ -62,7 +62,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-              className={["h-6 w-11 shrink-0 rounded-full transition-colors", resolvedTheme === "dark" ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"].join(" ")}
+              className={["h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors", resolvedTheme === "dark" ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"].join(" ")}
               aria-pressed={resolvedTheme === "dark"}
               aria-label="Toggle dark mode"
             >

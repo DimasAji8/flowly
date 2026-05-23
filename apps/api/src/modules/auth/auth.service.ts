@@ -22,7 +22,7 @@ export interface AuthTokens {
 }
 
 export interface AuthResponse {
-  user: { id: string; name: string; email: string };
+  user: { id: string; name: string; email: string; gender: string | null };
   workspaceId: string;
   accessToken: string;
   refreshToken: string;
@@ -53,6 +53,7 @@ export class AuthService {
           name: dto.name,
           email: dto.email,
           password: passwordHash,
+          gender: dto.gender ?? null,
         },
       });
 
@@ -100,7 +101,7 @@ export class AuthService {
 
     const tokens = await this.signTokens(user);
     return {
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: user.id, name: user.name, email: user.email, gender: user.gender },
       workspaceId: workspace.id,
       ...tokens,
     };
@@ -117,7 +118,7 @@ export class AuthService {
     const workspaceId = await this.getPrimaryWorkspaceId(user.id);
     const tokens = await this.signTokens(user);
     return {
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: user.id, name: user.name, email: user.email, gender: user.gender },
       workspaceId,
       ...tokens,
     };

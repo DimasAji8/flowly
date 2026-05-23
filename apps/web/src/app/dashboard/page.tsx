@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { SpendingInsights } from "@/components/dashboard/spending-insights";
@@ -13,8 +12,17 @@ import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
 import { useAuthStore } from "@/store/auth.store";
-import type { MonthlySummary, Transaction } from "@/types/finance";
+import type { MonthlySummary, Transaction, CategoryGroup } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
+
+type CategorySpend = {
+  categoryId: string;
+  categoryName: string;
+  categoryIcon: string;
+  categoryColor: string;
+  group: CategoryGroup | null;
+  amount: number;
+};
 
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -25,16 +33,21 @@ export default function DashboardPage() {
   const [allTx, setAllTx] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTxId, setDeleteTxId] = useState<string | null>(null);
 
-  useEffect(() => { void refreshMe(); }, [refreshMe]);
-
   const load = useCallback(() => {
     setLoading(true);
-    setError(null);
+    setReloadKey((k) => k + 1);
+  }, []);
+
+  useEffect(() => { void refreshMe(); }, [refreshMe]);
+
+  useEffect(() => {
+    let cancelled = false;
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
@@ -47,28 +60,29 @@ export default function DashboardPage() {
       transactionsService.list({ limit: 500, page: 1, from, to }),
     ])
       .then(([s, all]) => {
+        if (cancelled) return;
         setSummary(s);
         setRecent(all.data.slice(0, 5));
         setAllTx(all.data);
+        setError(null);
       })
       .catch((e: unknown) => {
+        if (cancelled) return;
         setError(e instanceof ApiError ? e.message : "Failed to load dashboard");
       })
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => { if (!cancelled) setLoading(false); });
 
-  useEffect(() => { load(); }, [load]);
+    return () => { cancelled = true; };
+  }, [reloadKey]);
 
-  // Reload saat FAB di bottom nav menambah transaksi
   useEffect(() => {
     const handler = () => load();
     window.addEventListener("flowly:transaction-added", handler);
     return () => window.removeEventListener("flowly:transaction-added", handler);
   }, [load]);
 
-  // Aggregate expense per category untuk insights
-  const categorySpends = useMemo(() => {
-    const map = new Map<string, { amount: number; name: string; icon: string; color: string; group: Transaction["category"] extends { group?: infer G } ? G : never }>();
+  const categorySpends = useMemo<CategorySpend[]>(() => {
+    const map = new Map<string, CategorySpend>();
     for (const tx of allTx) {
       if (tx.type !== "expense") continue;
       const existing = map.get(tx.categoryId);
@@ -76,39 +90,46 @@ export default function DashboardPage() {
         existing.amount += Number(tx.amount);
       } else {
         map.set(tx.categoryId, {
+          categoryId: tx.categoryId,
+          categoryName: tx.category.name,
+          categoryIcon: tx.category.icon,
+          categoryColor: tx.category.color,
+          group: (tx.category as { group?: CategoryGroup }).group ?? null,
           amount: Number(tx.amount),
-          name: tx.category.name,
-          icon: tx.category.icon,
-          color: tx.category.color,
-          group: (tx.category as any).group ?? null,
         });
       }
     }
-    return Array.from(map.entries()).map(([id, v]) => ({
-      categoryId: id,
-      categoryName: v.name,
-      categoryIcon: v.icon,
-      categoryColor: v.color,
-      group: v.group,
-      amount: v.amount,
-    }));
+    return Array.from(map.values());
   }, [allTx]);
 
   const totalIncome = Number(summary?.income ?? 0);
+  const avatarSrc = user?.gender === "m" ? "/svg/m.svg" : user?.gender === "f" ? "/svg/f.svg" : null;
 
   return (
-    <div className="flex flex-col gap-8 max-w-5xl">
-      <header className="flex flex-col gap-0.5">
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Halo, <span className="font-medium text-[var(--color-text-secondary)]">{user?.name ?? "..."}</span> 👋
-        </p>
-        <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
-          Ringkasan Keuangan
-        </h1>
+    <div className="flex flex-col gap-8">
+      <header className="flex items-center justify-between" suppressHydrationWarning>
+        {/* Logo: dark/light sesuai theme */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/img/logo-light.webp" alt="Flowly" height={32} className="h-8 w-auto block dark:hidden" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/img/logo-dark.webp" alt="Flowly" height={32} className="h-8 w-auto hidden dark:block" />
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-sm font-semibold text-foreground" suppressHydrationWarning>
+            {user?.name ?? "..."}
+          </h1>
+          {avatarSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarSrc} alt={user?.name ?? "avatar"} width={36} height={36} className="size-9 rounded-full object-cover shrink-0" />
+          ) : (
+            <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent select-none">
+              {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+            </div>
+          )}
+        </div>
       </header>
 
       {error && (
-        <div className="rounded-md border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 px-3 py-2 text-sm text-[var(--color-danger)]">
+        <div className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -128,56 +149,48 @@ export default function DashboardPage() {
         />
       )}
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_300px]">
-        <div className="flex flex-col gap-6">
-          <section className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium text-[var(--color-text-primary)]">
-                Recent transactions
-              </h2>
+      <div className="flex flex-col gap-6">
+        <section className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-foreground">
+              Recent transactions
+            </h2>
+            {!loading && (
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setAddOpen(true)}
-                  className="text-xs font-medium text-[var(--color-accent)] hover:underline"
-                >
-                  + Add
-                </button>
-                <Link href={ROUTES.transactions} className="text-xs text-[var(--color-text-muted)] hover:underline">
+                <Link href={ROUTES.transactions} className="text-xs text-muted hover:underline">
                   See all
                 </Link>
               </div>
+            )}
+          </div>
+          {loading ? (
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 rounded-xl" />
+              ))}
             </div>
-            <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] px-2 py-2">
+          ) : (
+            <div className="rounded-2xl border border-border-subtle bg-card px-2 py-2">
               <TransactionList
                 items={recent}
-                loading={loading}
+                loading={false}
                 onItemClick={(tx) => setEditTx(tx)}
               />
             </div>
-          </section>
-
-          {!loading && categorySpends.length > 0 && (
-            <SpendingInsights
-              categorySpends={categorySpends}
-              totalIncome={totalIncome}
-            />
           )}
-        </div>
+        </section>
 
-        <aside className="hidden md:flex md:flex-col md:gap-3">
-          <h2 className="text-sm font-medium text-[var(--color-text-primary)]">Quick actions</h2>
-          <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-4 flex flex-col gap-2">
-            <Button onClick={() => setAddOpen(true)} className="w-full">
-              + Add transaction
-            </Button>
-            <Button asChildHref={ROUTES.transactions} variant="secondary" className="w-full">
-              View all transactions
-            </Button>
-            <Button asChildHref={ROUTES.wallets} variant="ghost" className="w-full">
-              Manage wallets
-            </Button>
+        {loading ? (
+          <div className="flex flex-col gap-3">
+            <Skeleton className="h-5 w-32 rounded-lg" />
+            <Skeleton className="h-40 rounded-2xl" />
           </div>
-        </aside>
+        ) : categorySpends.length > 0 && (
+          <SpendingInsights
+            categorySpends={categorySpends}
+            totalIncome={totalIncome}
+          />
+        )}
       </div>
 
       <TransactionModal

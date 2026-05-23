@@ -15,7 +15,7 @@ export function SideNav() {
   return (
     <aside
       aria-label="Primary"
-      className="hidden md:flex md:sticky md:top-0 md:h-dvh md:w-60 md:shrink-0 md:flex-col md:border-r md:border-[var(--color-border-subtle)] md:bg-[var(--color-bg)] md:px-4 md:py-6"
+      className="hidden md:flex md:sticky md:top-0 md:h-dvh md:w-72 md:shrink-0 md:flex-col md:border-r md:border-[var(--color-border-subtle)] md:bg-[var(--color-bg)] md:px-5 md:py-6"
     >
       <Link
         href={ROUTES.dashboard}

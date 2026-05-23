@@ -1,4 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Gender } from '@prisma/client';
 
 export class AuthUserResponse {
   @ApiProperty({ example: 'cmpgdeuuu00001s58dbnf4xmi' })
@@ -9,6 +10,9 @@ export class AuthUserResponse {
 
   @ApiProperty({ example: 'dimas@example.com' })
   email!: string;
+
+  @ApiPropertyOptional({ enum: Gender, example: 'm' })
+  gender?: Gender | null;
 }
 
 export class AuthSessionResponse {

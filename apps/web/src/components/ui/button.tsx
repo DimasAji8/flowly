@@ -6,7 +6,7 @@ type Size = "md" | "sm" | "lg";
 
 const base = [
   "inline-flex items-center justify-center gap-2",
-  "font-medium",
+  "font-medium cursor-pointer",
   "transition-all duration-150 ease-out",
   "disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100",
   "active:scale-[0.98]",

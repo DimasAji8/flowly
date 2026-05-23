@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -28,11 +29,15 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", email: "", password: "", gender: undefined },
   });
+
+  const gender = watch("gender");
 
   if (!isReady || isAuthed) {
     return null;
@@ -74,6 +79,28 @@ export default function RegisterPage() {
           {...register("name")}
           error={errors.name?.message}
         />
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-[var(--color-text-primary)]">Avatar</span>
+          <div className="flex gap-3">
+            {(["m", "f"] as const).map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setValue("gender", g)}
+                className={[
+                  "flex flex-col items-center gap-1 rounded-2xl border-2 p-2 transition-colors",
+                  gender === g
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)]"
+                    : "border-[var(--color-border)] hover:border-[var(--color-accent)]/50",
+                ].join(" ")}
+              >
+                <Image src={`/${g}.svg`} alt={g === "m" ? "Male" : "Female"} width={56} height={56} className="size-14 rounded-xl object-cover" />
+                <span className="text-xs text-[var(--color-text-secondary)]">{g === "m" ? "Male" : "Female"}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <Input
           label="Email"
