@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import { Playfair_Display } from "next/font/google";
+import { Playfair_Display, Urbanist } from "next/font/google";
 import "./globals.css";
 import { AuthHydrator } from "@/components/layout/auth-hydrator";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+
+const jakarta = Urbanist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -22,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full antialiased ${playfair.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`h-full antialiased ${jakarta.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <ThemeProvider>
           <AuthHydrator>{children}</AuthHydrator>
