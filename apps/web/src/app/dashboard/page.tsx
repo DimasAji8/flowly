@@ -108,20 +108,30 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <header className="flex items-center justify-between" suppressHydrationWarning>
-        {/* Logo: dark/light sesuai theme */}
+        {/* Logo: hanya tampil di mobile */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/logo-light.webp" alt="Flowly" height={32} className="h-8 w-auto block dark:hidden" />
+        <img src="/img/logo-dark.webp" alt="Flowly" height={32} className="h-8 w-auto block dark:hidden md:hidden" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/logo-dark.webp" alt="Flowly" height={32} className="h-8 w-auto hidden dark:block" />
+        <img src="/img/logo-light.webp" alt="Flowly" height={32} className="h-8 w-auto hidden dark:block md:dark:hidden" />
+        {/* Desktop: greeting */}
+        <p className="hidden md:block text-xl font-semibold text-foreground" style={{ fontFamily: "var(--font-playfair), serif" }} suppressHydrationWarning>
+          {(() => {
+            const h = new Date().getHours();
+            if (h < 11) return "Selamat pagi";
+            if (h < 15) return "Selamat siang";
+            if (h < 18) return "Selamat sore";
+            return "Selamat malam";
+          })()}, {user?.name?.split(" ")[0] ?? "..."}
+        </p>
         <div className="flex items-center gap-2.5">
-          <h1 className="text-sm font-semibold text-foreground" suppressHydrationWarning>
+          <h1 className="text-sm font-semibold text-foreground md:hidden" suppressHydrationWarning>
             {user?.name ?? "..."}
           </h1>
           {avatarSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarSrc} alt={user?.name ?? "avatar"} width={36} height={36} className="size-9 rounded-full object-cover shrink-0" />
+            <img src={avatarSrc} alt={user?.name ?? "avatar"} width={36} height={36} className="size-9 rounded-full object-cover shrink-0 md:hidden" />
           ) : (
-            <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent select-none">
+            <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent select-none md:hidden">
               {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
             </div>
           )}
