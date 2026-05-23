@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Calendar as CalendarIcon, Home, Plus, Receipt, User, type LucideIcon } from "lucide-react";
+import { CalendarDays, CircleUserRound, Coins, LayoutDashboard, Plus, type LucideIcon } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 
@@ -15,11 +15,11 @@ interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: ROUTES.dashboard, label: "Home", icon: Home },
-  { href: ROUTES.calendar, label: "Calendar", icon: CalendarIcon },
+  { href: ROUTES.dashboard, label: "Beranda", icon: LayoutDashboard },
+  { href: ROUTES.calendar, label: "Kalender", icon: CalendarDays },
   // slot tengah kosong untuk FAB
-  { href: ROUTES.transactions, label: "Transactions", icon: Receipt, matchPrefix: "/transactions" },
-  { href: ROUTES.profile, label: "Profile", icon: User },
+  { href: ROUTES.transactions, label: "Transaksi", icon: Coins, matchPrefix: "/transactions" },
+  { href: ROUTES.profile, label: "Profil", icon: CircleUserRound },
 ];
 
 // Nav items split: 2 kiri, FAB tengah, 2 kanan

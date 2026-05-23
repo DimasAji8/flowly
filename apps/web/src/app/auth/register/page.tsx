@@ -62,10 +62,10 @@ export default function RegisterPage() {
     <section className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
-          Create your account
+          Buat akun baru
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)]">
-          Start your calm cashflow journal.
+          Mulai catat keuanganmu dengan tenang.
         </p>
       </header>
 
@@ -73,9 +73,9 @@ export default function RegisterPage() {
         <FormError message={submitError} />
 
         <Input
-          label="Name"
+          label="Nama"
           autoComplete="name"
-          placeholder="Your name"
+          placeholder="Nama kamu"
           {...register("name")}
           error={errors.name?.message}
         />
@@ -95,8 +95,8 @@ export default function RegisterPage() {
                     : "border-[var(--color-border)] hover:border-[var(--color-accent)]/50",
                 ].join(" ")}
               >
-                <Image src={`/${g}.svg`} alt={g === "m" ? "Male" : "Female"} width={56} height={56} className="size-14 rounded-xl object-cover" />
-                <span className="text-xs text-[var(--color-text-secondary)]">{g === "m" ? "Male" : "Female"}</span>
+                <Image src={`/svg/${g}.svg`} alt={g === "m" ? "Laki-laki" : "Perempuan"} width={56} height={56} className="size-14 rounded-xl object-cover" />
+                <span className="text-xs text-[var(--color-text-secondary)]">{g === "m" ? "Laki-laki" : "Perempuan"}</span>
               </button>
             ))}
           </div>
@@ -106,33 +106,33 @@ export default function RegisterPage() {
           label="Email"
           type="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder="kamu@contoh.com"
           {...register("email")}
           error={errors.email?.message}
         />
 
         <Input
-          label="Password"
+          label="Kata sandi"
           type="password"
           autoComplete="new-password"
-          placeholder="At least 8 characters"
-          hint="Minimum 8 characters."
+          placeholder="Minimal 8 karakter"
+          hint="Minimal 8 karakter."
           {...register("password")}
           error={errors.password?.message}
         />
 
         <Button type="submit" isLoading={isSubmitting} className="mt-2">
-          Create account
+          Buat akun
         </Button>
       </form>
 
       <p className="text-sm text-[var(--color-text-secondary)] text-center">
-        Already have an account?{" "}
+        Sudah punya akun?{" "}
         <Link
           href={ROUTES.login}
           className="text-[var(--color-accent)] hover:underline"
         >
-          Log in
+          Masuk
         </Link>
       </p>
     </section>

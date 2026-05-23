@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Wallet } from "lucide-react";
 import { NAV_ITEMS } from "./bottom-nav";
 import { ROUTES } from "@/constants/routes";
 
@@ -17,14 +16,11 @@ export function SideNav() {
       aria-label="Primary"
       className="hidden md:flex md:sticky md:top-0 md:h-dvh md:w-72 md:shrink-0 md:flex-col md:border-r md:border-[var(--color-border-subtle)] md:bg-[var(--color-bg)] md:px-5 md:py-6"
     >
-      <Link
-        href={ROUTES.dashboard}
-        className="mb-6 inline-flex items-center gap-2 px-2 text-lg font-semibold tracking-tight text-[var(--color-text-primary)]"
-      >
-        <span className="grid size-8 place-items-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
-          <Wallet className="size-4" strokeWidth={2.2} aria-hidden />
-        </span>
-        Flowly
+      <Link href={ROUTES.dashboard} className="mb-6 inline-flex items-center px-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/img/logo-light.webp" alt="Flowly" height={32} className="h-8 w-auto block dark:hidden" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/img/logo-dark.webp" alt="Flowly" height={32} className="h-8 w-auto hidden dark:block" />
       </Link>
 
       <nav>

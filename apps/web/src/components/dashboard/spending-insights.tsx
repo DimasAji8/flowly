@@ -18,9 +18,9 @@ interface SpendingInsightsProps {
 }
 
 const GROUP_CONFIG = {
-  needs:   { label: "Needs",   desc: "Kebutuhan pokok", target: 60, targetLabel: "≤60% income" },
-  wants:   { label: "Wants",   desc: "Lifestyle & keinginan", target: 30, targetLabel: "≤30% income" },
-  savings: { label: "Savings", desc: "Tabungan & investasi", target: 20, targetLabel: "≥20% income", isMin: true },
+  needs:   { label: "Kebutuhan",  desc: "Kebutuhan pokok",       target: 60, targetLabel: "≤60% pemasukan" },
+  wants:   { label: "Keinginan", desc: "Lifestyle & keinginan",  target: 30, targetLabel: "≤30% pemasukan" },
+  savings: { label: "Tabungan",  desc: "Tabungan & investasi",   target: 20, targetLabel: "≥20% pemasukan", isMin: true },
 } as const;
 
 function getStatus(pct: number, target: number, isMin = false) {
@@ -35,9 +35,9 @@ function getStatus(pct: number, target: number, isMin = false) {
 }
 
 const STATUS_STYLE = {
-  safe:    { bar: "var(--color-success)", text: "var(--color-success)", label: "Within range" },
-  warning: { bar: "var(--color-warning)", text: "var(--color-warning)", label: "Approaching limit" },
-  over:    { bar: "var(--color-danger)",  text: "var(--color-danger)",  label: "Above recommended" },
+  safe:    { bar: "var(--color-success)", text: "var(--color-success)", label: "Dalam batas" },
+  warning: { bar: "var(--color-warning)", text: "var(--color-warning)", label: "Mendekati batas" },
+  over:    { bar: "var(--color-danger)",  text: "var(--color-danger)",  label: "Melebihi rekomendasi" },
 };
 
 export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsightsProps) {
@@ -60,10 +60,10 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-sm font-medium text-[var(--color-text-primary)]">
-        Spending Insights
+        Analisis Pengeluaran
       </h2>
 
-      <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] divide-y divide-[var(--color-border-subtle)]">
+      <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] divide-y divide-[var(--color-border-subtle)]" style={{ boxShadow: "var(--shadow-card-emphasis)" }}>
         {/* Group rows */}
         {hasGroupData && (Object.entries(GROUP_CONFIG) as [keyof typeof GROUP_CONFIG, typeof GROUP_CONFIG[keyof typeof GROUP_CONFIG]][]).map(([key, cfg]) => {
           const amount = groupTotals[key] ?? 0;
@@ -85,10 +85,14 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
                 </div>
               </div>
               {/* Progress bar */}
-              <div className="h-1.5 w-full rounded-full bg-[var(--color-border-subtle)]">
+              <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)]">
                 <div
-                  className="h-1.5 rounded-full transition-all duration-500"
-                  style={{ width: `${barPct}%`, backgroundColor: style.bar }}
+                  className="h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${barPct}%`,
+                    backgroundColor: style.bar,
+                    boxShadow: `0 0 8px 0 ${style.bar}66`,
+                  }}
                 />
               </div>
               {status !== "safe" && (
@@ -115,7 +119,7 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
       </div>
 
       <p className="text-[11px] text-[var(--color-text-muted)]">
-        Berdasarkan income bulan ini · Kategori tanpa group tidak dihitung dalam target
+        Berdasarkan pemasukan bulan ini · Kategori tanpa grup tidak dihitung dalam target
       </p>
     </section>
   );

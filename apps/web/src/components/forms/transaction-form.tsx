@@ -131,11 +131,12 @@ export function TransactionForm({
         render={({ field }) => (
           <div
             role="radiogroup"
-            aria-label="Transaction type"
+            aria-label="Jenis transaksi"
             className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--color-card-subtle)] p-1"
           >
             {(["expense", "income"] as TransactionType[]).map((t) => {
               const isActive = field.value === t;
+              const label = t === "expense" ? "Pengeluaran" : "Pemasukan";
               return (
                 <button
                   key={t}
@@ -144,13 +145,13 @@ export function TransactionForm({
                   aria-checked={isActive}
                   onClick={() => field.onChange(t)}
                   className={[
-                    "h-9 rounded-lg text-sm font-medium capitalize transition-colors",
+                    "h-9 rounded-lg text-sm font-medium transition-colors",
                     isActive
                       ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]"
                       : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]",
                   ].join(" ")}
                 >
-                  {t}
+                  {label}
                 </button>
               );
             })}
@@ -159,7 +160,7 @@ export function TransactionForm({
       />
 
       <Input
-        label="Amount"
+        label="Jumlah"
         type="number"
         inputMode="decimal"
         step="0.01"
@@ -171,13 +172,13 @@ export function TransactionForm({
       />
 
       <SelectField
-        label="Category"
+        label="Kategori"
         {...register("categoryId")}
         error={errors.categoryId?.message}
         disabled={noCategories}
       >
         {noCategories ? (
-          <option value="">No category yet — create one first</option>
+          <option value="">Belum ada kategori — buat dulu</option>
         ) : (
           filteredCategories.map((c) => (
             <option key={c.id} value={c.id}>
@@ -188,13 +189,13 @@ export function TransactionForm({
       </SelectField>
 
       <SelectField
-        label="Wallet"
+        label="Dompet"
         {...register("walletId")}
         error={errors.walletId?.message}
         disabled={noWallets}
       >
         {noWallets ? (
-          <option value="">No wallet yet — create one first</option>
+          <option value="">Belum ada dompet — buat dulu</option>
         ) : (
           wallets.map((w) => (
             <option key={w.id} value={w.id}>
@@ -205,15 +206,15 @@ export function TransactionForm({
       </SelectField>
 
       <Input
-        label="Date"
+        label="Tanggal"
         type="date"
         {...register("transactionDate")}
         error={errors.transactionDate?.message}
       />
 
       <Input
-        label="Note (optional)"
-        placeholder="e.g. Lunch with team"
+        label="Catatan (opsional)"
+        placeholder="mis. Makan siang bareng tim"
         maxLength={280}
         {...register("note")}
         error={errors.note?.message}

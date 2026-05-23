@@ -73,7 +73,7 @@ export default function WalletsPage() {
       <BackButton />
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
-          Wallets
+          Dompet
         </h1>
       </header>
 
@@ -87,19 +87,19 @@ export default function WalletsPage() {
       <Card padding="md">
         <form onSubmit={handleCreate} className="flex flex-col gap-3">
           <h2 className="text-sm font-medium text-[var(--color-text-primary)]">
-            Add wallet
+            Tambah dompet
           </h2>
           <div className="grid gap-3 md:grid-cols-[1fr_180px_auto]">
             <Input
-              label="Name"
-              placeholder="e.g. BCA"
+              label="Nama"
+              placeholder="mis. BCA"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               maxLength={60}
               required
             />
             <Input
-              label="Initial balance"
+              label="Saldo awal"
               type="number"
               inputMode="decimal"
               step="0.01"
@@ -116,7 +116,7 @@ export default function WalletsPage() {
                 disabled={!newName.trim()}
                 className="w-full md:w-auto md:px-6"
               >
-                Add
+                Tambah
               </Button>
             </div>
           </div>
@@ -130,7 +130,7 @@ export default function WalletsPage() {
         </div>
       ) : wallets.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-secondary)]">
-          Belum ada wallet.
+          Belum ada dompet.
         </div>
       ) : (
         <Card padding="none">

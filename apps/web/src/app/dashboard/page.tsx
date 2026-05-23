@@ -153,12 +153,12 @@ export default function DashboardPage() {
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-foreground">
-              Recent transactions
+              Transaksi terbaru
             </h2>
             {!loading && (
               <div className="flex items-center gap-3">
                 <Link href={ROUTES.transactions} className="text-xs text-muted hover:underline">
-                  See all
+                  Lihat semua
                 </Link>
               </div>
             )}
@@ -170,7 +170,7 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-border-subtle bg-card px-2 py-2">
+            <div className="rounded-2xl border border-border-subtle bg-card px-2 py-2" style={{ boxShadow: "var(--shadow-card-emphasis)" }}>
               <TransactionList
                 items={recent}
                 loading={false}

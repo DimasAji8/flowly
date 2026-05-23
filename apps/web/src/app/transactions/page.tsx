@@ -42,10 +42,10 @@ export default function TransactionsPage() {
     <div className="flex flex-col gap-5 max-w-3xl">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-[var(--color-text-primary)] md:text-2xl">
-          Transactions
+          Transaksi
         </h1>
         <Button size="sm" onClick={() => setAddOpen(true)}>
-          + Add
+          + Tambah
         </Button>
       </header>
 

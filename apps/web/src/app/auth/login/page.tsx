@@ -54,10 +54,10 @@ export default function LoginPage() {
     <section className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
-          Welcome back
+          Selamat datang kembali
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)]">
-          Log in to keep your cashflow journal up to date.
+          Masuk untuk melanjutkan catatan keuanganmu.
         </p>
       </header>
 
@@ -68,13 +68,13 @@ export default function LoginPage() {
           label="Email"
           type="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder="kamu@contoh.com"
           {...register("email")}
           error={errors.email?.message}
         />
 
         <Input
-          label="Password"
+          label="Kata sandi"
           type="password"
           autoComplete="current-password"
           placeholder="••••••••"
@@ -83,17 +83,17 @@ export default function LoginPage() {
         />
 
         <Button type="submit" isLoading={isSubmitting} className="mt-2">
-          Log in
+          Masuk
         </Button>
       </form>
 
       <p className="text-sm text-[var(--color-text-secondary)] text-center">
-        Don&apos;t have an account?{" "}
+        Belum punya akun?{" "}
         <Link
           href={ROUTES.register}
           className="text-[var(--color-accent)] hover:underline"
         >
-          Sign up
+          Daftar
         </Link>
       </p>
     </section>

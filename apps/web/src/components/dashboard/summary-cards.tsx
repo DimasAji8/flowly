@@ -20,28 +20,32 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
           background: isPositive
             ? "linear-gradient(135deg, #1a4731 0%, #15803d 100%)"
             : "linear-gradient(135deg, #4a1515 0%, #b91c1c 100%)",
+          boxShadow: isPositive
+            ? "0 8px 32px -8px rgba(21, 128, 61, 0.45), 0 2px 8px rgba(0,0,0,0.12)"
+            : "0 8px 32px -8px rgba(185, 28, 28, 0.45), 0 2px 8px rgba(0,0,0,0.12)",
         }}
       >
         {/* Decorative circles */}
         <div className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full opacity-10" style={{ background: "white" }} aria-hidden />
         <div className="pointer-events-none absolute -bottom-12 -left-6 size-32 rounded-full opacity-10" style={{ background: "white" }} aria-hidden />
+        <div className="pointer-events-none absolute right-16 bottom-4 size-20 rounded-full opacity-5" style={{ background: "white" }} aria-hidden />
 
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/60">
-          Net Cashflow · {month}
+          Arus Kas · {month}
         </p>
-        <p className="mt-2 text-4xl font-bold tabular-nums tracking-tight text-white">
+        <p className="mt-2 text-4xl font-bold tabular-nums tracking-tight text-white drop-shadow-sm">
           {formatCurrency(net)}
         </p>
 
         {/* Income & Expense inline */}
         <div className="mt-5 flex gap-4 border-t border-white/10 pt-4">
           <div className="flex flex-1 flex-col gap-0.5">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Income</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pemasukan</p>
             <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(income)}</p>
           </div>
           <div className="w-px bg-white/10" aria-hidden />
           <div className="flex flex-1 flex-col gap-0.5">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Expense</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pengeluaran</p>
             <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(expense)}</p>
           </div>
         </div>
@@ -49,10 +53,13 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
 
       {/* Expense ratio bar */}
       {Number(income) > 0 && (
-        <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs text-[var(--color-text-muted)]">Expense ratio</p>
-            <p className="text-xs font-semibold tabular-nums" style={{
+        <div
+          className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] px-4 py-3.5"
+          style={{ boxShadow: "var(--shadow-card)" }}
+        >
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-xs font-medium text-[var(--color-text-secondary)]">Rasio pengeluaran</p>
+            <p className="text-xs font-bold tabular-nums" style={{
               color: Number(expense) / Number(income) > 1
                 ? "var(--color-danger)"
                 : Number(expense) / Number(income) > 0.8
@@ -62,9 +69,9 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
               {Math.round((Number(expense) / Number(income)) * 100)}%
             </p>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-[var(--color-border-subtle)]">
+          <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)]">
             <div
-              className="h-1.5 rounded-full transition-all duration-700"
+              className="h-2 rounded-full transition-all duration-700"
               style={{
                 width: `${Math.min(Math.round((Number(expense) / Number(income)) * 100), 100)}%`,
                 backgroundColor: Number(expense) / Number(income) > 1
@@ -72,6 +79,7 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
                   : Number(expense) / Number(income) > 0.8
                   ? "var(--color-warning)"
                   : "var(--color-success)",
+                boxShadow: `0 0 8px 0 ${Number(expense) / Number(income) > 1 ? "rgba(185,28,28,0.4)" : Number(expense) / Number(income) > 0.8 ? "rgba(180,83,9,0.4)" : "rgba(21,128,61,0.4)"}`,
               }}
             />
           </div>

@@ -48,10 +48,10 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? "Edit transaction" : "New transaction"}
+      title={isEdit ? "Edit transaksi" : "Transaksi baru"}
     >
       <TransactionForm
-        submitLabel={isEdit ? "Save changes" : "Save transaction"}
+        submitLabel={isEdit ? "Simpan perubahan" : "Simpan transaksi"}
         defaultValues={
           transaction
             ? {
@@ -69,9 +69,9 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
           <button
             type="button"
             onClick={onClose}
-            className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            className="text-sm text-secondary hover:text-foreground"
           >
-            Cancel
+            Batal
           </button>
         }
       />

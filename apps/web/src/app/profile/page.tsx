@@ -23,13 +23,13 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col gap-6 max-w-2xl">
       <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
-        Profile
+        Profil
       </h1>
 
       <Card padding="md">
         <div className="flex flex-col gap-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-muted)]">
-            Logged in as
+            Masuk sebagai
           </p>
           <p className="text-base font-medium text-[var(--color-text-primary)]">
             {user?.name}
@@ -42,7 +42,7 @@ export default function ProfilePage() {
 
       <section className="flex flex-col gap-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-muted)]">
-          Appearance
+          Tampilan
         </h2>
         <Card padding="none">
           <div className="flex items-center justify-between px-5 py-4">
@@ -54,9 +54,9 @@ export default function ProfilePage() {
               </span>
               <div className="flex flex-col">
                 <span className="text-sm font-medium text-[var(--color-text-primary)]">
-                  {resolvedTheme === "dark" ? "Dark mode" : "Light mode"}
+                  {resolvedTheme === "dark" ? "Mode gelap" : "Mode terang"}
                 </span>
-                <span className="text-xs text-[var(--color-text-muted)]">Tap to switch</span>
+                <span className="text-xs text-[var(--color-text-muted)]">Ketuk untuk ganti</span>
               </div>
             </div>
             <button
@@ -74,26 +74,26 @@ export default function ProfilePage() {
 
       <section className="flex flex-col gap-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-muted)]">
-          Manage
+          Kelola
         </h2>
         <Card padding="none">
           <ul className="divide-y divide-[var(--color-border-subtle)]">
             <ManageRow
               href={ROUTES.wallets}
               icon={<Wallet className="size-4" aria-hidden />}
-              label="Wallets"
+              label="Dompet"
               description="Kelola sumber uang"
             />
             <ManageRow
               href={ROUTES.categories}
               icon={<Tag className="size-4" aria-hidden />}
-              label="Categories"
-              description="Kelola kategori income & expense"
+              label="Kategori"
+              description="Kelola kategori pemasukan & pengeluaran"
             />
             <ManageRow
               href={ROUTES.recurring}
               icon={<Repeat className="size-4" aria-hidden />}
-              label="Recurring"
+              label="Berulang"
               description="Transaksi berulang otomatis"
             />
           </ul>
@@ -106,7 +106,7 @@ export default function ProfilePage() {
         leftIcon={<LogOut className="size-4" aria-hidden />}
         className="md:self-start md:px-8"
       >
-        Log out
+        Keluar
       </Button>
     </div>
   );
