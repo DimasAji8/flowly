@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { useTheme } from "next-themes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { SpendingInsights } from "@/components/dashboard/spending-insights";
@@ -26,6 +28,7 @@ type CategorySpend = {
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const refreshMe = useAuthStore((s) => s.refreshMe);
+  const { resolvedTheme } = useTheme();
 
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
@@ -119,10 +122,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-8">
       <header className="flex items-center justify-between" suppressHydrationWarning>
         {/* Logo: hanya tampil di mobile */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/logo-dark.webp" alt="Flowly" height={32} className="h-8 w-auto block dark:hidden md:hidden" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/logo-light.webp" alt="Flowly" height={32} className="h-8 w-auto hidden dark:block md:dark:hidden" />
+        <Image src={resolvedTheme === "dark" ? "/img/logo-dark.webp" : "/img/logo-light.webp"} alt="Flowly" width={48} height={48} className="h-12 w-auto md:hidden" />
         {/* Desktop: greeting */}
         <p className="hidden md:block text-xl font-semibold text-foreground" style={{ fontFamily: "var(--font-playfair), serif" }} suppressHydrationWarning>
           {greeting}, {user?.name?.split(" ")[0] ?? "..."}
