@@ -61,6 +61,27 @@ export function isoToday(): string {
   return todayIsoDate();
 }
 
+/**
+ * "2026-05-22" → format relatif dalam Bahasa Indonesia
+ * - Hari ini / Kemarin
+ * - 2–6 hari lalu → "X hari lalu"
+ * - ≥ 7 hari → "22 Mei 2026"
+ */
+export function formatRelativeDate(dateString: string): string {
+  const [y, m, d] = dateString.split("-").map(Number);
+  if (!y || !m || !d) return dateString;
+
+  const now = new Date();
+  const target = new Date(y, m - 1, d);
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((todayMidnight.getTime() - target.getTime()) / 86_400_000);
+
+  if (diffDays === 0) return "Hari ini";
+  if (diffDays === 1) return "Kemarin";
+  if (diffDays >= 2 && diffDays <= 6) return `${diffDays} hari lalu`;
+  return `${d} ${MONTHS_ID[m - 1]} ${y}`;
+}
+
 /** Range bulan ini sebagai YYYY-MM-DD. */
 export function currentMonthRange(): { from: string; to: string } {
   const now = new Date();

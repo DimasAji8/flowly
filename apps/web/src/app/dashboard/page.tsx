@@ -124,7 +124,7 @@ export default function DashboardPage() {
         {/* Logo: hanya tampil di mobile */}
         <Image src={resolvedTheme === "dark" ? "/img/logo-dark.webp" : "/img/logo-light.webp"} alt="Flowly" width={48} height={48} className="h-12 w-auto md:hidden" />
         {/* Desktop: greeting */}
-        <p className="hidden md:block text-xl font-semibold text-foreground" style={{ fontFamily: "var(--font-playfair), serif" }} suppressHydrationWarning>
+        <p className="hidden md:block text-xl font-medium text-foreground" suppressHydrationWarning>
           {greeting}, {user?.name?.split(" ")[0] ?? "..."}
         </p>
         <div className="flex items-center gap-2.5">

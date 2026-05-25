@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { DeleteTransactionModal } from "@/components/transaction/delete-transaction-modal";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
 import type { Transaction } from "@/types/finance";
+import { ROUTES } from "@/constants/routes";
 
 const MONTH_NAMES = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -79,6 +81,12 @@ export default function TransactionsPage() {
 
   return (
     <div className="flex flex-col gap-5 max-w-3xl">
+      {/* Mobile: back button */}
+      <Link href={ROUTES.dashboard} className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors w-fit md:hidden">
+        <ArrowLeft className="size-4" />
+        Kembali
+      </Link>
+
       <h1 className="text-xl font-semibold text-[var(--color-text-primary)] md:text-2xl">
           Transaksi
         </h1>

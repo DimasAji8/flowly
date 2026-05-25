@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Transaction } from "@/types/finance";
 import { formatAmount } from "@/utils/format-currency";
-import { formatDateShort, formatDateLong } from "@/utils/format-date";
+import { formatDateLong, formatRelativeDate } from "@/utils/format-date";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ROUTES } from "@/constants/routes";
@@ -43,12 +43,12 @@ function TransactionItem({ tx, onItemClick, showDate = false }: {
         </span>
         <span className="text-xs text-[var(--color-text-muted)]">
           {tx.note?.trim() ? `${tx.category.name} · ` : ""}
-          {showDate ? `${formatDateShort(tx.transactionDate)} · ` : ""}
+          {showDate ? `${formatRelativeDate(tx.transactionDate)} · ` : ""}
           {tx.wallet.name}
         </span>
       </div>
 
-      <span className="shrink-0 text-sm font-semibold tabular-nums" style={{ color: amountColor }}>
+      <span className="shrink-0 text-xs md:text-sm font-semibold tabular-nums" style={{ color: amountColor }}>
         {sign} Rp {formatAmount(tx.amount)}
       </span>
     </div>
