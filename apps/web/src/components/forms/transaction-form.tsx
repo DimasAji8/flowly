@@ -3,9 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDown, Check, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ApiError } from "@/lib/api-client";
 import {
   createTransactionSchema,
@@ -14,16 +23,23 @@ import {
 import { categoriesService } from "@/services/categories.service";
 import { walletsService } from "@/services/wallets.service";
 import type { Category, TransactionType, Wallet } from "@/types/finance";
-import { todayIsoDate } from "@/utils/format-date";
+import { todayIsoDate, formatDateLong } from "@/utils/format-date";
 
 export interface TransactionFormProps {
-  /** Default values untuk edit mode */
   defaultValues?: Partial<CreateTransactionFormValues>;
-  /** Submit handler. Throw ApiError → ditampilkan di banner */
   onSubmit: (values: CreateTransactionFormValues) => Promise<void>;
-  /** Action di kanan tombol submit (mis. Cancel) */
   secondaryAction?: React.ReactNode;
   submitLabel?: string;
+  hideTypeToggle?: boolean;
+}
+
+function formatRupiah(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function parseRupiah(formatted: string): number {
+  return Number(formatted.replace(/\./g, "")) || 0;
 }
 
 export function TransactionForm({
@@ -31,11 +47,15 @@ export function TransactionForm({
   onSubmit,
   secondaryAction,
   submitLabel = "Save",
+  hideTypeToggle = false,
 }: TransactionFormProps) {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [amountDisplay, setAmountDisplay] = useState(
+    defaultValues?.amount ? formatRupiah(String(defaultValues.amount)) : ""
+  );
 
   const {
     control,
@@ -48,7 +68,7 @@ export function TransactionForm({
     resolver: zodResolver(createTransactionSchema),
     defaultValues: {
       type: "expense",
-      amount: 0,
+      amount: defaultValues?.amount ?? 0,
       categoryId: "",
       walletId: "",
       note: "",
@@ -67,8 +87,6 @@ export function TransactionForm({
         if (cancelled) return;
         setWallets(w);
         setCategories(c);
-
-        // Auto-pick default kalau belum ada (mode create)
         if (!isEditing) {
           if (w[0]) setValue("walletId", w[0].id);
           const defaultCat = c.find((cat) => cat.type === "expense");
@@ -77,21 +95,16 @@ export function TransactionForm({
       })
       .catch((e: unknown) => {
         if (cancelled) return;
-        setBootstrapError(
-          e instanceof ApiError ? e.message : "Failed to load form data",
-        );
+        setBootstrapError(e instanceof ApiError ? e.message : "Failed to load form data");
       });
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [setValue, isEditing]);
 
-  // Saat type berubah, auto-pilih kategori pertama dengan type itu (kecuali sudah valid)
   useEffect(() => {
     if (categories.length === 0) return;
     const currentCatId = watch("categoryId");
     const currentCat = categories.find((c) => c.id === currentCatId);
-    if (currentCat && currentCat.type === selectedType) return; // ok
+    if (currentCat && currentCat.type === selectedType) return;
     const next = categories.find((c) => c.type === selectedType);
     if (next) setValue("categoryId", next.id);
   }, [selectedType, categories, setValue, watch]);
@@ -105,128 +118,178 @@ export function TransactionForm({
     setSubmitError(null);
     try {
       const noteTrimmed = values.note?.trim() ?? "";
-      await onSubmit({
-        ...values,
-        note: noteTrimmed || undefined,
-      });
+      await onSubmit({ ...values, note: noteTrimmed || undefined });
     } catch (e) {
-      setSubmitError(
-        e instanceof ApiError ? e.message : "Failed to save transaction",
-      );
+      setSubmitError(e instanceof ApiError ? e.message : "Failed to save transaction");
     }
   };
 
   const noWallets = wallets.length === 0;
   const noCategories = filteredCategories.length === 0;
 
+  const categoryId = watch("categoryId");
+  const walletId = watch("walletId");
+  const [dateOpen, setDateOpen] = useState(false);
+
+  const selectedCategory = filteredCategories.find((c) => c.id === categoryId);
+  const selectedWallet = wallets.find((w) => w.id === walletId);
+
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
       {bootstrapError && <FormError message={bootstrapError} />}
       <FormError message={submitError} />
 
-      {/* Type toggle */}
+      {!hideTypeToggle && (
+        <Controller
+          name="type"
+          control={control}
+          render={({ field }) => (
+            <div role="radiogroup" aria-label="Jenis transaksi" className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--color-card-subtle)] p-1">
+              {(["expense", "income"] as TransactionType[]).map((t) => {
+                const isActive = field.value === t;
+                return (
+                  <button key={t} type="button" role="radio" aria-checked={isActive} onClick={() => field.onChange(t)}
+                    className={["h-9 rounded-lg text-sm font-medium transition-colors", isActive ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"].join(" ")}
+                  >
+                    {t === "expense" ? "Pengeluaran" : "Pemasukan"}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        />
+      )}
+
       <Controller
-        name="type"
+        name="amount"
         control={control}
         render={({ field }) => (
-          <div
-            role="radiogroup"
-            aria-label="Jenis transaksi"
-            className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--color-card-subtle)] p-1"
-          >
-            {(["expense", "income"] as TransactionType[]).map((t) => {
-              const isActive = field.value === t;
-              const label = t === "expense" ? "Pengeluaran" : "Pemasukan";
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  role="radio"
-                  aria-checked={isActive}
-                  onClick={() => field.onChange(t)}
-                  className={[
-                    "h-9 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]"
-                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]",
-                  ].join(" ")}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          <Input
+            label="Jumlah"
+            inputMode="numeric"
+            placeholder="0"
+            leftAdornment={<span className="font-medium">Rp</span>}
+            value={amountDisplay}
+            onChange={(e) => {
+              const formatted = formatRupiah(e.target.value);
+              setAmountDisplay(formatted);
+              field.onChange(parseRupiah(formatted));
+            }}
+            error={errors.amount?.message}
+          />
         )}
       />
 
-      <Input
-        label="Jumlah"
-        type="number"
-        inputMode="decimal"
-        step="0.01"
-        min={0}
-        placeholder="0"
-        leftAdornment={<span className="font-medium">Rp</span>}
-        {...register("amount", { valueAsNumber: true })}
-        error={errors.amount?.message}
-      />
+      {/* Kategori */}
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">Kategori</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              disabled={noCategories}
+              className={[
+                "flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors",
+                "bg-[var(--color-card-subtle)] text-[var(--color-text-primary)]",
+                errors.categoryId ? "border-[var(--color-danger)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-accent)]",
+                "disabled:opacity-50",
+              ].join(" ")}
+            >
+              <span>{noCategories ? "Belum ada kategori" : (selectedCategory?.name ?? "Pilih kategori")}</span>
+              <ChevronDown className="size-4 text-[var(--color-text-muted)]" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]" align="start">
+            {filteredCategories.map((c) => (
+              <DropdownMenuItem key={c.id} onSelect={() => setValue("categoryId", c.id)} className="flex items-center justify-between">
+                <span>{c.name}</span>
+                {c.id === categoryId && <Check className="size-4 text-[var(--color-accent)]" />}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {errors.categoryId && <p className="text-xs text-[var(--color-danger)]">{errors.categoryId.message}</p>}
+      </div>
 
-      <SelectField
-        label="Kategori"
-        {...register("categoryId")}
-        error={errors.categoryId?.message}
-        disabled={noCategories}
-      >
-        {noCategories ? (
-          <option value="">Belum ada kategori — buat dulu</option>
-        ) : (
-          filteredCategories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))
-        )}
-      </SelectField>
+      {/* Dompet */}
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">Dompet</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              disabled={noWallets}
+              className={[
+                "flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors",
+                "bg-[var(--color-card-subtle)] text-[var(--color-text-primary)]",
+                errors.walletId ? "border-[var(--color-danger)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-accent)]",
+                "disabled:opacity-50",
+              ].join(" ")}
+            >
+              <span>{noWallets ? "Belum ada dompet" : (selectedWallet?.name ?? "Pilih dompet")}</span>
+              <ChevronDown className="size-4 text-[var(--color-text-muted)]" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]" align="start">
+            {wallets.map((w) => (
+              <DropdownMenuItem key={w.id} onSelect={() => setValue("walletId", w.id)} className="flex items-center justify-between">
+                <span>{w.name}</span>
+                {w.id === walletId && <Check className="size-4 text-[var(--color-accent)]" />}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {errors.walletId && <p className="text-xs text-[var(--color-danger)]">{errors.walletId.message}</p>}
+      </div>
 
-      <SelectField
-        label="Dompet"
-        {...register("walletId")}
-        error={errors.walletId?.message}
-        disabled={noWallets}
-      >
-        {noWallets ? (
-          <option value="">Belum ada dompet — buat dulu</option>
-        ) : (
-          wallets.map((w) => (
-            <option key={w.id} value={w.id}>
-              {w.name}
-            </option>
-          ))
-        )}
-      </SelectField>
+      {/* Tanggal — Popover + Calendar */}
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">Tanggal</span>
+        <Controller
+          name="transactionDate"
+          control={control}
+          render={({ field }) => {
+            const dateValue = field.value ? new Date(field.value + "T00:00:00") : undefined;
+            return (
+              <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={[
+                      "flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors text-left",
+                      "bg-[var(--color-card-subtle)] text-[var(--color-text-primary)]",
+                      errors.transactionDate ? "border-[var(--color-danger)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-accent)]",
+                    ].join(" ")}
+                  >
+                    <span>{field.value ? formatDateLong(field.value) : "Pilih tanggal"}</span>
+                    <CalendarIcon className="size-4 text-[var(--color-text-muted)]" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateValue}
+                    onSelect={(date) => {
+                      if (!date) return;
+                      const y = date.getFullYear();
+                      const m = String(date.getMonth() + 1).padStart(2, "0");
+                      const d = String(date.getDate()).padStart(2, "0");
+                      field.onChange(`${y}-${m}-${d}`);
+                      setDateOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            );
+          }}
+        />
+        {errors.transactionDate && <p className="text-xs text-[var(--color-danger)]">{errors.transactionDate.message}</p>}
+      </div>
 
-      <Input
-        label="Tanggal"
-        type="date"
-        {...register("transactionDate")}
-        error={errors.transactionDate?.message}
-      />
-
-      <Input
-        label="Catatan (opsional)"
-        placeholder="mis. Makan siang bareng tim"
-        maxLength={280}
-        {...register("note")}
-        error={errors.note?.message}
-      />
+      <Input label="Catatan (opsional)" placeholder="mis. Makan siang bareng tim" maxLength={280} {...register("note")} error={errors.note?.message} />
 
       <div className="mt-2 flex items-center gap-3">
-        <Button
-          type="submit"
-          isLoading={isSubmitting}
-          className="flex-1 md:flex-none md:px-8"
-          disabled={noWallets || noCategories}
-        >
+        <Button type="submit" isLoading={isSubmitting} className="flex-1 md:flex-none md:px-8" disabled={noWallets || noCategories}>
           {submitLabel}
         </Button>
         {secondaryAction}
@@ -234,53 +297,3 @@ export function TransactionForm({
     </form>
   );
 }
-
-// =====================================================
-// Inline select — mengikuti style Input
-// =====================================================
-
-type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
-  label: string;
-  error?: string;
-};
-
-const SelectField = (() => {
-  const C = ({ label, error, children, id, ...rest }: SelectProps) => {
-    const fieldId = id ?? rest.name;
-    return (
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor={fieldId}
-          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]"
-        >
-          {label}
-        </label>
-        <div
-          className={[
-            "flex items-center px-3",
-            "bg-[var(--color-card-subtle)] rounded-lg",
-            "border outline-none transition-colors",
-            "focus-within:bg-[var(--color-card)]",
-            error
-              ? "border-[var(--color-danger)] focus-within:border-[var(--color-danger)]"
-              : "border-[var(--color-border-subtle)] focus-within:border-[var(--color-accent)] focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
-          ].join(" ")}
-        >
-          <select
-            id={fieldId}
-            aria-invalid={Boolean(error) || undefined}
-            className="h-11 flex-1 appearance-none bg-transparent text-sm text-[var(--color-text-primary)] outline-none disabled:opacity-50"
-            {...rest}
-          >
-            {children}
-          </select>
-        </div>
-        {error && (
-          <p className="text-xs text-[var(--color-danger)]">{error}</p>
-        )}
-      </div>
-    );
-  };
-  C.displayName = "SelectField";
-  return C;
-})();

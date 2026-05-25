@@ -119,7 +119,7 @@ export default function DashboardPage() {
   const avatarSrc = user?.gender === "m" ? "/svg/m.svg" : user?.gender === "f" ? "/svg/f.svg" : null;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 flowly-enter">
       <header className="flex items-center justify-between" suppressHydrationWarning>
         {/* Logo: hanya tampil di mobile */}
         <Image src={resolvedTheme === "dark" ? "/img/logo-dark.webp" : "/img/logo-light.webp"} alt="Flowly" width={48} height={48} className="h-12 w-auto md:hidden" />

@@ -80,7 +80,7 @@ export default function TransactionsPage() {
   const isCurrentMonth = mounted && year === new Date().getFullYear() && month === new Date().getMonth() + 1;
 
   return (
-    <div className="flex flex-col gap-5 max-w-3xl">
+    <div className="flex flex-col gap-5 max-w-3xl flowly-enter">
       {/* Mobile: back button */}
       <Link href={ROUTES.dashboard} className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors w-fit md:hidden">
         <ArrowLeft className="size-4" />
