@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useRequireAuth } from "@/hooks/use-auth";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { SideNav } from "@/components/layout/side-nav";
+import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { ROUTES } from "@/constants/routes";
 
 // Halaman root — tidak perlu back button
@@ -35,6 +37,7 @@ function DesktopHeader() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const auth = useRequireAuth();
+  const [addOpen, setAddOpen] = useState(false);
 
   if (auth.status !== "authenticated") {
     return (
@@ -58,6 +61,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
         <BottomNav />
       </div>
+
+      {/* Desktop FAB — kanan bawah seperti Threads */}
+      <button
+        type="button"
+        onClick={() => setAddOpen(true)}
+        aria-label="Tambah transaksi"
+        className="fixed bottom-8 right-24 hidden md:flex size-20 items-center justify-center rounded-xl bg-[var(--color-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-transform hover:scale-105 hover:text-[var(--color-accent)] active:scale-95 z-40"
+        style={{ boxShadow: "var(--shadow-card-emphasis)" }}
+      >
+        <Plus className="size-8" strokeWidth={2} aria-hidden />
+      </button>
+
+      <TransactionModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onSuccess={() => window.dispatchEvent(new CustomEvent("flowly:transaction-added"))}
+      />
     </div>
   );
 }
