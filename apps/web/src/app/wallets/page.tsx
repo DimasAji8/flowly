@@ -48,7 +48,6 @@ export default function WalletsPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     reload();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreateWallet = async (e: React.FormEvent) => {
@@ -151,6 +150,7 @@ export default function WalletsPage() {
       </Modal>
 
       <TransferModal
+        key={`${transferOpen}-${transferFromId ?? ""}`}
         open={transferOpen}
         onClose={() => { setTransferOpen(false); setTransferFromId(undefined); }}
         onSuccess={reload}

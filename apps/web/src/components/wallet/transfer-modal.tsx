@@ -69,7 +69,7 @@ function WalletDropdown({
           <ChevronDown className="size-4 text-muted" />
         </button>
         {open && (
-          <div className="absolute left-0 top-12 z-60 w-full overflow-hidden rounded-xl border border-border-subtle bg-card shadow-[var(--shadow-modal)]">
+          <div className="absolute left-0 top-12 z-60 w-full overflow-hidden rounded-xl border border-border-subtle bg-card shadow-(--shadow-modal)">
             {options.map((w) => (
               <button
                 key={w.id}
@@ -88,42 +88,33 @@ function WalletDropdown({
 }
 
 export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId }: TransferModalProps) {
-  const [fromId, setFromId] = useState("");
-  const [toId, setToId] = useState("");
-  const [amountDisplay, setAmountDisplay] = useState("");
-  const [amountValue, setAmountValue] = useState(0);
-  const [note, setNote] = useState("");
+  const [form, setForm] = useState({
+    fromId: defaultFromId ?? "",
+    toId: "",
+    amountDisplay: "",
+    amountValue: 0,
+    note: "",
+  });
   const [loading, setLoading] = useState(false);
 
-  // Reset state setiap kali modal dibuka
-  useEffect(() => {
-    if (open) {
-      setFromId(defaultFromId ?? "");
-      setToId("");
-      setAmountDisplay("");
-      setAmountValue(0);
-      setNote("");
-    }
-  }, [open, defaultFromId]);
-
   const handleClose = () => {
-    setFromId(""); setToId(""); setAmountDisplay(""); setAmountValue(0); setNote("");
+    setForm({ fromId: defaultFromId ?? "", toId: "", amountDisplay: "", amountValue: 0, note: "" });
     onClose();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fromId || !toId) {
+    if (!form.fromId || !form.toId) {
       toast.error("Pilih dompet asal dan tujuan");
       return;
     }
     try {
       setLoading(true);
       await transfersService.create({
-        fromWalletId: fromId,
-        toWalletId: toId,
-        amount: amountValue,
-        note: note || undefined,
+        fromWalletId: form.fromId,
+        toWalletId: form.toId,
+        amount: form.amountValue,
+        note: form.note || undefined,
         transferDate: isoToday(),
       });
       toast.success("Transfer berhasil");
@@ -136,21 +127,21 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
     }
   };
 
-  const fromOptions = wallets.filter((w) => w.id !== toId);
-  const toOptions = wallets.filter((w) => w.id !== fromId);
+  const fromOptions = wallets.filter((w) => w.id !== form.toId);
+  const toOptions = wallets.filter((w) => w.id !== form.fromId);
 
   return (
     <Modal open={open} onClose={handleClose} title="Transfer antar dompet">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex items-end gap-2">
           <div className="flex-1">
-            <WalletDropdown label="Dari" options={fromOptions} value={fromId} onChange={setFromId} />
+            <WalletDropdown label="Dari" options={fromOptions} value={form.fromId} onChange={(id) => setForm((f) => ({ ...f, fromId: id }))} />
           </div>
           <div className="mb-1.5 shrink-0 text-muted">
             <ArrowRight className="size-4" aria-hidden />
           </div>
           <div className="flex-1">
-            <WalletDropdown label="Ke" options={toOptions} value={toId} onChange={setToId} />
+            <WalletDropdown label="Ke" options={toOptions} value={form.toId} onChange={(id) => setForm((f) => ({ ...f, toId: id }))} />
           </div>
         </div>
 
@@ -159,11 +150,10 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
           inputMode="numeric"
           placeholder="0"
           leftAdornment={<span className="font-medium">Rp</span>}
-          value={amountDisplay}
+          value={form.amountDisplay}
           onChange={(e) => {
             const formatted = formatRupiah(e.target.value);
-            setAmountDisplay(formatted);
-            setAmountValue(parseRupiah(formatted));
+            setForm((f) => ({ ...f, amountDisplay: formatted, amountValue: parseRupiah(formatted) }));
           }}
           required
         />
@@ -171,15 +161,15 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
         <Input
           label="Catatan (opsional)"
           placeholder="mis. Top up GoPay"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
+          value={form.note}
+          onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
         />
 
         <div className="flex items-center justify-between pt-1">
           <button type="button" onClick={handleClose} className="text-sm text-muted hover:text-foreground">
             Batal
           </button>
-          <Button type="submit" isLoading={loading} disabled={!fromId || !toId || amountValue <= 0}>
+          <Button type="submit" isLoading={loading} disabled={!form.fromId || !form.toId || form.amountValue <= 0}>
             Transfer
           </Button>
         </div>
