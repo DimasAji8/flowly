@@ -1,20 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { ArrowRight, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 interface ActionMenuProps {
   onEdit?: () => void;
   onDelete?: () => void;
+  onTransfer?: () => void;
   editLabel?: string;
   deleteLabel?: string;
+  transferLabel?: string;
 }
 
 export function ActionMenu({
   onEdit,
   onDelete,
+  onTransfer,
   editLabel = "Edit",
   deleteLabel = "Hapus",
+  transferLabel = "Transfer",
 }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -42,6 +46,16 @@ export function ActionMenu({
 
       {open && (
         <div className="absolute right-0 top-9 z-50 min-w-[140px] overflow-hidden rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] shadow-[var(--shadow-modal)]">
+          {onTransfer && (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); onTransfer(); }}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-card-subtle)]"
+            >
+              <ArrowRight className="size-3.5 text-[var(--color-text-muted)]" aria-hidden />
+              {transferLabel}
+            </button>
+          )}
           {onEdit && (
             <button
               type="button"

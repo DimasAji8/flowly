@@ -12,6 +12,8 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
 import { RecurringModule } from './modules/recurring/recurring.module';
 import { JobsModule } from './jobs/jobs.module';
 
+import { TransfersModule } from './modules/transfers/transfers.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -24,6 +26,7 @@ import { JobsModule } from './jobs/jobs.module';
     TransactionsModule,
     RecurringModule,
     JobsModule,
+    TransfersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

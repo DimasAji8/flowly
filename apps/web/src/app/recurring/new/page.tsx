@@ -15,12 +15,12 @@ export default function NewRecurringPage() {
       <BackButton />
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
-          New recurring
+          Recurring baru
         </h1>
       </header>
 
       <RecurringForm
-        submitLabel="Save"
+        submitLabel="Simpan"
         onSubmit={async (values) => {
           await recurringService.create({
             type: values.type,

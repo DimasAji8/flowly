@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { ActionMenu } from "@/components/ui/action-menu";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { recurringService } from "@/services/recurring.service";
@@ -14,9 +15,9 @@ import type { RecurringTransaction } from "@/types/finance";
 import { formatAmount } from "@/utils/format-currency";
 
 const FREQ_LABEL: Record<RecurringTransaction["frequency"], string> = {
-  daily: "Daily",
-  weekly: "Weekly",
-  monthly: "Monthly",
+  daily: "Harian",
+  weekly: "Mingguan",
+  monthly: "Bulanan",
 };
 
 export default function RecurringListPage() {
@@ -49,10 +50,12 @@ export default function RecurringListPage() {
     }
   };
 
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
   const handleDelete = async (id: string) => {
-    if (!confirm("Hapus recurring ini?")) return;
     try {
       await recurringService.remove(id);
+      setConfirmId(null);
       await reload();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to delete");
@@ -70,7 +73,7 @@ export default function RecurringListPage() {
           asChildHref={`${ROUTES.recurring}/new`}
           leftIcon={<Plus className="size-4" aria-hidden />}
         >
-          Add
+          Tambah
         </Button>
       </header>
 
@@ -82,7 +85,7 @@ export default function RecurringListPage() {
 
       {loading ? (
         <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
-          Loading…
+          Memuat…
         </div>
       ) : items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-secondary)]">
@@ -116,7 +119,7 @@ export default function RecurringListPage() {
                       </Chip>
                     </div>
                     <span className="text-xs text-[var(--color-text-muted)]">
-                      Next run: {date}
+                      Jadwal berikutnya: {date}
                     </span>
                   </div>
 
@@ -132,14 +135,14 @@ export default function RecurringListPage() {
                     onClick={() => toggleActive(r)}
                     className={["h-6 w-11 shrink-0 rounded-full transition-colors", r.isActive ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"].join(" ")}
                     aria-pressed={r.isActive}
-                    aria-label={r.isActive ? "Pause" : "Activate"}
+                    aria-label={r.isActive ? "Jeda" : "Aktifkan"}
                   >
                     <span className={["block size-5 rounded-full bg-white shadow transition-transform", r.isActive ? "translate-x-5" : "translate-x-0.5"].join(" ")} />
                   </button>
 
                   <ActionMenu
                     onEdit={() => router.push(`${ROUTES.recurring}/${r.id}/edit`)}
-                    onDelete={() => handleDelete(r.id)}
+                    onDelete={() => setConfirmId(r.id)}
                   />
                 </li>
               );
@@ -147,6 +150,13 @@ export default function RecurringListPage() {
           </ul>
         </Card>
       )}
+
+      <ConfirmModal
+        open={Boolean(confirmId)}
+        onClose={() => setConfirmId(null)}
+        onConfirm={() => confirmId && handleDelete(confirmId)}
+        title="Hapus recurring ini?"
+      />
     </div>
   );
 }

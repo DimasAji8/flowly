@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { TransactionForm } from "@/components/forms/transaction-form";
 import { FormError } from "@/components/ui/form-error";
 import { BackButton } from "@/components/ui/back-button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
@@ -47,11 +48,10 @@ export default function EditTransactionPage() {
     };
   }, [id]);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const handleDelete = async () => {
     if (!id) return;
-    if (!confirm("Hapus transaksi ini? Tindakan ini tidak bisa di-undo.")) {
-      return;
-    }
     try {
       setDeleting(true);
       await transactionsService.remove(id);
@@ -69,20 +69,20 @@ export default function EditTransactionPage() {
       <BackButton />
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
-          Edit transaction
+          Edit transaksi
         </h1>
       </header>
 
       {loading ? (
         <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
-          Loading…
+          Memuat…
         </div>
       ) : error && !tx ? (
         <FormError message={error} />
       ) : tx ? (
         <>
           <TransactionForm
-            submitLabel="Save changes"
+            submitLabel="Simpan perubahan"
             defaultValues={{
               type: tx.type,
               amount: Number(tx.amount),
@@ -107,14 +107,22 @@ export default function EditTransactionPage() {
           <div className="mt-6 border-t border-[var(--color-border-subtle)] pt-6">
             <Button
               variant="danger"
-              onClick={handleDelete}
+              onClick={() => setConfirmOpen(true)}
               isLoading={deleting}
               leftIcon={<Trash2 className="size-4" aria-hidden />}
               className="w-full md:w-auto md:px-8"
             >
-              Delete transaction
+              Hapus transaksi
             </Button>
           </div>
+
+          <ConfirmModal
+            open={confirmOpen}
+            onClose={() => setConfirmOpen(false)}
+            onConfirm={handleDelete}
+            title="Hapus transaksi ini?"
+            description="Tindakan ini tidak bisa di-undo."
+          />
         </>
       ) : null}
     </div>

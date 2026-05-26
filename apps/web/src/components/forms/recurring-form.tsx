@@ -42,7 +42,7 @@ export function RecurringForm({
   defaultValues,
   onSubmit,
   secondaryAction,
-  submitLabel = "Save",
+  submitLabel = "Simpan",
 }: RecurringFormProps) {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -138,7 +138,7 @@ export function RecurringForm({
         render={({ field }) => (
           <div
             role="radiogroup"
-            aria-label="Type"
+            aria-label="Jenis transaksi"
             className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--color-card-subtle)] p-1"
           >
             {(["expense", "income"] as TransactionType[]).map((t) => {
@@ -157,7 +157,7 @@ export function RecurringForm({
                       : "text-[var(--color-text-secondary)]",
                   ].join(" ")}
                 >
-                  {t}
+                  {t === "expense" ? "Pengeluaran" : "Pemasukan"}
                 </button>
               );
             })}
@@ -166,7 +166,7 @@ export function RecurringForm({
       />
 
       <Input
-        label="Amount"
+        label="Jumlah"
         type="number"
         step="0.01"
         min={0}
@@ -177,13 +177,13 @@ export function RecurringForm({
       />
 
       <SelectField
-        label="Category"
+        label="Kategori"
         {...register("categoryId")}
         error={errors.categoryId?.message}
         disabled={noCategories}
       >
         {noCategories ? (
-          <option value="">No category yet</option>
+          <option value="">Belum ada kategori</option>
         ) : (
           filteredCategories.map((c) => (
             <option key={c.id} value={c.id}>
@@ -194,13 +194,13 @@ export function RecurringForm({
       </SelectField>
 
       <SelectField
-        label="Wallet"
+        label="Dompet"
         {...register("walletId")}
         error={errors.walletId?.message}
         disabled={noWallets}
       >
         {noWallets ? (
-          <option value="">No wallet yet</option>
+          <option value="">Belum ada dompet</option>
         ) : (
           wallets.map((w) => (
             <option key={w.id} value={w.id}>
@@ -211,27 +211,25 @@ export function RecurringForm({
       </SelectField>
 
       <SelectField
-        label="Frequency"
+        label="Frekuensi"
         {...register("frequency")}
         error={errors.frequency?.message}
       >
-        {(["daily", "weekly", "monthly"] as RecurringFrequency[]).map((f) => (
-          <option key={f} value={f}>
-            {f}
-          </option>
-        ))}
+        <option value="daily">Harian</option>
+        <option value="weekly">Mingguan</option>
+        <option value="monthly">Bulanan</option>
       </SelectField>
 
       <Input
-        label="Next run date"
+        label="Tanggal mulai"
         type="date"
         {...register("nextRunAt")}
         error={errors.nextRunAt?.message}
       />
 
       <Input
-        label="Note (optional)"
-        placeholder="e.g. Spotify subscription"
+        label="Catatan (opsional)"
+        placeholder="mis. Langganan Spotify"
         maxLength={280}
         {...register("note")}
         error={errors.note?.message}

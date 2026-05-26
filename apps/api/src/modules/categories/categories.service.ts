@@ -26,7 +26,7 @@ export class CategoriesService {
     const cat = await this.prisma.category.findFirst({
       where: { id, workspaceId },
     });
-    if (!cat) throw new NotFoundException('Category not found');
+    if (!cat) throw new NotFoundException('Kategori tidak ditemukan');
     return cat;
   }
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { RecurringForm } from "@/components/forms/recurring-form";
 import { FormError } from "@/components/ui/form-error";
 import { BackButton } from "@/components/ui/back-button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { recurringService } from "@/services/recurring.service";
@@ -45,9 +46,10 @@ export default function EditRecurringPage() {
     };
   }, [id]);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const handleDelete = async () => {
     if (!id) return;
-    if (!confirm("Hapus recurring ini?")) return;
     try {
       setDeleting(true);
       await recurringService.remove(id);
@@ -69,14 +71,14 @@ export default function EditRecurringPage() {
 
       {loading ? (
         <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
-          Loading…
+          Memuat…
         </div>
       ) : error && !item ? (
         <FormError message={error} />
       ) : item ? (
         <>
           <RecurringForm
-            submitLabel="Save changes"
+            submitLabel="Simpan perubahan"
             defaultValues={{
               type: item.type,
               amount: Number(item.amount),
@@ -105,14 +107,20 @@ export default function EditRecurringPage() {
           <div className="mt-6 border-t border-[var(--color-border-subtle)] pt-6">
             <Button
               variant="danger"
-              onClick={handleDelete}
+              onClick={() => setConfirmOpen(true)}
               isLoading={deleting}
               leftIcon={<Trash2 className="size-4" aria-hidden />}
               className="w-full md:w-auto md:px-8"
             >
-              Delete recurring
-            </Button>
-          </div>
+              Hapus recurring
+            </Button>          </div>
+
+          <ConfirmModal
+            open={confirmOpen}
+            onClose={() => setConfirmOpen(false)}
+            onConfirm={handleDelete}
+            title="Hapus recurring ini?"
+          />
         </>
       ) : null}
     </div>

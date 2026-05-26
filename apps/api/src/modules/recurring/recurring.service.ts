@@ -32,7 +32,7 @@ export class RecurringService {
     const r = await this.prisma.recurringTransaction.findFirst({
       where: { id, workspaceId },
     });
-    if (!r) throw new NotFoundException('Recurring not found');
+    if (!r) throw new NotFoundException('Recurring tidak ditemukan');
     return serializeRecurring(r);
   }
 
@@ -59,7 +59,7 @@ export class RecurringService {
     const existing = await this.prisma.recurringTransaction.findFirst({
       where: { id, workspaceId },
     });
-    if (!existing) throw new NotFoundException('Recurring not found');
+    if (!existing) throw new NotFoundException('Recurring tidak ditemukan');
 
     if (dto.categoryId || dto.walletId || dto.type) {
       await this.assertRefs(workspaceId, {
@@ -95,7 +95,7 @@ export class RecurringService {
     const existing = await this.prisma.recurringTransaction.findFirst({
       where: { id, workspaceId },
     });
-    if (!existing) throw new NotFoundException('Recurring not found');
+    if (!existing) throw new NotFoundException('Recurring tidak ditemukan');
     await this.prisma.recurringTransaction.delete({ where: { id } });
   }
 
@@ -222,14 +222,14 @@ export class RecurringService {
       }),
     ]);
     if (!category) {
-      throw new BadRequestException('Category not found in this workspace');
+      throw new BadRequestException('Kategori tidak ditemukan');
     }
     if (!wallet) {
-      throw new BadRequestException('Wallet not found in this workspace');
+      throw new BadRequestException('Dompet tidak ditemukan');
     }
     if (category.type !== payload.type) {
       throw new BadRequestException(
-        `Category type (${category.type}) does not match recurring type (${payload.type})`,
+        'Jenis kategori tidak sesuai dengan jenis recurring',
       );
     }
   }

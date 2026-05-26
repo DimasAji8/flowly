@@ -8,6 +8,7 @@ export const ROUTES = {
   calendar: "/calendar",
   profile: "/profile",
   wallets: "/wallets",
+  walletTransfers: "/wallets/transfers",
   categories: "/categories",
   recurring: "/recurring",
 } as const;

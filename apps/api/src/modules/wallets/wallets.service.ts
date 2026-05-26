@@ -25,7 +25,7 @@ export class WalletsService {
     const wallet = await this.prisma.wallet.findFirst({
       where: { id, workspaceId },
     });
-    if (!wallet) throw new NotFoundException('Wallet not found');
+    if (!wallet) throw new NotFoundException('Dompet tidak ditemukan');
     return serializeWallet(wallet);
   }
 
@@ -69,7 +69,7 @@ export class WalletsService {
       ) {
         // Foreign key constraint: ada transaction/recurring yang masih refer wallet ini
         throw new ConflictException(
-          'Wallet still has transactions. Delete or move them first.',
+          'Dompet masih memiliki transaksi. Hapus atau pindahkan transaksi terlebih dahulu.',
         );
       }
       throw e;

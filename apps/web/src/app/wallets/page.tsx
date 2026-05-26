@@ -1,34 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Modal } from "@/components/ui/modal";
 import { BackButton } from "@/components/ui/back-button";
 import { ActionMenu } from "@/components/ui/action-menu";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { TransferModal } from "@/components/wallet/transfer-modal";
 import { ApiError } from "@/lib/api-client";
 import { walletsService } from "@/services/wallets.service";
 import type { Wallet } from "@/types/finance";
 import { formatCurrency } from "@/utils/format-currency";
+import { ROUTES } from "@/constants/routes";
 
 export default function WalletsPage() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [addOpen, setAddOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
-  const [newBalance, setNewBalance] = useState<string>("");
+  const [newBalance, setNewBalance] = useState("");
+
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [transferFromId, setTransferFromId] = useState<string | undefined>();
+  const [confirmWallet, setConfirmWallet] = useState<{ id: string; name: string } | null>(null);
 
   const reload = async () => {
     setError(null);
     try {
-      const data = await walletsService.list();
-      setWallets(data);
+      const w = await walletsService.list();
+      setWallets(w);
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Failed to load wallets");
+      setError(e instanceof ApiError ? e.message : "Gagal memuat data");
     }
   };
 
@@ -37,44 +47,45 @@ export default function WalletsPage() {
     reload().finally(() => setLoading(false));
   }, []);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreateWallet = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim()) return;
     try {
       setCreating(true);
-      await walletsService.create({
-        name: newName.trim(),
-        balance: newBalance ? Number(newBalance) : 0,
-      });
-      setNewName("");
-      setNewBalance("");
-      toast.success("Wallet ditambahkan");
+      await walletsService.create({ name: newName.trim(), balance: newBalance ? Number(newBalance) : 0 });
+      setNewName(""); setNewBalance("");
+      setAddOpen(false);
+      toast.success("Dompet ditambahkan");
       await reload();
     } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Failed to create wallet");
+      toast.error(e instanceof ApiError ? e.message : "Gagal membuat dompet");
     } finally {
       setCreating(false);
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus wallet "${name}"?`)) return;
+  const handleDeleteWallet = async (id: string, name: string) => {
     try {
       await walletsService.remove(id);
-      toast.success(`Wallet "${name}" dihapus`);
+      toast.success(`Dompet "${name}" dihapus`);
+      setConfirmWallet(null);
       await reload();
     } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Failed to delete wallet");
+      toast.error(e instanceof ApiError ? e.message : "Gagal menghapus dompet");
     }
   };
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl">
       <BackButton />
+
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
           Dompet
         </h1>
+        <Button size="sm" leftIcon={<Plus className="size-4" aria-hidden />} onClick={() => setAddOpen(true)}>
+          Tambah
+        </Button>
       </header>
 
       {error && (
@@ -83,50 +94,9 @@ export default function WalletsPage() {
         </div>
       )}
 
-      {/* Form add */}
-      <Card padding="md">
-        <form onSubmit={handleCreate} className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-[var(--color-text-primary)]">
-            Tambah dompet
-          </h2>
-          <div className="grid gap-3 md:grid-cols-[1fr_180px_auto]">
-            <Input
-              label="Nama"
-              placeholder="mis. BCA"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              maxLength={60}
-              required
-            />
-            <Input
-              label="Saldo awal"
-              type="number"
-              inputMode="decimal"
-              step="0.01"
-              placeholder="0"
-              leftAdornment={<span className="font-medium">Rp</span>}
-              value={newBalance}
-              onChange={(e) => setNewBalance(e.target.value)}
-            />
-            <div className="flex items-end">
-              <Button
-                type="submit"
-                isLoading={creating}
-                leftIcon={<Plus className="size-4" aria-hidden />}
-                disabled={!newName.trim()}
-                className="w-full md:w-auto md:px-6"
-              >
-                Tambah
-              </Button>
-            </div>
-          </div>
-        </form>
-      </Card>
-
-      {/* List */}
       {loading ? (
         <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
-          Loading…
+          Memuat…
         </div>
       ) : wallets.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-secondary)]">
@@ -136,24 +106,61 @@ export default function WalletsPage() {
         <Card padding="none">
           <ul className="divide-y divide-[var(--color-border-subtle)]">
             {wallets.map((w) => (
-              <li
-                key={w.id}
-                className="flex items-center gap-3 px-5 py-4"
-              >
+              <li key={w.id} className="flex items-center gap-3 px-5 py-4">
                 <div className="flex flex-1 flex-col">
-                  <span className="text-sm font-medium text-[var(--color-text-primary)]">
-                    {w.name}
-                  </span>
+                  <span className="text-sm font-medium text-[var(--color-text-primary)]">{w.name}</span>
                   <span className="text-xs text-[var(--color-text-muted)] tabular-nums">
                     Saldo: {formatCurrency(w.balance)}
                   </span>
                 </div>
-                <ActionMenu onDelete={() => handleDelete(w.id, w.name)} />
+                <ActionMenu
+                  onTransfer={wallets.length >= 2 ? () => { setTransferFromId(w.id); setTransferOpen(true); } : undefined}
+                  onDelete={() => setConfirmWallet({ id: w.id, name: w.name })}
+                />
               </li>
             ))}
           </ul>
         </Card>
       )}
+
+      <Link
+        href={ROUTES.walletTransfers}
+        className="flex items-center justify-between rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] px-5 py-4 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-card-subtle)] transition-colors"
+      >
+        Lihat riwayat transfer
+        <ArrowRight className="size-4 text-[var(--color-text-muted)]" aria-hidden />
+      </Link>
+
+      <Modal open={addOpen} onClose={() => { setAddOpen(false); setNewName(""); setNewBalance(""); }} title="Tambah dompet">
+        <form onSubmit={handleCreateWallet} className="flex flex-col gap-4">
+          <Input label="Nama" placeholder="mis. BCA" value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={60} required />
+          <Input label="Saldo awal" type="number" inputMode="decimal" step="0.01" placeholder="0" leftAdornment={<span className="font-medium">Rp</span>} value={newBalance} onChange={(e) => setNewBalance(e.target.value)} />
+          <div className="flex items-center justify-between pt-1">
+            <button type="button" onClick={() => setAddOpen(false)} className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">
+              Batal
+            </button>
+            <Button type="submit" isLoading={creating} disabled={!newName.trim()}>
+              Tambah
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      <TransferModal
+        open={transferOpen}
+        onClose={() => { setTransferOpen(false); setTransferFromId(undefined); }}
+        onSuccess={reload}
+        wallets={wallets}
+        defaultFromId={transferFromId}
+      />
+
+      <ConfirmModal
+        open={Boolean(confirmWallet)}
+        onClose={() => setConfirmWallet(null)}
+        onConfirm={() => confirmWallet && handleDeleteWallet(confirmWallet.id, confirmWallet.name)}
+        title={`Hapus dompet "${confirmWallet?.name}"?`}
+        description="Dompet tidak bisa dihapus jika masih memiliki transaksi."
+      />
     </div>
   );
 }

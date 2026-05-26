@@ -75,6 +75,7 @@ model Workspace {
   categories            Category[]
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
+  transfers             Transfer[]
 
   @@index([ownerId])
   @@map("workspaces")
@@ -117,6 +118,8 @@ model Wallet {
   workspace             Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
+  transfersFrom         Transfer[]             @relation("TransferFrom")
+  transfersTo           Transfer[]             @relation("TransferTo")
 
   @@index([workspaceId])
   @@map("wallets")
@@ -173,6 +176,29 @@ model Transaction {
   @@index([walletId])
   @@index([categoryId])
   @@map("transactions")
+}
+
+// =====================================================
+// Transfer (antar wallet)
+// =====================================================
+
+model Transfer {
+  id              String   @id @default(cuid())
+  workspaceId     String   @map("workspace_id")
+  fromWalletId    String   @map("from_wallet_id")
+  toWalletId      String   @map("to_wallet_id")
+  amount          Decimal  @db.Decimal(18, 2)
+  note            String?
+  transferDate    DateTime @map("transfer_date") @db.Date
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  fromWallet Wallet    @relation("TransferFrom", fields: [fromWalletId], references: [id], onDelete: Restrict)
+  toWallet   Wallet    @relation("TransferTo", fields: [toWalletId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@index([workspaceId, transferDate])
+  @@map("transfers")
 }
 
 // =====================================================

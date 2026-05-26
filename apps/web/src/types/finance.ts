@@ -83,3 +83,16 @@ export interface DailySummary {
   period: { year: number; month: number };
   days: { date: string; income: string; expense: string }[];
 }
+
+export interface Transfer {
+  id: string;
+  workspaceId: string;
+  fromWalletId: string;
+  toWalletId: string;
+  fromWalletName: string;
+  toWalletName: string;
+  amount: string;
+  note: string | null;
+  transferDate: string;
+  createdAt: string;
+}

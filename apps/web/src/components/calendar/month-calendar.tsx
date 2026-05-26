@@ -31,7 +31,6 @@ export function MonthCalendar({
   onPrev,
   onNext,
   onToday,
-  monthlySummary,
 }: MonthCalendarProps) {
   const grid = getMonthGrid(year, month);
   const todayIso = isoDate(new Date());
@@ -42,7 +41,7 @@ export function MonthCalendar({
     <div className="flex flex-col gap-4">
       {/* Header: navigasi + tombol hari ini */}
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
+        <h2 className="text-base font-semibold text-foreground">
           {formatMonthYear(year, month)}
         </h2>
 
@@ -51,7 +50,7 @@ export function MonthCalendar({
             <button
               type="button"
               onClick={onToday}
-              className="rounded-lg px-2 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)] transition-colors"
+              className="rounded-lg px-2 py-1 text-xs font-medium text-accent hover:bg-accent-soft transition-colors"
             >
               Hari Ini
             </button>
@@ -70,7 +69,7 @@ export function MonthCalendar({
         {WEEKDAYS_ID.map((d) => (
           <div
             key={d}
-            className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-muted)]"
+            className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.06em] text-muted"
           >
             {d}
           </div>
@@ -90,13 +89,13 @@ export function MonthCalendar({
               className={[
                 "relative flex flex-col items-center gap-0.5 rounded-xl py-1.5 px-0.5 text-xs transition-colors",
                 inMonth
-                  ? "text-[var(--color-text-primary)]"
-                  : "text-[var(--color-text-muted)]/30 pointer-events-none",
+                  ? "text-foreground"
+                  : "text-(--color-text-muted)/30 pointer-events-none",
                 isSelected
-                  ? "bg-[var(--color-accent-soft)]"
+                  ? "bg-accent-soft"
                   : isToday
-                    ? "bg-[var(--color-card-subtle)]"
-                    : "hover:bg-[var(--color-card-subtle)]",
+                    ? "bg-card-subtle"
+                    : "hover:bg-card-subtle",
               ].join(" ")}
             >
               {/* Date number */}
@@ -104,9 +103,9 @@ export function MonthCalendar({
                 className={[
                   "flex size-6 items-center justify-center rounded-full text-xs font-medium leading-none",
                   isToday && !isSelected
-                    ? "bg-[var(--color-text-primary)] text-[var(--color-bg)] font-semibold"
+                    ? "bg-foreground text-background font-semibold"
                     : isSelected
-                      ? "text-[var(--color-accent)] font-semibold"
+                      ? "text-accent font-semibold"
                       : "",
                 ].join(" ")}
               >

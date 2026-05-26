@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { BackButton } from "@/components/ui/back-button";
 import { ActionMenu } from "@/components/ui/action-menu";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ApiError } from "@/lib/api-client";
 import { categoriesService } from "@/services/categories.service";
 import type { Category, TransactionType } from "@/types/finance";
@@ -90,11 +91,13 @@ export default function CategoriesPage() {
     }
   };
 
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
+
   const handleDelete = async (id: string, catName: string) => {
-    if (!confirm(`Hapus kategori "${catName}"?`)) return;
     try {
       await categoriesService.remove(id);
       toast.success(`Kategori "${catName}" dihapus`);
+      setConfirmDelete(null);
       await reload();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Failed to delete category");
@@ -123,13 +126,13 @@ export default function CategoriesPage() {
       <Card padding="md">
         <form onSubmit={handleCreate} className="flex flex-col gap-4">
           <h2 className="text-sm font-medium text-[var(--color-text-primary)]">
-            Add category
+            Tambah kategori
           </h2>
 
           <div className="grid gap-3 md:grid-cols-[1fr_140px_auto]">
             <Input
-              label="Name"
-              placeholder="e.g. Food"
+              label="Nama"
+              placeholder="mis. Makanan"
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={60}
@@ -138,16 +141,16 @@ export default function CategoriesPage() {
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                Type
+                Jenis
               </label>
-              <div role="radiogroup" aria-label="Category type" className="grid grid-cols-2 gap-1 rounded-lg bg-[var(--color-card-subtle)] p-1">
+              <div role="radiogroup" aria-label="Jenis kategori" className="grid grid-cols-2 gap-1 rounded-lg bg-[var(--color-card-subtle)] p-1">
                 {(["expense", "income"] as TransactionType[]).map((t) => {
                   const isActive = type === t;
                   return (
                     <button key={t} type="button" role="radio" aria-checked={isActive}
                       onClick={() => { setType(t); setIcon(EMOJI_SUGGESTIONS[t][0]); }}
                       className={["h-9 rounded-md text-xs font-medium capitalize transition-colors", isActive ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]" : "text-[var(--color-text-secondary)]"].join(" ")}
-                    >{t}</button>
+                    >{t === "expense" ? "Pengeluaran" : "Pemasukan"}</button>
                   );
                 })}
               </div>
@@ -155,7 +158,7 @@ export default function CategoriesPage() {
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="cat-color" className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                Color
+                Warna
               </label>
               <div className="flex h-11 items-center gap-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-card-subtle)] px-2">
                 <input type="color" id="cat-color" value={color} onChange={(e) => setColor(e.target.value)}
@@ -169,7 +172,7 @@ export default function CategoriesPage() {
           {type === "expense" && (
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                Group
+                Grup
                 <span className="ml-1 normal-case font-normal text-[var(--color-text-muted)]">— untuk insight keuangan</span>
               </label>
               <div role="radiogroup" className="grid grid-cols-3 gap-2">
@@ -187,7 +190,7 @@ export default function CategoriesPage() {
           )}
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-              Icon
+              Ikon
             </label>
             <div className="flex items-center gap-2">
               {/* Selected preview */}
@@ -213,7 +216,7 @@ export default function CategoriesPage() {
 
           <div className="flex items-center gap-3">
             <Button type="submit" isLoading={creating} leftIcon={<Plus className="size-4" aria-hidden />} disabled={!name.trim()}>
-              Add category
+              Tambah kategori
             </Button>
           </div>
         </form>
@@ -227,21 +230,28 @@ export default function CategoriesPage() {
       ) : (
         <div className="flex flex-col gap-6">
           <CategorySection
-            title="Expense"
+            title="Pengeluaran"
             tone="danger"
             items={expenseCats}
-            onDelete={handleDelete}
+            onDelete={(id, name) => setConfirmDelete({ id, name })}
             onReload={reload}
           />
           <CategorySection
-            title="Income"
+            title="Pemasukan"
             tone="success"
             items={incomeCats}
-            onDelete={handleDelete}
+            onDelete={(id, name) => setConfirmDelete({ id, name })}
             onReload={reload}
           />
         </div>
       )}
+
+      <ConfirmModal
+        open={Boolean(confirmDelete)}
+        onClose={() => setConfirmDelete(null)}
+        onConfirm={() => confirmDelete && handleDelete(confirmDelete.id, confirmDelete.name)}
+        title={`Hapus kategori "${confirmDelete?.name}"?`}
+      />
     </div>
   );
 }
@@ -299,8 +309,7 @@ function CategorySection({
       {items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-5 text-center text-sm text-[var(--color-text-secondary)]">
           Belum ada kategori {title.toLowerCase()}.
-        </div>
-      ) : (
+        </div>      ) : (
         <Card padding="none">
           <ul className="divide-y divide-[var(--color-border-subtle)]">
             {items.map((c) => {
@@ -333,8 +342,8 @@ function CategorySection({
                         ))}
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" isLoading={saving} onClick={() => saveEdit(c.id)}>Save</Button>
-                        <Button size="sm" variant="ghost" onClick={cancelEdit}>Cancel</Button>
+                        <Button size="sm" isLoading={saving} onClick={() => saveEdit(c.id)}>Simpan</Button>
+                        <Button size="sm" variant="ghost" onClick={cancelEdit}>Batal</Button>
                       </div>
                     </div>
                   ) : (

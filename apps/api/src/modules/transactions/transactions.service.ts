@@ -68,7 +68,7 @@ export class TransactionsService {
         wallet: { select: { id: true, name: true } },
       },
     });
-    if (!tx) throw new NotFoundException('Transaction not found');
+    if (!tx) throw new NotFoundException('Transaksi tidak ditemukan');
     return serializeTransactionWithRefs(tx);
   }
 
@@ -112,7 +112,7 @@ export class TransactionsService {
     const existing = await this.prisma.transaction.findFirst({
       where: { id, workspaceId },
     });
-    if (!existing) throw new NotFoundException('Transaction not found');
+    if (!existing) throw new NotFoundException('Transaksi tidak ditemukan');
 
     if (dto.categoryId || dto.walletId || dto.type) {
       await this.assertCategoryAndWalletBelong(workspaceId, {
@@ -170,7 +170,7 @@ export class TransactionsService {
     const existing = await this.prisma.transaction.findFirst({
       where: { id, workspaceId },
     });
-    if (!existing) throw new NotFoundException('Transaction not found');
+    if (!existing) throw new NotFoundException('Transaksi tidak ditemukan');
 
     await this.prisma.$transaction(async (tx) => {
       await this.applyBalanceDelta(
@@ -294,14 +294,14 @@ export class TransactionsService {
     ]);
 
     if (!category) {
-      throw new BadRequestException('Category not found in this workspace');
+      throw new BadRequestException('Kategori tidak ditemukan');
     }
     if (!wallet) {
-      throw new BadRequestException('Wallet not found in this workspace');
+      throw new BadRequestException('Dompet tidak ditemukan');
     }
     if (category.type !== payload.type) {
       throw new BadRequestException(
-        `Category type (${category.type}) does not match transaction type (${payload.type})`,
+        'Jenis kategori tidak sesuai dengan jenis transaksi',
       );
     }
   }
