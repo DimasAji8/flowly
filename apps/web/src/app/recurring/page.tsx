@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { ActionMenu } from "@/components/ui/action-menu";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { RecurringModal } from "@/components/recurring/recurring-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { recurringService } from "@/services/recurring.service";
@@ -51,6 +52,7 @@ export default function RecurringListPage() {
   };
 
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const handleDelete = async (id: string) => {
     try {
@@ -70,7 +72,7 @@ export default function RecurringListPage() {
         </h1>
         <Button
           size="sm"
-          asChildHref={`${ROUTES.recurring}/new`}
+          onClick={() => setAddOpen(true)}
           leftIcon={<Plus className="size-4" aria-hidden />}
         >
           Tambah
@@ -150,6 +152,12 @@ export default function RecurringListPage() {
           </ul>
         </Card>
       )}
+
+      <RecurringModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onSuccess={reload}
+      />
 
       <ConfirmModal
         open={Boolean(confirmId)}

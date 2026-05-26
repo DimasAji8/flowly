@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, Check, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,6 @@ export function TransactionForm({
     control,
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<CreateTransactionFormValues>({
@@ -77,7 +76,8 @@ export function TransactionForm({
     },
   });
 
-  const selectedType = watch("type") as TransactionType;
+  const selectedType = useWatch({ control, name: "type" }) as TransactionType;
+  const categoryId = useWatch({ control, name: "categoryId" });
   const isEditing = Boolean(defaultValues);
 
   useEffect(() => {
@@ -102,12 +102,11 @@ export function TransactionForm({
 
   useEffect(() => {
     if (categories.length === 0) return;
-    const currentCatId = watch("categoryId");
-    const currentCat = categories.find((c) => c.id === currentCatId);
+    const currentCat = categories.find((c) => c.id === categoryId);
     if (currentCat && currentCat.type === selectedType) return;
     const next = categories.find((c) => c.type === selectedType);
     if (next) setValue("categoryId", next.id);
-  }, [selectedType, categories, setValue, watch]);
+  }, [selectedType, categories, setValue, categoryId]);
 
   const filteredCategories = useMemo(
     () => categories.filter((c) => c.type === selectedType),
@@ -127,8 +126,7 @@ export function TransactionForm({
   const noWallets = wallets.length === 0;
   const noCategories = filteredCategories.length === 0;
 
-  const categoryId = watch("categoryId");
-  const walletId = watch("walletId");
+  const walletId = useWatch({ control, name: "walletId" });
   const [dateOpen, setDateOpen] = useState(false);
 
   const selectedCategory = filteredCategories.find((c) => c.id === categoryId);
@@ -149,7 +147,7 @@ export function TransactionForm({
                 const isActive = field.value === t;
                 return (
                   <button key={t} type="button" role="radio" aria-checked={isActive} onClick={() => field.onChange(t)}
-                    className={["h-9 rounded-lg text-sm font-medium transition-colors", isActive ? "bg-card text-foreground shadow-[var(--shadow-card)]" : "text-secondary hover:text-foreground"].join(" ")}
+                    className={["h-9 rounded-lg text-sm font-medium transition-colors", isActive ? "bg-card text-foreground shadow-(--shadow-card)" : "text-secondary hover:text-foreground"].join(" ")}
                   >
                     {t === "expense" ? "Pengeluaran" : "Pemasukan"}
                   </button>
@@ -199,7 +197,7 @@ export function TransactionForm({
               <ChevronDown className="size-4 text-muted" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]" align="start">
+          <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)" align="start">
             {filteredCategories.map((c) => (
               <DropdownMenuItem key={c.id} onSelect={() => setValue("categoryId", c.id)} className="flex items-center justify-between">
                 <span>{c.name}</span>
@@ -230,7 +228,7 @@ export function TransactionForm({
               <ChevronDown className="size-4 text-muted" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]" align="start">
+          <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)" align="start">
             {wallets.map((w) => (
               <DropdownMenuItem key={w.id} onSelect={() => setValue("walletId", w.id)} className="flex items-center justify-between">
                 <span>{w.name}</span>

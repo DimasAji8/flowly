@@ -53,7 +53,7 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
           <button
             type="button"
             onClick={() => setSelectedType("income")}
-            className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-[var(--color-success)] hover:bg-success/5"
+            className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-success hover:bg-success/5"
           >
             <ArrowUpCircle className="size-8 shrink-0 text-success" strokeWidth={1.5} />
             <div>
