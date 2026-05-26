@@ -33,18 +33,22 @@ export default function WalletsPage() {
   const [confirmWallet, setConfirmWallet] = useState<{ id: string; name: string } | null>(null);
 
   const reload = async () => {
+    setLoading(true);
     setError(null);
     try {
       const w = await walletsService.list();
       setWallets(w);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Gagal memuat data");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setLoading(true);
-    reload().finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    reload();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreateWallet = async (e: React.FormEvent) => {
@@ -80,7 +84,7 @@ export default function WalletsPage() {
       <BackButton />
 
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Dompet
         </h1>
         <Button size="sm" leftIcon={<Plus className="size-4" aria-hidden />} onClick={() => setAddOpen(true)}>
@@ -89,27 +93,27 @@ export default function WalletsPage() {
       </header>
 
       {error && (
-        <div className="rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-3 py-2.5 text-sm text-[var(--color-danger)]">
+        <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
+        <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
           Memuat…
         </div>
       ) : wallets.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-secondary)]">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-secondary">
           Belum ada dompet.
         </div>
       ) : (
         <Card padding="none">
-          <ul className="divide-y divide-[var(--color-border-subtle)]">
+          <ul className="divide-y divide-border-subtle">
             {wallets.map((w) => (
               <li key={w.id} className="flex items-center gap-3 px-5 py-4">
                 <div className="flex flex-1 flex-col">
-                  <span className="text-sm font-medium text-[var(--color-text-primary)]">{w.name}</span>
-                  <span className="text-xs text-[var(--color-text-muted)] tabular-nums">
+                  <span className="text-sm font-medium text-foreground">{w.name}</span>
+                  <span className="text-xs text-muted tabular-nums">
                     Saldo: {formatCurrency(w.balance)}
                   </span>
                 </div>
@@ -125,10 +129,10 @@ export default function WalletsPage() {
 
       <Link
         href={ROUTES.walletTransfers}
-        className="flex items-center justify-between rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] px-5 py-4 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-card-subtle)] transition-colors"
+        className="flex items-center justify-between rounded-xl border border-border-subtle bg-card px-5 py-4 text-sm font-medium text-foreground hover:bg-card-subtle transition-colors"
       >
         Lihat riwayat transfer
-        <ArrowRight className="size-4 text-[var(--color-text-muted)]" aria-hidden />
+        <ArrowRight className="size-4 text-muted" aria-hidden />
       </Link>
 
       <Modal open={addOpen} onClose={() => { setAddOpen(false); setNewName(""); setNewBalance(""); }} title="Tambah dompet">
@@ -136,7 +140,7 @@ export default function WalletsPage() {
           <Input label="Nama" placeholder="mis. BCA" value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={60} required />
           <Input label="Saldo awal" type="number" inputMode="decimal" step="0.01" placeholder="0" leftAdornment={<span className="font-medium">Rp</span>} value={newBalance} onChange={(e) => setNewBalance(e.target.value)} />
           <div className="flex items-center justify-between pt-1">
-            <button type="button" onClick={() => setAddOpen(false)} className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">
+            <button type="button" onClick={() => setAddOpen(false)} className="text-sm text-muted hover:text-foreground">
               Batal
             </button>
             <Button type="submit" isLoading={creating} disabled={!newName.trim()}>

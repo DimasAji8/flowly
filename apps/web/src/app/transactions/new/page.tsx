@@ -14,7 +14,7 @@ export default function NewTransactionPage() {
     <div className="flex flex-col gap-5 max-w-lg">
       <BackButton />
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           New transaction
         </h1>
       </header>

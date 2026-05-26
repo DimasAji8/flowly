@@ -27,18 +27,22 @@ export default function RecurringListPage() {
   const [error, setError] = useState<string | null>(null);
 
   const reload = async () => {
+    setLoading(true);
     setError(null);
     try {
       const data = await recurringService.list();
       setItems(data);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to load");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setLoading(true);
-    reload().finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    reload();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleActive = async (r: RecurringTransaction) => {
@@ -65,7 +69,7 @@ export default function RecurringListPage() {
   return (
     <div className="flex flex-col gap-6 max-w-3xl">
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Recurring
         </h1>
         <Button
@@ -78,22 +82,22 @@ export default function RecurringListPage() {
       </header>
 
       {error && (
-        <div className="rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-3 py-2.5 text-sm text-[var(--color-danger)]">
+        <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
+        <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
           Memuat…
         </div>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-secondary)]">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-secondary">
           Belum ada recurring transaction.
         </div>
       ) : (
         <Card padding="none">
-          <ul className="divide-y divide-[var(--color-border-subtle)]">
+          <ul className="divide-y divide-border-subtle">
             {items.map((r) => {
               const isIncome = r.type === "income";
               const sign = isIncome ? "+" : "−";
@@ -105,7 +109,7 @@ export default function RecurringListPage() {
                 <li key={r.id} className="flex items-center gap-3 px-5 py-4">
                   <div className="flex flex-1 flex-col">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[var(--color-text-primary)]">
+                      <span className="text-sm font-medium text-foreground">
                         {r.note?.trim() || `${FREQ_LABEL[r.frequency]} ${r.type}`}
                       </span>
                       <Chip
@@ -118,7 +122,7 @@ export default function RecurringListPage() {
                         {FREQ_LABEL[r.frequency]}
                       </Chip>
                     </div>
-                    <span className="text-xs text-[var(--color-text-muted)]">
+                    <span className="text-xs text-muted">
                       Jadwal berikutnya: {date}
                     </span>
                   </div>
@@ -133,7 +137,7 @@ export default function RecurringListPage() {
                   <button
                     type="button"
                     onClick={() => toggleActive(r)}
-                    className={["h-6 w-11 shrink-0 rounded-full transition-colors", r.isActive ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"].join(" ")}
+                    className={["h-6 w-11 shrink-0 rounded-full transition-colors", r.isActive ? "bg-accent" : "bg-border"].join(" ")}
                     aria-pressed={r.isActive}
                     aria-label={r.isActive ? "Jeda" : "Aktifkan"}
                   >

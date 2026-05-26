@@ -64,7 +64,7 @@ export function BottomNav() {
       >
         {isActive && (
           <span
-            className="absolute top-0 h-0.5 rounded-full bg-[var(--color-accent)] transition-all duration-300"
+            className="absolute top-0 h-0.5 rounded-full bg-accent transition-all duration-300"
             style={{ width: "var(--line-width)" }}
             aria-hidden
           />
@@ -94,7 +94,7 @@ export function BottomNav() {
     <>
       <nav
         aria-label="Primary"
-        className="sticky bottom-0 z-30 w-full border-t border-[var(--color-border-subtle)] bg-[var(--color-bg)]/90 backdrop-blur-md md:hidden"
+        className="sticky bottom-0 z-30 w-full border-t border-border-subtle bg-[var(--color-bg)]/90 backdrop-blur-md md:hidden"
       >
         <div className="flex items-center">
           {/* Left items */}
@@ -106,7 +106,7 @@ export function BottomNav() {
               type="button"
               onClick={() => setAddOpen(true)}
               aria-label="Add transaction"
-              className="relative -top-4 flex size-14 items-center justify-center rounded-full bg-[var(--color-accent)] transition-transform active:scale-95 hover:scale-105"
+              className="relative -top-4 flex size-14 items-center justify-center rounded-full bg-accent transition-transform active:scale-95 hover:scale-105"
               style={{
                 boxShadow: "0 4px 20px -2px rgba(37,99,235,0.5), 0 0 0 4px rgba(37,99,235,0.15)",
               }}

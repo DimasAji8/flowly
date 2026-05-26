@@ -139,7 +139,7 @@ export function RecurringForm({
           <div
             role="radiogroup"
             aria-label="Jenis transaksi"
-            className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--color-card-subtle)] p-1"
+            className="grid grid-cols-2 gap-2 rounded-xl bg-card-subtle p-1"
           >
             {(["expense", "income"] as TransactionType[]).map((t) => {
               const active = field.value === t;
@@ -153,8 +153,8 @@ export function RecurringForm({
                   className={[
                     "h-9 rounded-lg text-sm font-medium capitalize transition-colors",
                     active
-                      ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]"
-                      : "text-[var(--color-text-secondary)]",
+                      ? "bg-card text-foreground shadow-[var(--shadow-card)]"
+                      : "text-secondary",
                   ].join(" ")}
                 >
                   {t === "expense" ? "Pengeluaran" : "Pemasukan"}
@@ -265,32 +265,32 @@ const SelectField = (() => {
       <div className="flex flex-col gap-1.5">
         <label
           htmlFor={fieldId}
-          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]"
+          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary"
         >
           {label}
         </label>
         <div
           className={[
             "flex items-center px-3 rounded-lg",
-            "bg-[var(--color-card-subtle)]",
+            "bg-card-subtle",
             "border outline-none transition-colors",
-            "focus-within:bg-[var(--color-card)]",
+            "focus-within:bg-card",
             error
-              ? "border-[var(--color-danger)] focus-within:border-[var(--color-danger)]"
-              : "border-[var(--color-border-subtle)] focus-within:border-[var(--color-accent)] focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
+              ? "border-danger focus-within:border-danger"
+              : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
           ].join(" ")}
         >
           <select
             id={fieldId}
             aria-invalid={Boolean(error) || undefined}
-            className="h-11 flex-1 appearance-none bg-transparent text-sm capitalize text-[var(--color-text-primary)] outline-none disabled:opacity-50"
+            className="h-11 flex-1 appearance-none bg-transparent text-sm capitalize text-foreground outline-none disabled:opacity-50"
             {...rest}
           >
             {children}
           </select>
         </div>
         {error && (
-          <p className="text-xs text-[var(--color-danger)]">{error}</p>
+          <p className="text-xs text-danger">{error}</p>
         )}
       </div>
     );

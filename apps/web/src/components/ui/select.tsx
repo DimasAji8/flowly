@@ -18,7 +18,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       {label && (
         <label
           htmlFor={inputId}
-          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]"
+          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary"
         >
           {label}
         </label>
@@ -26,18 +26,18 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       <div
         className={[
           "flex items-center px-3",
-          "bg-[var(--color-card-subtle)] rounded-lg border outline-none transition-colors",
-          "focus-within:bg-[var(--color-card)]",
+          "bg-card-subtle rounded-lg border outline-none transition-colors",
+          "focus-within:bg-card",
           error
-            ? "border-[var(--color-danger)]"
-            : "border-[var(--color-border-subtle)] focus-within:border-[var(--color-accent)] focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
+            ? "border-danger"
+            : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
         ].join(" ")}
       >
         <select
           id={inputId}
           ref={ref}
           className={[
-            "h-11 flex-1 bg-transparent text-sm text-[var(--color-text-primary)] outline-none appearance-none cursor-pointer",
+            "h-11 flex-1 bg-transparent text-sm text-foreground outline-none appearance-none cursor-pointer",
             className,
           ].join(" ")}
           {...rest}
@@ -48,7 +48,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           ))}
         </select>
       </div>
-      {error && <p className="text-xs text-[var(--color-danger)]">{error}</p>}
+      {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   );
 });

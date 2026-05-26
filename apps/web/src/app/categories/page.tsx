@@ -111,13 +111,13 @@ export default function CategoriesPage() {
     <div className="flex flex-col gap-6 max-w-2xl">
       <BackButton />
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Categories
         </h1>
       </header>
 
       {error && (
-        <div className="rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-3 py-2.5 text-sm text-[var(--color-danger)]">
+        <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
           {error}
         </div>
       )}
@@ -125,7 +125,7 @@ export default function CategoriesPage() {
       {/* Form add */}
       <Card padding="md">
         <form onSubmit={handleCreate} className="flex flex-col gap-4">
-          <h2 className="text-sm font-medium text-[var(--color-text-primary)]">
+          <h2 className="text-sm font-medium text-foreground">
             Tambah kategori
           </h2>
 
@@ -140,16 +140,16 @@ export default function CategoriesPage() {
             />
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
+              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
                 Jenis
               </label>
-              <div role="radiogroup" aria-label="Jenis kategori" className="grid grid-cols-2 gap-1 rounded-lg bg-[var(--color-card-subtle)] p-1">
+              <div role="radiogroup" aria-label="Jenis kategori" className="grid grid-cols-2 gap-1 rounded-lg bg-card-subtle p-1">
                 {(["expense", "income"] as TransactionType[]).map((t) => {
                   const isActive = type === t;
                   return (
                     <button key={t} type="button" role="radio" aria-checked={isActive}
                       onClick={() => { setType(t); setIcon(EMOJI_SUGGESTIONS[t][0]); }}
-                      className={["h-9 rounded-md text-xs font-medium capitalize transition-colors", isActive ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]" : "text-[var(--color-text-secondary)]"].join(" ")}
+                      className={["h-9 rounded-md text-xs font-medium capitalize transition-colors", isActive ? "bg-card text-foreground shadow-[var(--shadow-card)]" : "text-secondary"].join(" ")}
                     >{t === "expense" ? "Pengeluaran" : "Pemasukan"}</button>
                   );
                 })}
@@ -157,13 +157,13 @@ export default function CategoriesPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="cat-color" className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
+              <label htmlFor="cat-color" className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
                 Warna
               </label>
-              <div className="flex h-11 items-center gap-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-card-subtle)] px-2">
+              <div className="flex h-11 items-center gap-2 rounded-lg border border-border-subtle bg-card-subtle px-2">
                 <input type="color" id="cat-color" value={color} onChange={(e) => setColor(e.target.value)}
                   className="size-7 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Pick color" />
-                <span className="text-xs tabular-nums text-[var(--color-text-secondary)]">{color.toUpperCase()}</span>
+                <span className="text-xs tabular-nums text-secondary">{color.toUpperCase()}</span>
               </div>
             </div>
           </div>
@@ -171,30 +171,30 @@ export default function CategoriesPage() {
           {/* Group picker — hanya untuk expense */}
           {type === "expense" && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
+              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
                 Grup
-                <span className="ml-1 normal-case font-normal text-[var(--color-text-muted)]">— untuk insight keuangan</span>
+                <span className="ml-1 normal-case font-normal text-muted">— untuk insight keuangan</span>
               </label>
               <div role="radiogroup" className="grid grid-cols-3 gap-2">
                 {GROUP_OPTIONS.map((g) => (
                   <button key={g.value} type="button" role="radio" aria-checked={group === g.value}
                     onClick={() => setGroup(g.value)}
-                    className={["rounded-xl border px-3 py-2.5 text-left transition-colors", group === g.value ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)]" : "border-[var(--color-border-subtle)] bg-[var(--color-card-subtle)] hover:border-[var(--color-border)]"].join(" ")}
+                    className={["rounded-xl border px-3 py-2.5 text-left transition-colors", group === g.value ? "border-accent bg-accent-soft" : "border-border-subtle bg-card-subtle hover:border-border"].join(" ")}
                   >
-                    <p className={["text-xs font-semibold", group === g.value ? "text-[var(--color-accent)]" : "text-[var(--color-text-primary)]"].join(" ")}>{g.label}</p>
-                    <p className="text-[11px] text-[var(--color-text-muted)]">{g.desc}</p>
+                    <p className={["text-xs font-semibold", group === g.value ? "text-accent" : "text-foreground"].join(" ")}>{g.label}</p>
+                    <p className="text-[11px] text-muted">{g.desc}</p>
                   </button>
                 ))}
               </div>
             </div>
           )}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
+            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
               Ikon
             </label>
             <div className="flex items-center gap-2">
               {/* Selected preview */}
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--color-accent-soft)] text-xl">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-xl">
                 {icon}
               </span>
               {/* Scrollable emoji grid */}
@@ -204,7 +204,7 @@ export default function CategoriesPage() {
                     key={e}
                     type="button"
                     onClick={() => setIcon(e)}
-                    className={["size-9 shrink-0 rounded-xl text-lg transition-colors", icon === e ? "bg-[var(--color-accent-soft)] ring-2 ring-[var(--color-accent)]" : "bg-[var(--color-card-subtle)] hover:bg-[var(--color-surface)]"].join(" ")}
+                    className={["size-9 shrink-0 rounded-xl text-lg transition-colors", icon === e ? "bg-accent-soft ring-2 ring-[var(--color-accent)]" : "bg-card-subtle hover:bg-surface"].join(" ")}
                     aria-label={e}
                   >
                     {e}
@@ -224,7 +224,7 @@ export default function CategoriesPage() {
 
       {/* List */}
       {loading ? (
-        <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
+        <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
           Loading…
         </div>
       ) : (
@@ -302,16 +302,16 @@ function CategorySection({
   return (
     <section className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <h2 className="text-sm font-medium text-[var(--color-text-primary)]">{title}</h2>
+        <h2 className="text-sm font-medium text-foreground">{title}</h2>
         <Chip tone={tone} size="sm">{items.length}</Chip>
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-5 text-center text-sm text-[var(--color-text-secondary)]">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-5 text-center text-sm text-secondary">
           Belum ada kategori {title.toLowerCase()}.
         </div>      ) : (
         <Card padding="none">
-          <ul className="divide-y divide-[var(--color-border-subtle)]">
+          <ul className="divide-y divide-border-subtle">
             {items.map((c) => {
               const isEditing = editingId === c.id;
               return (
@@ -327,7 +327,7 @@ function CategorySection({
                           autoFocus
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
-                          className="flex-1 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-card-subtle)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]"
+                          className="flex-1 rounded-lg border border-border-subtle bg-card-subtle px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-accent-soft)]"
                           maxLength={60}
                         />
                         <input type="color" value={editColor} onChange={(e) => setEditColor(e.target.value)}
@@ -337,7 +337,7 @@ function CategorySection({
                       <div className="flex gap-1.5 overflow-x-auto pb-1">
                         {EMOJI_SUGGESTIONS[c.type].map((e) => (
                           <button key={e} type="button" onClick={() => setEditIcon(e)}
-                            className={["size-8 shrink-0 rounded-lg text-base transition-colors", editIcon === e ? "bg-[var(--color-accent-soft)] ring-2 ring-[var(--color-accent)]" : "bg-[var(--color-card-subtle)]"].join(" ")}
+                            className={["size-8 shrink-0 rounded-lg text-base transition-colors", editIcon === e ? "bg-accent-soft ring-2 ring-[var(--color-accent)]" : "bg-card-subtle"].join(" ")}
                           >{e}</button>
                         ))}
                       </div>
@@ -351,7 +351,7 @@ function CategorySection({
                       <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-xl text-lg" style={{ background: c.color + "22" }}>
                         {c.icon}
                       </span>
-                      <span className="flex-1 text-sm font-medium text-[var(--color-text-primary)]">{c.name}</span>
+                      <span className="flex-1 text-sm font-medium text-foreground">{c.name}</span>
                       <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: c.color }} aria-hidden />
                       <ActionMenu
                         onEdit={() => startEdit(c)}

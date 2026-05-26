@@ -19,7 +19,7 @@ export default function HomePage() {
   }, [isReady, user, accessToken, router]);
 
   return (
-    <div className="flex min-h-dvh items-center justify-center text-sm text-[var(--color-text-secondary)]">
+    <div className="flex min-h-dvh items-center justify-center text-sm text-secondary">
       Loading…
     </div>
   );

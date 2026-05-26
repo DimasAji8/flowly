@@ -3,11 +3,11 @@ type Padding = "none" | "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   default:
-    "bg-[var(--color-card)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-card)]",
+    "bg-card border border-border-subtle shadow-[var(--shadow-card)]",
   emphasis:
-    "bg-[var(--color-card)] border border-[var(--color-border)] shadow-[var(--shadow-card-emphasis)]",
+    "bg-card border border-border shadow-[var(--shadow-card-emphasis)]",
   subtle:
-    "bg-[var(--color-card-subtle)] border border-[var(--color-border-subtle)]",
+    "bg-card-subtle border border-border-subtle",
 };
 
 const paddings: Record<Padding, string> = {

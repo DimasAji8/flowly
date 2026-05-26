@@ -33,7 +33,7 @@ export function DeleteTransactionModal({ open, onClose, onSuccess, transactionId
 
   return (
     <Modal open={open} onClose={onClose} title="Hapus transaksi?">
-      <p className="mb-6 text-sm text-[var(--color-text-secondary)]">
+      <p className="mb-6 text-sm text-secondary">
         Tindakan ini tidak bisa di-undo. Saldo wallet akan dikembalikan.
       </p>
       <div className="flex gap-3">

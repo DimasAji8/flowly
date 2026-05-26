@@ -39,20 +39,20 @@ export function ActionMenu({
         onClick={() => setOpen((v) => !v)}
         aria-label="More actions"
         aria-expanded={open}
-        className="grid size-8 place-items-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-card-subtle)] hover:text-[var(--color-text-primary)]"
+        className="grid size-8 place-items-center rounded-lg text-muted transition-colors hover:bg-card-subtle hover:text-foreground"
       >
         <MoreVertical className="size-4" />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-9 z-50 min-w-[140px] overflow-hidden rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] shadow-[var(--shadow-modal)]">
+        <div className="absolute right-0 top-9 z-50 min-w-[140px] overflow-hidden rounded-xl border border-border-subtle bg-card shadow-[var(--shadow-modal)]">
           {onTransfer && (
             <button
               type="button"
               onClick={() => { setOpen(false); onTransfer(); }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-card-subtle)]"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-card-subtle"
             >
-              <ArrowRight className="size-3.5 text-[var(--color-text-muted)]" aria-hidden />
+              <ArrowRight className="size-3.5 text-muted" aria-hidden />
               {transferLabel}
             </button>
           )}
@@ -60,9 +60,9 @@ export function ActionMenu({
             <button
               type="button"
               onClick={() => { setOpen(false); onEdit(); }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-card-subtle)]"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-card-subtle"
             >
-              <Pencil className="size-3.5 text-[var(--color-text-muted)]" aria-hidden />
+              <Pencil className="size-3.5 text-muted" aria-hidden />
               {editLabel}
             </button>
           )}
@@ -70,7 +70,7 @@ export function ActionMenu({
             <button
               type="button"
               onClick={() => { setOpen(false); onDelete(); }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger-soft)]"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-danger transition-colors hover:bg-danger-soft"
             >
               <Trash2 className="size-3.5" aria-hidden />
               {deleteLabel}

@@ -61,10 +61,10 @@ export default function RegisterPage() {
   return (
     <section className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
+        <h1 className="text-2xl font-semibold text-foreground">
           Buat akun baru
         </h1>
-        <p className="text-sm text-[var(--color-text-secondary)]">
+        <p className="text-sm text-secondary">
           Mulai catat keuanganmu dengan tenang.
         </p>
       </header>
@@ -81,7 +81,7 @@ export default function RegisterPage() {
         />
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[var(--color-text-primary)]">Avatar</span>
+          <span className="text-sm font-medium text-foreground">Avatar</span>
           <div className="flex gap-3">
             {(["m", "f"] as const).map((g) => (
               <button
@@ -91,12 +91,12 @@ export default function RegisterPage() {
                 className={[
                   "flex flex-col items-center gap-1 rounded-2xl border-2 p-2 transition-colors",
                   gender === g
-                    ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)]"
-                    : "border-[var(--color-border)] hover:border-[var(--color-accent)]/50",
+                    ? "border-accent bg-accent-soft"
+                    : "border-border hover:border-accent/50",
                 ].join(" ")}
               >
                 <Image src={`/svg/${g}.svg`} alt={g === "m" ? "Laki-laki" : "Perempuan"} width={56} height={56} className="size-14 rounded-xl object-cover" />
-                <span className="text-xs text-[var(--color-text-secondary)]">{g === "m" ? "Laki-laki" : "Perempuan"}</span>
+                <span className="text-xs text-secondary">{g === "m" ? "Laki-laki" : "Perempuan"}</span>
               </button>
             ))}
           </div>
@@ -126,11 +126,11 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      <p className="text-sm text-[var(--color-text-secondary)] text-center">
+      <p className="text-sm text-secondary text-center">
         Sudah punya akun?{" "}
         <Link
           href={ROUTES.login}
-          className="text-[var(--color-accent)] hover:underline"
+          className="text-accent hover:underline"
         >
           Masuk
         </Link>

@@ -64,13 +64,13 @@ export default function EditRecurringPage() {
     <div className="flex flex-col gap-5 max-w-lg">
       <BackButton />
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Edit recurring
         </h1>
       </header>
 
       {loading ? (
-        <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] p-6 text-center text-sm text-[var(--color-text-muted)]">
+        <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
           Memuat…
         </div>
       ) : error && !item ? (
@@ -104,7 +104,7 @@ export default function EditRecurringPage() {
             }}
           />
 
-          <div className="mt-6 border-t border-[var(--color-border-subtle)] pt-6">
+          <div className="mt-6 border-t border-border-subtle pt-6">
             <Button
               variant="danger"
               onClick={() => setConfirmOpen(true)}

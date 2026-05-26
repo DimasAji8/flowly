@@ -82,33 +82,33 @@ export default function TransactionsPage() {
   return (
     <div className="flex flex-col gap-5 max-w-3xl flowly-enter">
       {/* Mobile: back button */}
-      <Link href={ROUTES.dashboard} className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors w-fit md:hidden">
+      <Link href={ROUTES.dashboard} className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors w-fit md:hidden">
         <ArrowLeft className="size-4" />
         Kembali
       </Link>
 
-      <h1 className="text-xl font-semibold text-[var(--color-text-primary)] md:text-2xl">
+      <h1 className="text-xl font-semibold text-foreground md:text-2xl">
           Transaksi
         </h1>
 
       {/* Filter bulan */}
-      <div className="flex items-center justify-between rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] px-4 py-3" style={{ boxShadow: "var(--shadow-card)" }}>
+      <div className="flex items-center justify-between rounded-2xl border border-border-subtle bg-card px-4 py-3" style={{ boxShadow: "var(--shadow-card)" }}>
         <button
           type="button"
           onClick={prevMonth}
-          className="grid size-8 place-items-center rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-card-subtle)] hover:text-[var(--color-text-primary)] transition-colors"
+          className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-foreground transition-colors"
         >
           <ChevronLeft className="size-4" />
         </button>
         <div className="text-center">
-          <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+          <p className="text-sm font-semibold text-foreground">
             {MONTH_NAMES[month - 1]} {year}
           </p>
           {!isCurrentMonth && (
             <button
               type="button"
               onClick={goToCurrentMonth}
-              className="text-[11px] text-[var(--color-accent)] hover:underline"
+              className="text-[11px] text-accent hover:underline"
             >
               Kembali ke bulan ini
             </button>
@@ -118,14 +118,14 @@ export default function TransactionsPage() {
           type="button"
           onClick={nextMonth}
           disabled={isCurrentMonth}
-          className="grid size-8 place-items-center rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-card-subtle)] hover:text-[var(--color-text-primary)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <ChevronRight className="size-4" />
         </button>
       </div>
 
       {error && (
-        <div className="rounded-md border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 px-3 py-2 text-sm text-[var(--color-danger)]">
+        <div className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}

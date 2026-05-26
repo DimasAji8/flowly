@@ -30,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {label && (
         <label
           htmlFor={inputId}
-          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]"
+          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary"
         >
           {label}
         </label>
@@ -39,16 +39,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       <div
         className={[
           "flex items-center gap-2 px-3",
-          "bg-[var(--color-card-subtle)] rounded-lg",
+          "bg-card-subtle rounded-lg",
           "border outline-none transition-colors",
-          "focus-within:bg-[var(--color-card)]",
+          "focus-within:bg-card",
           error
-            ? "border-[var(--color-danger)] focus-within:border-[var(--color-danger)]"
-            : "border-[var(--color-border-subtle)] focus-within:border-[var(--color-accent)] focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
+            ? "border-danger focus-within:border-danger"
+            : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
         ].join(" ")}
       >
         {leftAdornment && (
-          <span className="shrink-0 text-sm text-[var(--color-text-muted)]">
+          <span className="shrink-0 text-sm text-muted">
             {leftAdornment}
           </span>
         )}
@@ -65,14 +65,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           }
           className={[
             "h-11 flex-1 bg-transparent text-sm",
-            "text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]",
+            "text-foreground placeholder:text-muted",
             "outline-none",
             className,
           ].join(" ")}
           {...rest}
         />
         {rightAdornment && (
-          <span className="shrink-0 text-sm text-[var(--color-text-muted)]">
+          <span className="shrink-0 text-sm text-muted">
             {rightAdornment}
           </span>
         )}
@@ -81,14 +81,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {error ? (
         <p
           id={`${inputId}-error`}
-          className="text-xs text-[var(--color-danger)]"
+          className="text-xs text-danger"
         >
           {error}
         </p>
       ) : hint ? (
         <p
           id={`${inputId}-hint`}
-          className="text-xs text-[var(--color-text-muted)]"
+          className="text-xs text-muted"
         >
           {hint}
         </p>

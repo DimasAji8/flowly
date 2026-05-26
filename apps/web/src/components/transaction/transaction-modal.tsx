@@ -53,23 +53,23 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
           <button
             type="button"
             onClick={() => setSelectedType("income")}
-            className="flex items-center gap-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-card-subtle)] px-5 py-4 text-left transition-colors hover:border-[var(--color-success)] hover:bg-[var(--color-success)]/5"
+            className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-[var(--color-success)] hover:bg-success/5"
           >
-            <ArrowUpCircle className="size-8 shrink-0 text-[var(--color-success)]" strokeWidth={1.5} />
+            <ArrowUpCircle className="size-8 shrink-0 text-success" strokeWidth={1.5} />
             <div>
-              <p className="text-sm font-semibold text-[var(--color-text-primary)]">Pemasukan</p>
-              <p className="text-xs text-[var(--color-text-muted)]">Gaji, transfer masuk, dll.</p>
+              <p className="text-sm font-semibold text-foreground">Pemasukan</p>
+              <p className="text-xs text-muted">Gaji, transfer masuk, dll.</p>
             </div>
           </button>
           <button
             type="button"
             onClick={() => setSelectedType("expense")}
-            className="flex items-center gap-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-card-subtle)] px-5 py-4 text-left transition-colors hover:border-[var(--color-danger)] hover:bg-[var(--color-danger)]/5"
+            className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-danger hover:bg-danger/5"
           >
-            <ArrowDownCircle className="size-8 shrink-0 text-[var(--color-danger)]" strokeWidth={1.5} />
+            <ArrowDownCircle className="size-8 shrink-0 text-danger" strokeWidth={1.5} />
             <div>
-              <p className="text-sm font-semibold text-[var(--color-text-primary)]">Pengeluaran</p>
-              <p className="text-xs text-[var(--color-text-muted)]">Belanja, tagihan, dll.</p>
+              <p className="text-sm font-semibold text-foreground">Pengeluaran</p>
+              <p className="text-xs text-muted">Belanja, tagihan, dll.</p>
             </div>
           </button>
         </div>

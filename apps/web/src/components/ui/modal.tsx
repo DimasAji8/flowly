@@ -19,7 +19,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
         {/* Mobile: bottom sheet | Desktop: centered */}
         <Dialog.Content
           className={[
-            "fixed z-50 bg-[var(--color-card)] shadow-[var(--shadow-modal)] outline-none",
+            "fixed z-50 bg-card shadow-[var(--shadow-modal)] outline-none",
             // mobile: bottom sheet
             "bottom-0 left-0 right-0 rounded-t-[24px] px-5 pb-8 pt-4",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -35,14 +35,14 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
           ].join(" ")}
         >
           {/* Drag handle (mobile only) */}
-          <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[var(--color-border)] md:hidden" aria-hidden />
+          <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border md:hidden" aria-hidden />
 
           <div className="mb-4 flex items-center justify-between">
-            <Dialog.Title className="text-base font-semibold text-[var(--color-text-primary)]">
+            <Dialog.Title className="text-base font-semibold text-foreground">
               {title}
             </Dialog.Title>
             <Dialog.Close
-              className="grid size-8 place-items-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-card-subtle)] hover:text-[var(--color-text-primary)]"
+              className="grid size-8 place-items-center rounded-lg text-muted transition-colors hover:bg-card-subtle hover:text-foreground"
               aria-label="Close"
             >
               <X className="size-4" />

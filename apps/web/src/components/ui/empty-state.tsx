@@ -10,7 +10,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, actionLabel, actionHref, onAction }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card px-6 py-10 text-center">
       {/* Line-art SVG illustration */}
       <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden>
         <circle cx="32" cy="32" r="24" stroke="var(--color-border)" strokeWidth="1.5" />
@@ -20,9 +20,9 @@ export function EmptyState({ title, description, actionLabel, actionHref, onActi
         <circle cx="44" cy="44" r="2" fill="var(--color-accent-soft)" />
       </svg>
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-medium text-[var(--color-text-primary)]">{title}</p>
+        <p className="text-sm font-medium text-foreground">{title}</p>
         {description && (
-          <p className="text-xs text-[var(--color-text-muted)]">{description}</p>
+          <p className="text-xs text-muted">{description}</p>
         )}
       </div>
       {(actionLabel && (actionHref || onAction)) && (

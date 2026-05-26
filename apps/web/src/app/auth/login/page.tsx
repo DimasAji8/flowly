@@ -53,10 +53,10 @@ export default function LoginPage() {
   return (
     <section className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
+        <h1 className="text-2xl font-semibold text-foreground">
           Selamat datang kembali
         </h1>
-        <p className="text-sm text-[var(--color-text-secondary)]">
+        <p className="text-sm text-secondary">
           Masuk untuk melanjutkan catatan keuanganmu.
         </p>
       </header>
@@ -87,11 +87,11 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="text-sm text-[var(--color-text-secondary)] text-center">
+      <p className="text-sm text-secondary text-center">
         Belum punya akun?{" "}
         <Link
           href={ROUTES.register}
-          className="text-[var(--color-accent)] hover:underline"
+          className="text-accent hover:underline"
         >
           Daftar
         </Link>

@@ -26,7 +26,7 @@ function TransactionItem({ tx, onItemClick, showDate = false }: {
 
   const content = (
     <div
-      className="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[var(--color-card-subtle)] active:scale-[0.99]"
+      className="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-card-subtle active:scale-[0.99]"
       style={{ cursor: onItemClick ? "pointer" : undefined }}
     >
       <span
@@ -38,10 +38,10 @@ function TransactionItem({ tx, onItemClick, showDate = false }: {
       </span>
 
       <div className="flex flex-1 flex-col min-w-0">
-        <span className="truncate text-sm font-medium text-[var(--color-text-primary)]">
+        <span className="truncate text-sm font-medium text-foreground">
           {tx.note?.trim() || tx.category.name}
         </span>
-        <span className="text-xs text-[var(--color-text-muted)]">
+        <span className="text-xs text-muted">
           {tx.note?.trim() ? `${tx.category.name} · ` : ""}
           {showDate ? `${formatRelativeDate(tx.transactionDate)} · ` : ""}
           {tx.wallet.name}
@@ -121,7 +121,7 @@ export function TransactionList({ items, loading, grouped = false, onItemClick }
     return (
       <ul className="flex flex-col">
         {items.map((tx, idx) => (
-          <li key={tx.id} className={idx !== items.length - 1 ? "border-b border-[var(--color-border-subtle)]" : ""}>
+          <li key={tx.id} className={idx !== items.length - 1 ? "border-b border-border-subtle" : ""}>
             <TransactionItem tx={tx} onItemClick={onItemClick} showDate />
           </li>
         ))}
@@ -143,7 +143,7 @@ export function TransactionList({ items, loading, grouped = false, onItemClick }
           <div key={date}>
             {/* Group header */}
             <div className="flex items-center justify-between px-3 pb-1.5">
-              <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
+              <span className="text-xs font-semibold text-secondary">
                 {dateLabel(date)}
               </span>
               {(() => {
@@ -157,10 +157,10 @@ export function TransactionList({ items, loading, grouped = false, onItemClick }
               })()}
             </div>
             {/* Items */}
-            <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)]" style={{ boxShadow: "var(--shadow-card)" }}>
+            <div className="rounded-2xl border border-border-subtle bg-card" style={{ boxShadow: "var(--shadow-card)" }}>
               <ul className="flex flex-col">
                 {transactions.map((tx, idx) => (
-                  <li key={tx.id} className={idx !== transactions.length - 1 ? "border-b border-[var(--color-border-subtle)]" : ""}>
+                  <li key={tx.id} className={idx !== transactions.length - 1 ? "border-b border-border-subtle" : ""}>
                     <TransactionItem tx={tx} onItemClick={onItemClick} />
                   </li>
                 ))}
@@ -173,7 +173,7 @@ export function TransactionList({ items, loading, grouped = false, onItemClick }
         <button
           type="button"
           onClick={() => setVisibleGroups((v) => v + 3)}
-          className="w-full py-2 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+          className="w-full py-2 text-xs text-muted hover:text-secondary transition-colors"
         >
           Tampilkan lebih banyak
         </button>

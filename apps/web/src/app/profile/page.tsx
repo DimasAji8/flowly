@@ -22,47 +22,47 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl">
-      <h1 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-2xl">
+      <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
         Profil
       </h1>
 
       <Card padding="md">
         <div className="flex flex-col gap-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-muted)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">
             Masuk sebagai
           </p>
-          <p className="text-base font-medium text-[var(--color-text-primary)]">
+          <p className="text-base font-medium text-foreground">
             {user?.name}
           </p>
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-secondary">
             {user?.email}
           </p>
         </div>
       </Card>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-muted)]">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">
           Tampilan
         </h2>
         <Card padding="none">
           <div className="flex items-center justify-between px-5 py-4">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
                 {resolvedTheme === "dark"
                   ? <Moon className="size-4" aria-hidden />
                   : <Sun className="size-4" aria-hidden />}
               </span>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-[var(--color-text-primary)]">
+                <span className="text-sm font-medium text-foreground">
                   {resolvedTheme === "dark" ? "Mode gelap" : "Mode terang"}
                 </span>
-                <span className="text-xs text-[var(--color-text-muted)]">Ketuk untuk ganti</span>
+                <span className="text-xs text-muted">Ketuk untuk ganti</span>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-              className={["h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors", resolvedTheme === "dark" ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"].join(" ")}
+              className={["h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors", resolvedTheme === "dark" ? "bg-accent" : "bg-border"].join(" ")}
               aria-pressed={resolvedTheme === "dark"}
               aria-label="Toggle dark mode"
             >
@@ -73,11 +73,11 @@ export default function ProfilePage() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-muted)]">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">
           Kelola
         </h2>
         <Card padding="none">
-          <ul className="divide-y divide-[var(--color-border-subtle)]">
+          <ul className="divide-y divide-border-subtle">
             <ManageRow
               href={ROUTES.wallets}
               icon={<Wallet className="size-4" aria-hidden />}
@@ -127,21 +127,21 @@ function ManageRow({
     <li>
       <Link
         href={href}
-        className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-[var(--color-card-subtle)]"
+        className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-card-subtle"
       >
-        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
           {icon}
         </span>
         <div className="flex flex-1 flex-col">
-          <span className="text-sm font-medium text-[var(--color-text-primary)]">
+          <span className="text-sm font-medium text-foreground">
             {label}
           </span>
-          <span className="text-xs text-[var(--color-text-muted)]">
+          <span className="text-xs text-muted">
             {description}
           </span>
         </div>
         <ChevronRight
-          className="size-4 text-[var(--color-text-muted)]"
+          className="size-4 text-muted"
           aria-hidden
         />
       </Link>

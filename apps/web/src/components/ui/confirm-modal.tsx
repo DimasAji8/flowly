@@ -25,13 +25,13 @@ export function ConfirmModal({
   return (
     <Modal open={open} onClose={onClose} title={title}>
       {description && (
-        <p className="mb-4 text-sm text-[var(--color-text-secondary)]">{description}</p>
+        <p className="mb-4 text-sm text-secondary">{description}</p>
       )}
       <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={onClose}
-          className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+          className="text-sm text-muted hover:text-foreground"
         >
           Batal
         </button>

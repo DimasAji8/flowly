@@ -65,11 +65,11 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-sm font-medium text-[var(--color-text-primary)]">
+      <h2 className="text-sm font-medium text-foreground">
         Analisis Pengeluaran
       </h2>
 
-      <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] divide-y divide-[var(--color-border-subtle)]" style={{ boxShadow: "var(--shadow-card-emphasis)" }}>
+      <div className="rounded-2xl border border-border-subtle bg-card divide-y divide-border-subtle" style={{ boxShadow: "var(--shadow-card-emphasis)" }}>
         {/* Group rows */}
         {hasGroupData && (Object.entries(GROUP_CONFIG) as [keyof typeof GROUP_CONFIG, typeof GROUP_CONFIG[keyof typeof GROUP_CONFIG]][]).map(([key, cfg]) => {
           const amount = groupTotals[key] ?? 0;
@@ -84,16 +84,16 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
             <div key={key} className="px-4 py-3.5">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <span className="text-sm font-medium text-[var(--color-text-primary)]">{cfg.label}</span>
-                  <span className="ml-2 text-xs text-[var(--color-text-muted)]">{cfg.targetLabel}</span>
+                  <span className="text-sm font-medium text-foreground">{cfg.label}</span>
+                  <span className="ml-2 text-xs text-muted">{cfg.targetLabel}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs tabular-nums" style={{ color: style.text }}>{displayPct}%</span>
-                  <span className="text-xs text-[var(--color-text-muted)] tabular-nums">{formatCurrency(amount)}</span>
+                  <span className="text-xs text-muted tabular-nums">{formatCurrency(amount)}</span>
                 </div>
               </div>
               {/* Progress bar */}
-              <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)] overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-border-subtle overflow-hidden">
                 <div
                   className="h-2 rounded-full transition-all duration-500"
                   style={{
@@ -118,15 +118,15 @@ export function SpendingInsights({ categorySpends, totalIncome }: SpendingInsigh
               <span className="grid size-8 shrink-0 place-items-center rounded-lg text-base" style={{ background: s.categoryColor + "22" }}>
                 {s.categoryIcon}
               </span>
-              <span className="flex-1 text-sm text-[var(--color-text-primary)]">{s.categoryName}</span>
-              <span className="text-xs tabular-nums text-[var(--color-text-muted)]">{pct}%</span>
-              <span className="text-xs tabular-nums text-[var(--color-text-secondary)]">{formatCurrency(s.amount)}</span>
+              <span className="flex-1 text-sm text-foreground">{s.categoryName}</span>
+              <span className="text-xs tabular-nums text-muted">{pct}%</span>
+              <span className="text-xs tabular-nums text-secondary">{formatCurrency(s.amount)}</span>
             </div>
           );
         })}
       </div>
 
-      <p className="text-[11px] text-[var(--color-text-muted)]">
+      <p className="text-[11px] text-muted">
         Berdasarkan pemasukan bulan ini · Kategori tanpa grup tidak dihitung dalam target
       </p>
     </section>

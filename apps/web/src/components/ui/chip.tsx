@@ -3,11 +3,11 @@ type Size = "sm" | "md";
 
 const tones: Record<Tone, string> = {
   neutral:
-    "bg-[var(--color-card-subtle)] text-[var(--color-text-secondary)]",
-  accent: "bg-[var(--color-accent-soft)] text-[var(--color-accent)]",
+    "bg-card-subtle text-secondary",
+  accent: "bg-accent-soft text-accent",
   success:
-    "bg-[var(--color-success-soft)] text-[var(--color-success)]",
-  danger: "bg-[var(--color-danger-soft)] text-[var(--color-danger)]",
+    "bg-success-soft text-success",
+  danger: "bg-danger-soft text-danger",
   warning:
     "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
 };

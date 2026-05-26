@@ -54,11 +54,11 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
       {/* Expense ratio bar */}
       {Number(income) > 0 && (
         <div
-          className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] px-4 py-3.5"
+          className="rounded-2xl border border-border-subtle bg-card px-4 py-3.5"
           style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-xs font-medium text-[var(--color-text-secondary)]">Rasio pengeluaran</p>
+            <p className="text-xs font-medium text-secondary">Rasio pengeluaran</p>
             <p className="text-xs font-bold tabular-nums" style={{
               color: Number(expense) / Number(income) > 1
                 ? "var(--color-danger)"
@@ -69,7 +69,7 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
               {Math.round((Number(expense) / Number(income)) * 100)}%
             </p>
           </div>
-          <div className="h-2 w-full rounded-full bg-[var(--color-border-subtle)] overflow-hidden">
+          <div className="h-2 w-full rounded-full bg-border-subtle overflow-hidden">
             <div
               className="h-2 rounded-full transition-all duration-700"
               style={{

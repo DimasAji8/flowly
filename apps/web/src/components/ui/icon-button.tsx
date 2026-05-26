@@ -8,9 +8,9 @@ const sizes: Record<Size, string> = {
 
 const variants: Record<Variant, string> = {
   ghost:
-    "text-[var(--color-text-secondary)] hover:bg-[var(--color-card-subtle)] hover:text-[var(--color-text-primary)]",
+    "text-secondary hover:bg-card-subtle hover:text-foreground",
   secondary:
-    "bg-[var(--color-card)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-card-subtle)]",
+    "bg-card text-foreground border border-border hover:bg-card-subtle",
 };
 
 export interface IconButtonProps

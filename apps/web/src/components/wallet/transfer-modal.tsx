@@ -54,28 +54,28 @@ function WalletDropdown({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
         {label}
       </span>
       <div ref={ref} className="relative">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex h-11 w-full items-center justify-between rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-card-subtle)] px-3 text-sm text-[var(--color-text-primary)] transition-colors hover:border-[var(--color-accent)]"
+          className="flex h-11 w-full items-center justify-between rounded-lg border border-border-subtle bg-card-subtle px-3 text-sm text-foreground transition-colors hover:border-accent"
         >
-          <span className={selected ? "" : "text-[var(--color-text-muted)]"}>
+          <span className={selected ? "" : "text-muted"}>
             {selected?.name ?? "Pilih dompet"}
           </span>
-          <ChevronDown className="size-4 text-[var(--color-text-muted)]" />
+          <ChevronDown className="size-4 text-muted" />
         </button>
         {open && (
-          <div className="absolute left-0 top-12 z-[60] w-full overflow-hidden rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-card)] shadow-[var(--shadow-modal)]">
+          <div className="absolute left-0 top-12 z-60 w-full overflow-hidden rounded-xl border border-border-subtle bg-card shadow-[var(--shadow-modal)]">
             {options.map((w) => (
               <button
                 key={w.id}
                 type="button"
                 onClick={() => { onChange(w.id); setOpen(false); }}
-                className="flex w-full items-center px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-card-subtle)]"
+                className="flex w-full items-center px-4 py-2.5 text-sm text-foreground hover:bg-card-subtle"
               >
                 {w.name}
               </button>
@@ -146,7 +146,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
           <div className="flex-1">
             <WalletDropdown label="Dari" options={fromOptions} value={fromId} onChange={setFromId} />
           </div>
-          <div className="mb-1.5 shrink-0 text-[var(--color-text-muted)]">
+          <div className="mb-1.5 shrink-0 text-muted">
             <ArrowRight className="size-4" aria-hidden />
           </div>
           <div className="flex-1">
@@ -176,7 +176,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
         />
 
         <div className="flex items-center justify-between pt-1">
-          <button type="button" onClick={handleClose} className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">
+          <button type="button" onClick={handleClose} className="text-sm text-muted hover:text-foreground">
             Batal
           </button>
           <Button type="submit" isLoading={loading} disabled={!fromId || !toId || amountValue <= 0}>

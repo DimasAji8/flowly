@@ -144,12 +144,12 @@ export function TransactionForm({
           name="type"
           control={control}
           render={({ field }) => (
-            <div role="radiogroup" aria-label="Jenis transaksi" className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--color-card-subtle)] p-1">
+            <div role="radiogroup" aria-label="Jenis transaksi" className="grid grid-cols-2 gap-2 rounded-xl bg-card-subtle p-1">
               {(["expense", "income"] as TransactionType[]).map((t) => {
                 const isActive = field.value === t;
                 return (
                   <button key={t} type="button" role="radio" aria-checked={isActive} onClick={() => field.onChange(t)}
-                    className={["h-9 rounded-lg text-sm font-medium transition-colors", isActive ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"].join(" ")}
+                    className={["h-9 rounded-lg text-sm font-medium transition-colors", isActive ? "bg-card text-foreground shadow-[var(--shadow-card)]" : "text-secondary hover:text-foreground"].join(" ")}
                   >
                     {t === "expense" ? "Pengeluaran" : "Pemasukan"}
                   </button>
@@ -182,7 +182,7 @@ export function TransactionForm({
 
       {/* Kategori */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">Kategori</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Kategori</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -190,30 +190,30 @@ export function TransactionForm({
               disabled={noCategories}
               className={[
                 "flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors",
-                "bg-[var(--color-card-subtle)] text-[var(--color-text-primary)]",
-                errors.categoryId ? "border-[var(--color-danger)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-accent)]",
+                "bg-card-subtle text-foreground",
+                errors.categoryId ? "border-danger" : "border-border-subtle hover:border-accent",
                 "disabled:opacity-50",
               ].join(" ")}
             >
               <span>{noCategories ? "Belum ada kategori" : (selectedCategory?.name ?? "Pilih kategori")}</span>
-              <ChevronDown className="size-4 text-[var(--color-text-muted)]" />
+              <ChevronDown className="size-4 text-muted" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]" align="start">
             {filteredCategories.map((c) => (
               <DropdownMenuItem key={c.id} onSelect={() => setValue("categoryId", c.id)} className="flex items-center justify-between">
                 <span>{c.name}</span>
-                {c.id === categoryId && <Check className="size-4 text-[var(--color-accent)]" />}
+                {c.id === categoryId && <Check className="size-4 text-accent" />}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-        {errors.categoryId && <p className="text-xs text-[var(--color-danger)]">{errors.categoryId.message}</p>}
+        {errors.categoryId && <p className="text-xs text-danger">{errors.categoryId.message}</p>}
       </div>
 
       {/* Dompet */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">Dompet</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Dompet</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -221,30 +221,30 @@ export function TransactionForm({
               disabled={noWallets}
               className={[
                 "flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors",
-                "bg-[var(--color-card-subtle)] text-[var(--color-text-primary)]",
-                errors.walletId ? "border-[var(--color-danger)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-accent)]",
+                "bg-card-subtle text-foreground",
+                errors.walletId ? "border-danger" : "border-border-subtle hover:border-accent",
                 "disabled:opacity-50",
               ].join(" ")}
             >
               <span>{noWallets ? "Belum ada dompet" : (selectedWallet?.name ?? "Pilih dompet")}</span>
-              <ChevronDown className="size-4 text-[var(--color-text-muted)]" />
+              <ChevronDown className="size-4 text-muted" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]" align="start">
             {wallets.map((w) => (
               <DropdownMenuItem key={w.id} onSelect={() => setValue("walletId", w.id)} className="flex items-center justify-between">
                 <span>{w.name}</span>
-                {w.id === walletId && <Check className="size-4 text-[var(--color-accent)]" />}
+                {w.id === walletId && <Check className="size-4 text-accent" />}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-        {errors.walletId && <p className="text-xs text-[var(--color-danger)]">{errors.walletId.message}</p>}
+        {errors.walletId && <p className="text-xs text-danger">{errors.walletId.message}</p>}
       </div>
 
       {/* Tanggal — Popover + Calendar */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">Tanggal</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Tanggal</span>
         <Controller
           name="transactionDate"
           control={control}
@@ -257,12 +257,12 @@ export function TransactionForm({
                     type="button"
                     className={[
                       "flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors text-left",
-                      "bg-[var(--color-card-subtle)] text-[var(--color-text-primary)]",
-                      errors.transactionDate ? "border-[var(--color-danger)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-accent)]",
+                      "bg-card-subtle text-foreground",
+                      errors.transactionDate ? "border-danger" : "border-border-subtle hover:border-accent",
                     ].join(" ")}
                   >
                     <span>{field.value ? formatDateLong(field.value) : "Pilih tanggal"}</span>
-                    <CalendarIcon className="size-4 text-[var(--color-text-muted)]" />
+                    <CalendarIcon className="size-4 text-muted" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -283,7 +283,7 @@ export function TransactionForm({
             );
           }}
         />
-        {errors.transactionDate && <p className="text-xs text-[var(--color-danger)]">{errors.transactionDate.message}</p>}
+        {errors.transactionDate && <p className="text-xs text-danger">{errors.transactionDate.message}</p>}
       </div>
 
       <Input label="Catatan (opsional)" placeholder="mis. Makan siang bareng tim" maxLength={280} {...register("note")} error={errors.note?.message} />
