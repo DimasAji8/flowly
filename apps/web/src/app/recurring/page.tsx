@@ -27,22 +27,18 @@ export default function RecurringListPage() {
   const [error, setError] = useState<string | null>(null);
 
   const reload = async () => {
-    setLoading(true);
     setError(null);
     try {
       const data = await recurringService.list();
       setItems(data);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to load");
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    reload();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    reload().finally(() => setLoading(false));
   }, []);
 
   const toggleActive = async (r: RecurringTransaction) => {
