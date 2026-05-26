@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { BackButton } from "@/components/ui/back-button";
 import { ActionMenu } from "@/components/ui/action-menu";
+import { Modal } from "@/components/ui/modal";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ApiError } from "@/lib/api-client";
 import { categoriesService } from "@/services/categories.service";
@@ -52,6 +53,8 @@ export default function CategoriesPage() {
   const [color, setColor] = useState(DEFAULT_COLOR);
   const [icon, setIcon] = useState(DEFAULT_ICON);
   const [group, setGroup] = useState<"needs" | "wants" | "savings">("needs");
+  const [addOpen, setAddOpen] = useState(false);
+  const [addStep, setAddStep] = useState<"pick" | "form">("pick");
   const [creating, setCreating] = useState(false);
 
   const reload = async () => {
@@ -82,6 +85,8 @@ export default function CategoriesPage() {
       setName("");
       setColor(DEFAULT_COLOR);
       setIcon(DEFAULT_ICON);
+      setAddOpen(false);
+      setAddStep("pick");
       toast.success("Kategori ditambahkan");
       await reload();
     } catch (e) {
@@ -112,8 +117,11 @@ export default function CategoriesPage() {
       <BackButton />
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-          Categories
+          Kategori
         </h1>
+        <Button size="sm" leftIcon={<Plus className="size-4" aria-hidden />} onClick={() => setAddOpen(true)}>
+          Tambah
+        </Button>
       </header>
 
       {error && (
@@ -121,106 +129,6 @@ export default function CategoriesPage() {
           {error}
         </div>
       )}
-
-      {/* Form add */}
-      <Card padding="md">
-        <form onSubmit={handleCreate} className="flex flex-col gap-4">
-          <h2 className="text-sm font-medium text-foreground">
-            Tambah kategori
-          </h2>
-
-          <div className="grid gap-3 md:grid-cols-[1fr_140px_auto]">
-            <Input
-              label="Nama"
-              placeholder="mis. Makanan"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={60}
-              required
-            />
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
-                Jenis
-              </label>
-              <div role="radiogroup" aria-label="Jenis kategori" className="grid grid-cols-2 gap-1 rounded-lg bg-card-subtle p-1">
-                {(["expense", "income"] as TransactionType[]).map((t) => {
-                  const isActive = type === t;
-                  return (
-                    <button key={t} type="button" role="radio" aria-checked={isActive}
-                      onClick={() => { setType(t); setIcon(EMOJI_SUGGESTIONS[t][0]); }}
-                      className={["h-9 rounded-md text-xs font-medium capitalize transition-colors", isActive ? "bg-card text-foreground shadow-[var(--shadow-card)]" : "text-secondary"].join(" ")}
-                    >{t === "expense" ? "Pengeluaran" : "Pemasukan"}</button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="cat-color" className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
-                Warna
-              </label>
-              <div className="flex h-11 items-center gap-2 rounded-lg border border-border-subtle bg-card-subtle px-2">
-                <input type="color" id="cat-color" value={color} onChange={(e) => setColor(e.target.value)}
-                  className="size-7 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Pick color" />
-                <span className="text-xs tabular-nums text-secondary">{color.toUpperCase()}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Group picker — hanya untuk expense */}
-          {type === "expense" && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
-                Grup
-                <span className="ml-1 normal-case font-normal text-muted">— untuk insight keuangan</span>
-              </label>
-              <div role="radiogroup" className="grid grid-cols-3 gap-2">
-                {GROUP_OPTIONS.map((g) => (
-                  <button key={g.value} type="button" role="radio" aria-checked={group === g.value}
-                    onClick={() => setGroup(g.value)}
-                    className={["rounded-xl border px-3 py-2.5 text-left transition-colors", group === g.value ? "border-accent bg-accent-soft" : "border-border-subtle bg-card-subtle hover:border-border"].join(" ")}
-                  >
-                    <p className={["text-xs font-semibold", group === g.value ? "text-accent" : "text-foreground"].join(" ")}>{g.label}</p>
-                    <p className="text-[11px] text-muted">{g.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
-              Ikon
-            </label>
-            <div className="flex items-center gap-2">
-              {/* Selected preview */}
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-xl">
-                {icon}
-              </span>
-              {/* Scrollable emoji grid */}
-              <div className="flex flex-1 gap-1.5 overflow-x-auto pb-1">
-                {EMOJI_SUGGESTIONS[type].map((e) => (
-                  <button
-                    key={e}
-                    type="button"
-                    onClick={() => setIcon(e)}
-                    className={["size-9 shrink-0 rounded-xl text-lg transition-colors", icon === e ? "bg-accent-soft ring-2 ring-[var(--color-accent)]" : "bg-card-subtle hover:bg-surface"].join(" ")}
-                    aria-label={e}
-                  >
-                    {e}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button type="submit" isLoading={creating} leftIcon={<Plus className="size-4" aria-hidden />} disabled={!name.trim()}>
-              Tambah kategori
-            </Button>
-          </div>
-        </form>
-      </Card>
 
       {/* List */}
       {loading ? (
@@ -252,6 +160,80 @@ export default function CategoriesPage() {
         onConfirm={() => confirmDelete && handleDelete(confirmDelete.id, confirmDelete.name)}
         title={`Hapus kategori "${confirmDelete?.name}"?`}
       />
+
+      <Modal open={addOpen} onClose={() => { setAddOpen(false); setAddStep("pick"); setName(""); setColor(DEFAULT_COLOR); setIcon(DEFAULT_ICON); setType("expense"); }} title={addStep === "form" ? (type === "expense" ? "Kategori Pengeluaran" : "Kategori Pemasukan") : "Tambah kategori"}>
+        {addStep === "pick" ? (
+          <div className="flex flex-col gap-3 py-2">
+            <button type="button" onClick={() => { setType("expense"); setIcon(EMOJI_SUGGESTIONS.expense[0]); setAddStep("form"); }}
+              className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-danger hover:bg-danger-soft">
+              <span className="text-2xl">💸</span>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Pengeluaran</p>
+                <p className="text-xs text-muted">Makanan, transportasi, dll.</p>
+              </div>
+            </button>
+            <button type="button" onClick={() => { setType("income"); setIcon(EMOJI_SUGGESTIONS.income[0]); setAddStep("form"); }}
+              className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-success hover:bg-success-soft">
+              <span className="text-2xl">💰</span>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Pemasukan</p>
+                <p className="text-xs text-muted">Gaji, freelance, dll.</p>
+              </div>
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+            <Input label="Nama" placeholder="mis. Makanan" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} required />
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="cat-color-modal" className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Warna</label>
+              <div className="flex h-11 items-center gap-2 rounded-lg border border-border-subtle bg-card-subtle px-2">
+                <input type="color" id="cat-color-modal" value={color} onChange={(e) => setColor(e.target.value)} className="size-7 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Pick color" />
+                <span className="text-xs tabular-nums text-secondary">{color.toUpperCase()}</span>
+              </div>
+            </div>
+
+            {type === "expense" && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
+                  Grup <span className="ml-1 normal-case font-normal text-muted">— untuk insight keuangan</span>
+                </label>
+                <div role="radiogroup" className="grid grid-cols-3 gap-2">
+                  {GROUP_OPTIONS.map((g) => (
+                    <button key={g.value} type="button" role="radio" aria-checked={group === g.value}
+                      onClick={() => setGroup(g.value)}
+                      className={["rounded-xl border px-3 py-2.5 text-left transition-colors", group === g.value ? "border-accent bg-accent-soft" : "border-border-subtle bg-card-subtle hover:border-border"].join(" ")}
+                    >
+                      <p className={["text-xs font-semibold", group === g.value ? "text-accent" : "text-foreground"].join(" ")}>{g.label}</p>
+                      <p className="text-[11px] text-muted">{g.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Ikon</label>
+              <div className="flex items-center gap-2">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-xl">{icon}</span>
+                <div className="flex flex-1 gap-1 overflow-x-auto overflow-y-visible py-1 pb-2">
+                  {EMOJI_SUGGESTIONS[type].map((e) => (
+                    <button key={e} type="button" onClick={() => setIcon(e)}
+                      className={["size-8 shrink-0 rounded-lg text-base transition-colors", icon === e ? "bg-accent-soft ring-2 ring-[var(--color-accent)]" : "bg-card-subtle hover:bg-surface"].join(" ")}
+                      aria-label={e}
+                    >{e}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <button type="button" onClick={() => setAddStep("pick")} className="text-sm text-muted hover:text-foreground">← Kembali</button>
+              <Button type="submit" isLoading={creating} disabled={!name.trim()}>Tambah</Button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 }
