@@ -200,56 +200,46 @@ export default function SavingsGoalsPage() {
                   />
                 </div>
 
-                {/* ── amounts ── */}
-                <div className="flex items-end justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] font-medium uppercase tracking-widest text-muted">
-                      Terkumpul
-                    </p>
-                    <p className="text-lg font-bold tabular-nums leading-tight text-foreground">
+                {/* ── amounts + progress ── */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-base font-semibold tabular-nums text-foreground">
                       {formatCurrency(currentAmount)}
-                    </p>
+                    </span>
+                    <span className="text-xs tabular-nums text-muted">
+                      / {formatCurrency(targetAmount)}
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-medium uppercase tracking-widest text-muted">
-                      Target
-                    </p>
-                    <p className="text-sm font-medium tabular-nums text-secondary">
-                      {formatCurrency(targetAmount)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* ── progress ── */}
-                <div className="flex flex-col gap-1.5">
-                  <div className={["h-2.5 w-full overflow-hidden rounded-full", cfg.track].join(" ")}>
+                  <div className={["h-2 w-full overflow-hidden rounded-full", cfg.track].join(" ")}>
                     <div
                       className={["h-full rounded-full transition-all duration-500", cfg.fill].join(" ")}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-xs text-muted">
                     {remaining > 0 ? (
-                      <span className="text-muted">
+                      <span>
                         Sisa {formatCurrency(remaining)}
                         {goal.note ? ` · ${goal.note}` : ""}
                       </span>
                     ) : (
                       <span className="font-medium text-success">Target tercapai</span>
                     )}
-                    <span className="font-bold text-foreground">{progress}%</span>
+                    <span className="font-medium text-foreground">{progress}%</span>
                   </div>
                 </div>
 
                 {/* ── CTA ── */}
                 {status !== "completed" && (
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={() => setContributionGoal(goal)}
-                  >
-                    Tambah Setoran
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setContributionGoal(goal)}
+                    >
+                       Tambah Setoran
+                    </Button>
+                  </div>
                 )}
               </li>
             );
