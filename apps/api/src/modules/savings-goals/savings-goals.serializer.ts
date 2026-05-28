@@ -8,6 +8,7 @@ export interface SerializedSavingsGoal {
   currentAmount: string;
   targetDate: string;
   note: string | null;
+  isPaused: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +24,7 @@ export function serializeSavingsGoal(
     currentAmount: goal.currentAmount.toString(),
     targetDate: goal.targetDate.toISOString(),
     note: goal.note,
+    isPaused: goal.isPaused,
     createdAt: goal.createdAt,
     updatedAt: goal.updatedAt,
   };

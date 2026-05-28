@@ -80,6 +80,7 @@ export class SavingsGoalsService {
           ? { targetDate: new Date(dto.targetDate) }
           : {}),
         ...(dto.note !== undefined ? { note: dto.note } : {}),
+        ...(dto.isPaused !== undefined ? { isPaused: dto.isPaused } : {}),
       },
     });
     return serializeSavingsGoal(updated);

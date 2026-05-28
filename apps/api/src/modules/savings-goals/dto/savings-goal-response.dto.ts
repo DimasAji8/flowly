@@ -8,6 +8,7 @@ export class SavingsGoalResponse {
   @ApiProperty({ example: '2500000.00' }) currentAmount!: string;
   @ApiProperty({ example: '2026-12-31T00:00:00.000Z' }) targetDate!: string;
   @ApiProperty({ nullable: true }) note!: string | null;
+  @ApiProperty() isPaused!: boolean;
   @ApiProperty() createdAt!: Date;
   @ApiProperty() updatedAt!: Date;
 }

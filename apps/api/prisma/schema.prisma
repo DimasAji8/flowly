@@ -163,6 +163,7 @@ model SavingsGoal {
   currentAmount  Decimal  @default(0) @map("current_amount") @db.Decimal(18, 2)
   targetDate     DateTime @map("target_date") @db.Date
   note           String?
+  isPaused       Boolean  @default(false) @map("is_paused")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 

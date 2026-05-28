@@ -19,10 +19,10 @@ function DesktopHeader() {
   const pathname = usePathname();
   const router = useRouter();
 
-  if (ROOT_PATHS.has(pathname as any)) return null;
+  if (ROOT_PATHS.has(pathname as string)) return null;
 
   return (
-    <div className="sticky top-0 z-20 hidden md:flex items-center gap-3 rounded-t-2xl border-b border-border-subtle bg-[var(--color-bg)]/90 backdrop-blur-md px-6 py-3">
+    <div className="sticky top-0 z-20 hidden md:flex items-center gap-3 rounded-t-2xl border-b border-border-subtle bg-(--color-bg)/90 backdrop-blur-md px-6 py-3">
       <button
         type="button"
         onClick={() => router.back()}
@@ -41,14 +41,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (auth.status !== "authenticated") {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[var(--color-bg)] text-sm text-muted">
+      <div className="flex min-h-dvh items-center justify-center bg-background text-sm text-muted">
         Loading…
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-dvh w-full bg-[var(--color-bg)]">
+    <div className="flex min-h-dvh w-full bg-background">
       <SideNav />
 
       {/* Desktop: konten di-center seperti Threads */}

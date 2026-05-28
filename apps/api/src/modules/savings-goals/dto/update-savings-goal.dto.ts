@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsBoolean,
   IsDateString,
   IsNumber,
   IsOptional,
@@ -54,4 +55,9 @@ export class UpdateSavingsGoalDto {
     typeof value === 'string' ? value.trim() : value,
   )
   note?: string;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  isPaused?: boolean;
 }

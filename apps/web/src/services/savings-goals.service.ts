@@ -8,6 +8,7 @@ export interface CreateSavingsGoalPayload {
   targetDate: string;
   linkedWalletId?: string;
   note?: string;
+  isPaused?: boolean;
 }
 
 export const savingsGoalsService = {

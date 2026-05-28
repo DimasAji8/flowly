@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { ArrowRight, MoreVertical, Pause, Pencil, Play, Trash2 } from "lucide-react";
 
 interface ActionMenuProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onTransfer?: () => void;
+  onTogglePause?: () => void;
+  isPaused?: boolean;
   editLabel?: string;
   deleteLabel?: string;
   transferLabel?: string;
@@ -16,6 +18,8 @@ export function ActionMenu({
   onEdit,
   onDelete,
   onTransfer,
+  onTogglePause,
+  isPaused = false,
   editLabel = "Edit",
   deleteLabel = "Hapus",
   transferLabel = "Transfer",
@@ -33,7 +37,9 @@ export function ActionMenu({
   }, [open]);
 
   return (
-    <div ref={ref} className="relative">
+    // isolation:isolate creates a new stacking context so the dropdown
+    // is always painted above sibling elements regardless of their z-index
+    <div ref={ref} className="relative isolate">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -45,7 +51,17 @@ export function ActionMenu({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-9 z-50 min-w-35 overflow-hidden rounded-xl border border-border-subtle bg-card shadow-(--shadow-modal)">
+        <div className="absolute right-0 top-full z-100 mt-1 w-44 overflow-hidden rounded-xl border border-border-subtle bg-card shadow-lg">
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); onEdit(); }}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-card-subtle"
+            >
+              <Pencil className="size-3.5 text-muted" aria-hidden />
+              {editLabel}
+            </button>
+          )}
           {onTransfer && (
             <button
               type="button"
@@ -56,14 +72,16 @@ export function ActionMenu({
               {transferLabel}
             </button>
           )}
-          {onEdit && (
+          {onTogglePause && (
             <button
               type="button"
-              onClick={() => { setOpen(false); onEdit(); }}
+              onClick={() => { setOpen(false); onTogglePause(); }}
               className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-card-subtle"
             >
-              <Pencil className="size-3.5 text-muted" aria-hidden />
-              {editLabel}
+              {isPaused
+                ? <Play className="size-3.5 text-muted" aria-hidden />
+                : <Pause className="size-3.5 text-muted" aria-hidden />}
+              {isPaused ? "Aktifkan" : "Tunda"}
             </button>
           )}
           {onDelete && (

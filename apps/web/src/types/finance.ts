@@ -105,6 +105,7 @@ export interface SavingsGoal {
   currentAmount: string;
   targetDate: string;
   note: string | null;
+  isPaused: boolean;
   createdAt: string;
   updatedAt: string;
 }

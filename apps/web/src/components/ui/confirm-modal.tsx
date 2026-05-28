@@ -10,6 +10,7 @@ interface ConfirmModalProps {
   title: string;
   description?: string;
   confirmLabel?: string;
+  confirmVariant?: "primary" | "secondary" | "danger";
   loading?: boolean;
 }
 
@@ -20,6 +21,7 @@ export function ConfirmModal({
   title,
   description,
   confirmLabel = "Hapus",
+  confirmVariant = "danger",
   loading = false,
 }: ConfirmModalProps) {
   return (
@@ -35,7 +37,7 @@ export function ConfirmModal({
         >
           Batal
         </button>
-        <Button variant="danger" isLoading={loading} onClick={onConfirm}>
+        <Button variant={confirmVariant} isLoading={loading} onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </div>
