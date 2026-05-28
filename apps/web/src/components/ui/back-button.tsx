@@ -9,7 +9,7 @@ export function BackButton({ label = "Kembali" }: { label?: string }) {
     <button
       type="button"
       onClick={() => router.back()}
-      className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-foreground transition-colors"
+      className="md:hidden inline-flex items-center gap-1.5 text-sm text-secondary hover:text-foreground transition-colors"
     >
       <ArrowLeft className="size-4" aria-hidden />
       {label}

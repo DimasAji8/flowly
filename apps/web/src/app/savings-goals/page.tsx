@@ -7,7 +7,6 @@ import { SavingsGoalContributionModal } from "@/components/savings-goals/savings
 import { ActionMenu } from "@/components/ui/action-menu";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { SavingsGoalModal } from "@/components/savings-goals/savings-goal-modal";
 import { ApiError } from "@/lib/api-client";
@@ -19,12 +18,15 @@ import { formatDateLong } from "@/utils/format-date";
 
 type GoalStatus = "pending" | "on-track" | "completed" | "overdue" | "paused";
 
-const STATUS_CONFIG: Record<GoalStatus, { label: string; className: string }> = {
-  pending: { label: "Belum mulai", className: "bg-card-subtle text-secondary" },
-  "on-track": { label: "Berjalan", className: "bg-accent-soft text-accent" },
-  completed: { label: "Tercapai", className: "bg-success/15 text-success" },
-  overdue: { label: "Terlambat", className: "bg-danger-soft text-danger" },
-  paused: { label: "Dijeda", className: "bg-warning/15 text-warning" },
+const STATUS_CONFIG: Record<
+  GoalStatus,
+  { label: string; badge: string; track: string; fill: string }
+> = {
+  pending:    { label: "Belum mulai", badge: "bg-card-subtle text-secondary",   track: "bg-border-subtle",  fill: "bg-muted"    },
+  "on-track": { label: "Berjalan",    badge: "bg-accent-soft text-accent",      track: "bg-accent/15",      fill: "bg-accent"   },
+  completed:  { label: "Tercapai",    badge: "bg-success/15 text-success",      track: "bg-success/15",     fill: "bg-success"  },
+  overdue:    { label: "Terlambat",   badge: "bg-danger-soft text-danger",      track: "bg-danger/15",      fill: "bg-danger"   },
+  paused:     { label: "Dijeda",      badge: "bg-warning/15 text-warning",      track: "bg-warning/15",     fill: "bg-warning"  },
 };
 
 function getGoalStatus(goal: SavingsGoal): GoalStatus {
@@ -33,13 +35,11 @@ function getGoalStatus(goal: SavingsGoal): GoalStatus {
   if (currentAmount >= targetAmount) return "completed";
   if (goal.isPaused) return "paused";
   if (currentAmount <= 0) return "pending";
-
   const targetDate = new Date(goal.targetDate);
   const today = new Date();
   targetDate.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
   if (targetDate < today) return "overdue";
-
   return "on-track";
 }
 
@@ -70,27 +70,19 @@ export default function SavingsGoalsPage() {
 
   useEffect(() => {
     let cancelled = false;
-
     async function fetchInitial() {
       try {
         const [goals, walletList] = await Promise.all([
           savingsGoalsService.list(),
           walletsService.list(),
         ]);
-        if (!cancelled) {
-          setItems(goals);
-          setWallets(walletList);
-          setError(null);
-        }
+        if (!cancelled) { setItems(goals); setWallets(walletList); setError(null); }
       } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof ApiError ? e.message : "Gagal memuat target tabungan");
-        }
+        if (!cancelled) setError(e instanceof ApiError ? e.message : "Gagal memuat target tabungan");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
-
     fetchInitial();
     return () => { cancelled = true; };
   }, []);
@@ -156,104 +148,113 @@ export default function SavingsGoalsPage() {
           Belum ada target tabungan. Buat target pertama untuk mulai melacak tujuan finansial.
         </div>
       ) : (
-        <Card padding="none">
-          <ul className="divide-y divide-border-subtle">
-            {items.map((goal) => {
-              const targetAmount = Number(goal.targetAmount);
-              const currentAmount = Number(goal.currentAmount);
-              const progress = targetAmount > 0
-                ? Math.min(100, Math.round((currentAmount / targetAmount) * 100))
-                : 0;
-              const remaining = Math.max(targetAmount - currentAmount, 0);
-              const status = getGoalStatus(goal);
-              const { label, className: badgeClass } = STATUS_CONFIG[status];
-              const linkedWalletName = goal.linkedWalletId
-                ? walletNameById.get(goal.linkedWalletId)
-                : null;
+        <ul className="flex flex-col gap-4">
+          {items.map((goal) => {
+            const targetAmount = Number(goal.targetAmount);
+            const currentAmount = Number(goal.currentAmount);
+            const progress = targetAmount > 0
+              ? Math.min(100, Math.round((currentAmount / targetAmount) * 100))
+              : 0;
+            const remaining = Math.max(targetAmount - currentAmount, 0);
+            const status = getGoalStatus(goal);
+            const cfg = STATUS_CONFIG[status];
+            const linkedWalletName = goal.linkedWalletId
+              ? walletNameById.get(goal.linkedWalletId)
+              : null;
 
-              return (
-                <li key={goal.id} className="flex flex-col gap-3 px-5 py-4">
-                  {/* row 1 — name + badge + action menu */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold text-foreground">
-                          {goal.name}
-                        </span>
-                        <span className={["rounded-full px-2 py-0.5 text-[11px] font-medium", badgeClass].join(" ")}>
-                          {label}
-                        </span>
-                      </div>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
-                        <span>Target {formatDateLong(goal.targetDate.slice(0, 10))}</span>
-                        {linkedWalletName && (
-                          <>
-                            <span aria-hidden>·</span>
-                            <span className="flex items-center gap-1">
-                              <WalletIcon className="size-3" aria-hidden />
-                              {linkedWalletName}
-                            </span>
-                          </>
-                        )}
-                      </div>
+            return (
+              <li
+                key={goal.id}
+                className="flex flex-col gap-3 rounded-2xl border border-border-subtle bg-card p-4"
+                style={{ boxShadow: "var(--shadow-card-emphasis)" }}
+              >
+                {/* ── top row: name / meta / menu ── */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-semibold text-foreground leading-tight">
+                        {goal.name}
+                      </h3>
+                      <span className={["rounded-full px-2 py-0.5 text-[11px] font-semibold", cfg.badge].join(" ")}>
+                        {cfg.label}
+                      </span>
                     </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
+                      <span>Target {formatDateLong(goal.targetDate.slice(0, 10))}</span>
+                      {linkedWalletName && (
+                        <>
+                          <span aria-hidden>·</span>
+                          <span className="flex items-center gap-1">
+                            <WalletIcon className="size-3" aria-hidden />
+                            {linkedWalletName}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <ActionMenu
+                    onEdit={() => { setEditingGoal(goal); setModalOpen(true); }}
+                    onDelete={() => setConfirmDeleteGoal(goal)}
+                    onTogglePause={status !== "completed" ? () => setConfirmPauseGoal(goal) : undefined}
+                    isPaused={goal.isPaused}
+                  />
+                </div>
 
-                    <ActionMenu
-                      onEdit={() => { setEditingGoal(goal); setModalOpen(true); }}
-                      onDelete={() => setConfirmDeleteGoal(goal)}
-                      onTogglePause={status !== "completed"
-                        ? () => setConfirmPauseGoal(goal)
-                        : undefined}
-                      isPaused={goal.isPaused}
+                {/* ── amounts ── */}
+                <div className="flex items-end justify-between gap-2">
+                  <div>
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-muted">
+                      Terkumpul
+                    </p>
+                    <p className="text-lg font-bold tabular-nums leading-tight text-foreground">
+                      {formatCurrency(currentAmount)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-muted">
+                      Target
+                    </p>
+                    <p className="text-sm font-medium tabular-nums text-secondary">
+                      {formatCurrency(targetAmount)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* ── progress ── */}
+                <div className="flex flex-col gap-1.5">
+                  <div className={["h-2.5 w-full overflow-hidden rounded-full", cfg.track].join(" ")}>
+                    <div
+                      className={["h-full rounded-full transition-all duration-500", cfg.fill].join(" ")}
+                      style={{ width: `${progress}%` }}
                     />
                   </div>
-
-                  {/* row 2 — progress bar */}
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-xs">
+                    {remaining > 0 ? (
                       <span className="text-muted">
-                        {formatCurrency(currentAmount)} / {formatCurrency(targetAmount)}
+                        Sisa {formatCurrency(remaining)}
+                        {goal.note ? ` · ${goal.note}` : ""}
                       </span>
-                      <span className="font-medium text-foreground">{progress}%</span>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-border-subtle">
-                      <div
-                        className={[
-                          "h-full rounded-full transition-all",
-                          status === "completed" ? "bg-success"
-                            : status === "overdue" ? "bg-danger"
-                            : status === "paused" ? "bg-muted"
-                            : status === "pending" ? "bg-border"
-                            : "bg-accent",
-                        ].join(" ")}
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                    {(remaining > 0 || goal.note) && (
-                      <div className="flex items-center justify-between text-xs text-muted">
-                        {remaining > 0 && <span>Sisa {formatCurrency(remaining)}</span>}
-                        {goal.note && <span className="truncate pl-2">{goal.note}</span>}
-                      </div>
+                    ) : (
+                      <span className="font-medium text-success">Target tercapai</span>
                     )}
+                    <span className="font-bold text-foreground">{progress}%</span>
                   </div>
+                </div>
 
-                  {/* row 3 — cta (hidden if completed) */}
-                  {status !== "completed" && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      className="self-start"
-                      onClick={() => setContributionGoal(goal)}
-                    >
-                      + Tambah setoran
-                    </Button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </Card>
+                {/* ── CTA ── */}
+                {status !== "completed" && (
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={() => setContributionGoal(goal)}
+                  >
+                    Tambah Setoran
+                  </Button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       <SavingsGoalModal
@@ -272,7 +273,6 @@ export default function SavingsGoalsPage() {
         onSuccess={reload}
       />
 
-      {/* confirm delete */}
       <ConfirmModal
         open={Boolean(confirmDeleteGoal)}
         onClose={() => setConfirmDeleteGoal(null)}
@@ -283,7 +283,6 @@ export default function SavingsGoalsPage() {
         confirmVariant="danger"
       />
 
-      {/* confirm pause / resume */}
       <ConfirmModal
         open={Boolean(confirmPauseGoal)}
         onClose={() => setConfirmPauseGoal(null)}

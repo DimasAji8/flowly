@@ -10,16 +10,15 @@ import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { ROUTES } from "@/constants/routes";
 
 // Halaman root — tidak perlu back button
-const ROOT_PATHS = new Set([
-  ROUTES.dashboard, ROUTES.transactions, ROUTES.calendar,
-  ROUTES.profile, ROUTES.wallets, ROUTES.categories, ROUTES.recurring,
+const ROOT_PATHS = new Set<string>([
+  ROUTES.dashboard, ROUTES.transactions, ROUTES.calendar, ROUTES.profile,
 ]);
 
 function DesktopHeader() {
   const pathname = usePathname();
   const router = useRouter();
 
-  if (ROOT_PATHS.has(pathname as string)) return null;
+  if (ROOT_PATHS.has(pathname)) return null;
 
   return (
     <div className="sticky top-0 z-20 hidden md:flex items-center gap-3 rounded-t-2xl border-b border-border-subtle bg-(--color-bg)/90 backdrop-blur-md px-6 py-3">
