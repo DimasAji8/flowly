@@ -138,11 +138,11 @@ export default function WalletsPage() {
         <form onSubmit={handleCreateWallet} className="flex flex-col gap-4">
           <Input label="Nama" placeholder="mis. BCA" value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={60} required />
           <Input label="Saldo awal" type="number" inputMode="decimal" step="0.01" placeholder="0" leftAdornment={<span className="font-medium">Rp</span>} value={newBalance} onChange={(e) => setNewBalance(e.target.value)} />
-          <div className="flex items-center justify-between pt-1">
-            <button type="button" onClick={() => setAddOpen(false)} className="text-sm text-muted hover:text-foreground">
+          <div className="flex items-center gap-3 pt-1">
+            <Button type="button" variant="secondary" className="flex-1" onClick={() => setAddOpen(false)}>
               Batal
-            </button>
-            <Button type="submit" isLoading={creating} disabled={!newName.trim()}>
+            </Button>
+            <Button type="submit" isLoading={creating} className="flex-1" disabled={!newName.trim()}>
               Tambah
             </Button>
           </div>

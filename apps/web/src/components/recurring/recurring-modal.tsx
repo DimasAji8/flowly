@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/modal";
+import { Button } from "@/components/ui/button";
 import { RecurringForm } from "@/components/forms/recurring-form";
 import { recurringService } from "@/services/recurring.service";
 import type { TransactionType } from "@/types/finance";
@@ -83,13 +84,9 @@ export function RecurringModal({ open, onClose, onSuccess }: RecurringModalProps
               onSuccess();
             }}
             secondaryAction={
-              <button
-                type="button"
-                onClick={handleClose}
-                className="text-sm text-secondary hover:text-foreground"
-              >
+              <Button type="button" variant="secondary" className="flex-1" onClick={handleClose}>
                 Batal
-              </button>
+              </Button>
             }
           />
         </div>

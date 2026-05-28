@@ -287,10 +287,10 @@ export function TransactionForm({
       <Input label="Catatan (opsional)" placeholder="mis. Makan siang bareng tim" maxLength={280} {...register("note")} error={errors.note?.message} />
 
       <div className="mt-2 flex items-center gap-3">
-        <Button type="submit" isLoading={isSubmitting} className="flex-1 md:flex-none md:px-8" disabled={noWallets || noCategories}>
+        {secondaryAction}
+        <Button type="submit" isLoading={isSubmitting} className="flex-1" disabled={noWallets || noCategories}>
           {submitLabel}
         </Button>
-        {secondaryAction}
       </div>
     </form>
   );

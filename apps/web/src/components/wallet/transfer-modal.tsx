@@ -165,11 +165,11 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
           onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
         />
 
-        <div className="flex items-center justify-between pt-1">
-          <button type="button" onClick={handleClose} className="text-sm text-muted hover:text-foreground">
+        <div className="flex items-center gap-3 pt-1">
+          <Button type="button" variant="secondary" className="flex-1" onClick={handleClose}>
             Batal
-          </button>
-          <Button type="submit" isLoading={loading} disabled={!form.fromId || !form.toId || form.amountValue <= 0}>
+          </Button>
+          <Button type="submit" isLoading={loading} className="flex-1" disabled={!form.fromId || !form.toId || form.amountValue <= 0}>
             Transfer
           </Button>
         </div>

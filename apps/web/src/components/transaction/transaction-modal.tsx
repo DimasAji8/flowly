@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/modal";
+import { Button } from "@/components/ui/button";
 import { TransactionForm } from "@/components/forms/transaction-form";
 import { transactionsService } from "@/services/transactions.service";
 import type { CreateTransactionFormValues } from "@/lib/transaction-schemas";
@@ -85,9 +86,9 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
           }
           onSubmit={handleSubmit}
           secondaryAction={
-            <button type="button" onClick={handleClose} className="text-sm text-secondary hover:text-foreground">
+            <Button type="button" variant="secondary" className="flex-1" onClick={handleClose}>
               Batal
-            </button>
+            </Button>
           }
         />
         </div>
