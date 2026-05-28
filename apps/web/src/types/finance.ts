@@ -96,3 +96,15 @@ export interface Transfer {
   transferDate: string;
   createdAt: string;
 }
+
+export interface SavingsGoal {
+  id: string;
+  linkedWalletId: string | null;
+  name: string;
+  targetAmount: string;
+  currentAmount: string;
+  targetDate: string;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

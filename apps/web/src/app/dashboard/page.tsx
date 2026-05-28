@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useTheme } from "next-themes";
+import { SavingsGoalsSummary } from "@/components/dashboard/savings-goals-summary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { SpendingInsights } from "@/components/dashboard/spending-insights";
@@ -11,9 +12,10 @@ import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
+import { savingsGoalsService } from "@/services/savings-goals.service";
 import { transactionsService } from "@/services/transactions.service";
 import { useAuthStore } from "@/store/auth.store";
-import type { MonthlySummary, Transaction, CategoryGroup } from "@/types/finance";
+import type { MonthlySummary, Transaction, CategoryGroup, SavingsGoal } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
 
 type CategorySpend = {
@@ -33,6 +35,7 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
   const [allTx, setAllTx] = useState<Transaction[]>([]);
+  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -67,8 +70,9 @@ export default function DashboardPage() {
     Promise.all([
       transactionsService.monthlySummary(),
       transactionsService.list({ limit: 500, page: 1, from, to }),
+      savingsGoalsService.list(),
     ])
-      .then(([s, all]) => {
+      .then(([s, all, goals]) => {
         if (cancelled) return;
         setSummary(s);
         setRecent(all.data
@@ -77,6 +81,7 @@ export default function DashboardPage() {
           .slice(0, 5)
         );
         setAllTx(all.data);
+        setSavingsGoals(goals);
         setError(null);
       })
       .catch((e: unknown) => {
@@ -204,6 +209,10 @@ export default function DashboardPage() {
             categorySpends={categorySpends}
             totalIncome={totalIncome}
           />
+        )}
+
+        {!loading && savingsGoals.length > 0 && (
+          <SavingsGoalsSummary items={savingsGoals} />
         )}
       </div>
 

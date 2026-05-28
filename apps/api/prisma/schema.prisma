@@ -73,6 +73,7 @@ model Workspace {
   members               WorkspaceMember[]
   wallets               Wallet[]
   categories            Category[]
+  savingsGoals          SavingsGoal[]
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
   transfers             Transfer[]
@@ -116,6 +117,7 @@ model Wallet {
   createdAt   DateTime @default(now()) @map("created_at")
 
   workspace             Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  savingsGoals          SavingsGoal[]
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
   transfersFrom         Transfer[]             @relation("TransferFrom")
@@ -146,6 +148,30 @@ model Category {
   @@index([workspaceId])
   @@index([workspaceId, type])
   @@map("categories")
+}
+
+// =====================================================
+// Savings Goal
+// =====================================================
+
+model SavingsGoal {
+  id             String   @id @default(cuid())
+  workspaceId    String   @map("workspace_id")
+  linkedWalletId String?  @map("linked_wallet_id")
+  name           String
+  targetAmount   Decimal  @map("target_amount") @db.Decimal(18, 2)
+  currentAmount  Decimal  @default(0) @map("current_amount") @db.Decimal(18, 2)
+  targetDate     DateTime @map("target_date") @db.Date
+  note           String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  linkedWallet Wallet?   @relation(fields: [linkedWalletId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([workspaceId, targetDate])
+  @@map("savings_goals")
 }
 
 // =====================================================

@@ -8,6 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { WalletsModule } from './modules/wallets/wallets.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { SavingsGoalsModule } from './modules/savings-goals/savings-goals.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { RecurringModule } from './modules/recurring/recurring.module';
 import { JobsModule } from './jobs/jobs.module';
@@ -23,6 +24,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
     WorkspacesModule,
     WalletsModule,
     CategoriesModule,
+    SavingsGoalsModule,
     TransactionsModule,
     RecurringModule,
     JobsModule,

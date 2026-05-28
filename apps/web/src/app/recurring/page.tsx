@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { ActionMenu } from "@/components/ui/action-menu";
@@ -66,6 +67,8 @@ export default function RecurringListPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-3xl">
+      <BackButton />
+
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Recurring

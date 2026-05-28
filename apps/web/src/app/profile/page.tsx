@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { ChevronRight, Tag, Wallet, LogOut, Repeat, Sun, Moon } from "lucide-react";
+import { ChevronRight, Tag, Wallet, LogOut, Repeat, Sun, Moon, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
@@ -83,6 +83,12 @@ export default function ProfilePage() {
               icon={<Wallet className="size-4" aria-hidden />}
               label="Dompet"
               description="Kelola sumber uang"
+            />
+            <ManageRow
+              href={ROUTES.savingsGoals}
+              icon={<Target className="size-4" aria-hidden />}
+              label="Target Tabungan"
+              description="Kelola tujuan dan progress menabung"
             />
             <ManageRow
               href={ROUTES.categories}

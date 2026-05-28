@@ -45,7 +45,7 @@ export function ActionMenu({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-9 z-50 min-w-[140px] overflow-hidden rounded-xl border border-border-subtle bg-card shadow-[var(--shadow-modal)]">
+        <div className="absolute right-0 top-9 z-50 min-w-35 overflow-hidden rounded-xl border border-border-subtle bg-card shadow-(--shadow-modal)">
           {onTransfer && (
             <button
               type="button"

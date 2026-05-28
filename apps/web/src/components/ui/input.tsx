@@ -44,7 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           "focus-within:bg-card",
           error
             ? "border-danger focus-within:border-danger"
-            : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
+            : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-accent-soft",
         ].join(" ")}
       >
         {leftAdornment && (

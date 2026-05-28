@@ -7,6 +7,7 @@ export const ROUTES = {
   transactionsNew: "/transactions/new",
   calendar: "/calendar",
   profile: "/profile",
+  savingsGoals: "/savings-goals",
   wallets: "/wallets",
   walletTransfers: "/wallets/transfers",
   categories: "/categories",
