@@ -58,18 +58,29 @@ export default function CategoriesPage() {
   const [creating, setCreating] = useState(false);
 
   const reload = async () => {
-    setError(null);
     try {
       const data = await categoriesService.list();
       setCategories(data);
+      setError(null);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to load categories");
     }
   };
 
   useEffect(() => {
-    setLoading(true);
-    reload().finally(() => setLoading(false));
+    let cancelled = false;
+    async function fetchInitial() {
+      try {
+        const data = await categoriesService.list();
+        if (!cancelled) { setCategories(data); setError(null); }
+      } catch (e) {
+        if (!cancelled) setError(e instanceof ApiError ? e.message : "Failed to load categories");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchInitial();
+    return () => { cancelled = true; };
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -219,7 +230,7 @@ export default function CategoriesPage() {
                 <div className="flex flex-1 gap-1 overflow-x-auto overflow-y-visible py-1 pb-2">
                   {EMOJI_SUGGESTIONS[type].map((e) => (
                     <button key={e} type="button" onClick={() => setIcon(e)}
-                      className={["size-8 shrink-0 rounded-lg text-base transition-colors", icon === e ? "bg-accent-soft ring-2 ring-[var(--color-accent)]" : "bg-card-subtle hover:bg-surface"].join(" ")}
+                      className={["size-8 shrink-0 rounded-lg text-base transition-colors", icon === e ? "bg-accent-soft ring-2 ring-accent" : "bg-card-subtle hover:bg-surface"].join(" ")}
                       aria-label={e}
                     >{e}</button>
                   ))}
@@ -309,7 +320,7 @@ function CategorySection({
                           autoFocus
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
-                          className="flex-1 rounded-lg border border-border-subtle bg-card-subtle px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-accent-soft)]"
+                          className="flex-1 rounded-lg border border-border-subtle bg-card-subtle px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-2 focus:ring-accent-soft"
                           maxLength={60}
                         />
                         <input type="color" value={editColor} onChange={(e) => setEditColor(e.target.value)}
@@ -319,7 +330,7 @@ function CategorySection({
                       <div className="flex gap-1.5 overflow-x-auto pb-1">
                         {EMOJI_SUGGESTIONS[c.type].map((e) => (
                           <button key={e} type="button" onClick={() => setEditIcon(e)}
-                            className={["size-8 shrink-0 rounded-lg text-base transition-colors", editIcon === e ? "bg-accent-soft ring-2 ring-[var(--color-accent)]" : "bg-card-subtle"].join(" ")}
+                            className={["size-8 shrink-0 rounded-lg text-base transition-colors", editIcon === e ? "bg-accent-soft ring-2 ring-accent" : "bg-card-subtle"].join(" ")}
                           >{e}</button>
                         ))}
                       </div>

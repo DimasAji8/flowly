@@ -29,6 +29,7 @@ export function RecurringModal({ open, onClose, onSuccess }: RecurringModalProps
     <Modal
       open={open}
       onClose={handleClose}
+      onBack={!showPicker ? () => setSelectedType(null) : undefined}
       title={
         showPicker
           ? "Tambah recurring"

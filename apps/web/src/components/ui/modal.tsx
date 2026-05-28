@@ -1,16 +1,17 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 
 interface ModalProps {
   open: boolean;
   onClose: () => void;
+  onBack?: () => void;
   title: string;
   children: React.ReactNode;
 }
 
-export function Modal({ open, onClose, title, children }: ModalProps) {
+export function Modal({ open, onClose, onBack, title, children }: ModalProps) {
   return (
     <Dialog.Root open={open} onOpenChange={(o) => !o && onClose()}>
       <Dialog.Portal>
@@ -39,8 +40,18 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
 
           <Dialog.Description className="sr-only">{title}</Dialog.Description>
 
-          <div className="mb-4 flex items-center justify-between">
-            <Dialog.Title className="text-base font-semibold text-foreground">
+          <div className="mb-4 flex items-center gap-2">
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="grid size-8 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-card-subtle hover:text-foreground"
+                aria-label="Kembali"
+              >
+                <ArrowLeft className="size-4" />
+              </button>
+            )}
+            <Dialog.Title className="flex-1 text-base font-semibold text-foreground">
               {title}
             </Dialog.Title>
             <Dialog.Close

@@ -48,7 +48,7 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
   const showPicker = !isEdit && selectedType === null;
 
   return (
-    <Modal open={open} onClose={handleClose} title={isEdit ? "Edit transaksi" : showPicker ? "Tambah transaksi" : selectedType === "income" ? "Pemasukan" : "Pengeluaran"}>
+    <Modal open={open} onClose={handleClose} onBack={!showPicker && !isEdit ? () => setSelectedType(null) : undefined} title={isEdit ? "Edit transaksi" : showPicker ? "Tambah transaksi" : selectedType === "income" ? "Pemasukan" : "Pengeluaran"}>
       {showPicker ? (
         <div className="flex flex-col gap-3 py-2">
           <button
