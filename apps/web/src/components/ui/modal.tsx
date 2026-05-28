@@ -19,7 +19,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
         {/* Mobile: bottom sheet | Desktop: centered */}
         <Dialog.Content
           className={[
-            "fixed z-50 bg-card shadow-[var(--shadow-modal)] outline-none",
+            "fixed z-50 bg-card shadow-(--shadow-modal) outline-none",
             // mobile: bottom sheet
             "bottom-0 left-0 right-0 rounded-t-[24px] px-5 pb-8 pt-4",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -28,7 +28,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
             "data-[state=open]:ease-[cubic-bezier(0.32,0.72,0,1)]",
             // desktop: centered dialog
             "md:bottom-auto md:left-1/2 md:top-1/2 md:right-auto md:-translate-x-1/2 md:-translate-y-1/2",
-            "md:w-full md:max-w-[480px] md:rounded-2xl md:px-6 md:pb-6 md:pt-5",
+            "md:w-full md:max-w-120 md:rounded-2xl md:px-6 md:pb-6 md:pt-5",
             "md:data-[state=closed]:slide-out-to-bottom-0 md:data-[state=open]:slide-in-from-bottom-0",
             "md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
             "md:data-[state=open]:fade-in-0 md:data-[state=closed]:fade-out-0",
@@ -36,6 +36,8 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
         >
           {/* Drag handle (mobile only) */}
           <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border md:hidden" aria-hidden />
+
+          <Dialog.Description className="sr-only">{title}</Dialog.Description>
 
           <div className="mb-4 flex items-center justify-between">
             <Dialog.Title className="text-base font-semibold text-foreground">
