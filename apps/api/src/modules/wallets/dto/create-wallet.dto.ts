@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -9,6 +10,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { WalletType } from '@prisma/client';
 
 export class CreateWalletDto {
   @ApiProperty({ example: 'Cash', minLength: 1, maxLength: 60 })
@@ -19,6 +21,16 @@ export class CreateWalletDto {
     typeof value === 'string' ? value.trim() : value,
   )
   name!: string;
+
+  @ApiProperty({
+    enum: WalletType,
+    example: WalletType.cash,
+    required: false,
+    default: WalletType.cash,
+  })
+  @IsOptional()
+  @IsEnum(WalletType)
+  type?: WalletType;
 
   @ApiProperty({
     example: 0,

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { WalletType } from '@prisma/client';
 
 export class UpdateWalletDto {
   @ApiProperty({ example: 'Cash Wallet', required: false })
@@ -12,4 +13,9 @@ export class UpdateWalletDto {
     typeof value === 'string' ? value.trim() : value,
   )
   name?: string;
+
+  @ApiProperty({ enum: WalletType, required: false })
+  @IsOptional()
+  @IsEnum(WalletType)
+  type?: WalletType;
 }

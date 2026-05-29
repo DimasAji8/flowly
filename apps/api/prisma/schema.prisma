@@ -38,6 +38,14 @@ enum Gender {
   f
 }
 
+enum WalletType {
+  bank
+  e_wallet
+  cash
+  credit
+  other
+}
+
 // =====================================================
 // User
 // =====================================================
@@ -110,11 +118,12 @@ enum CategoryGroup {
 
 
 model Wallet {
-  id          String   @id @default(cuid())
-  workspaceId String   @map("workspace_id")
+  id          String     @id @default(cuid())
+  workspaceId String     @map("workspace_id")
   name        String
-  balance     Decimal  @default(0) @db.Decimal(18, 2)
-  createdAt   DateTime @default(now()) @map("created_at")
+  type        WalletType @default(cash)
+  balance     Decimal    @default(0) @db.Decimal(18, 2)
+  createdAt   DateTime   @default(now()) @map("created_at")
 
   workspace             Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   savingsGoals          SavingsGoal[]

@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { Wallet } from "@/types/finance";
+import type { Wallet, WalletType } from "@/types/finance";
 
 export const walletsService = {
   list() {
@@ -9,14 +9,14 @@ export const walletsService = {
     });
   },
 
-  create(payload: { name: string; balance?: number }) {
+  create(payload: { name: string; type?: WalletType; balance?: number }) {
     return apiClient.post<Wallet>("/wallets", payload, {
       auth: true,
       workspaceScoped: true,
     });
   },
 
-  update(id: string, payload: { name?: string }) {
+  update(id: string, payload: { name?: string; type?: WalletType }) {
     return apiClient.patch<Wallet>(`/wallets/${id}`, payload, {
       auth: true,
       workspaceScoped: true,

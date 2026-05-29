@@ -79,6 +79,7 @@ export class AuthService {
           data: DEFAULT_WALLETS.map((w) => ({
             workspaceId: workspace.id,
             name: w.name,
+            type: w.type,
             balance: new Prisma.Decimal(w.balance),
           })),
         });

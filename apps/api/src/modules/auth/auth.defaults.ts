@@ -1,7 +1,7 @@
-import { CategoryGroup, TransactionType } from '@prisma/client';
+import { CategoryGroup, TransactionType, WalletType } from '@prisma/client';
 
-export const DEFAULT_WALLETS: { name: string; balance: number }[] = [
-  { name: 'Cash', balance: 0 },
+export const DEFAULT_WALLETS: { name: string; balance: number; type: WalletType }[] = [
+  { name: 'Cash', balance: 0, type: WalletType.cash },
 ];
 
 export const DEFAULT_CATEGORIES: {

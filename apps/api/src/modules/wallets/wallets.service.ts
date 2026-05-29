@@ -37,6 +37,7 @@ export class WalletsService {
       data: {
         workspaceId,
         name: dto.name,
+        type: dto.type,
         balance: new Prisma.Decimal(dto.balance ?? 0),
       },
     });
@@ -53,7 +54,10 @@ export class WalletsService {
 
     const updated = await this.prisma.wallet.update({
       where: { id },
-      data: { name: dto.name },
+      data: {
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.type !== undefined && { type: dto.type }),
+      },
     });
     return serializeWallet(updated);
   }

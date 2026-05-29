@@ -30,7 +30,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           "focus-within:bg-card",
           error
             ? "border-danger"
-            : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
+            : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-accent-soft",
         ].join(" ")}
       >
         <select
