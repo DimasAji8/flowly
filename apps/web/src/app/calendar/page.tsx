@@ -20,13 +20,11 @@ export default function CalendarPage() {
   const [daily, setDaily] = useState<DailySummary | null>(null);
   const [dayItems, setDayItems] = useState<Transaction[]>([]);
   const [loadingMonth, setLoadingMonth] = useState(true);
-  const [loadingDay, setLoadingDay] = useState(false);
+  const [loadingDay, setLoadingDay] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setLoadingMonth(true);
-    setError(null);
     transactionsService
       .dailySummary(year, month)
       .then((d) => { if (!cancelled) setDaily(d); })
@@ -39,7 +37,6 @@ export default function CalendarPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoadingDay(true);
     transactionsService
       .list({ from: selectedDate, to: selectedDate, limit: 100, page: 1 })
       .then((r) => { if (!cancelled) setDayItems(r.data); })
@@ -78,17 +75,28 @@ export default function CalendarPage() {
   }, [dayItems]);
 
   const handlePrev = () => {
+    setLoadingMonth(true);
+    setError(null);
     if (month === 1) { setMonth(12); setYear(year - 1); }
     else setMonth(month - 1);
   };
   const handleNext = () => {
+    setLoadingMonth(true);
+    setError(null);
     if (month === 12) { setMonth(1); setYear(year + 1); }
     else setMonth(month + 1);
   };
   const handleToday = () => {
+    setLoadingMonth(true);
+    setLoadingDay(true);
+    setError(null);
     setYear(today.getFullYear());
     setMonth(today.getMonth() + 1);
     setSelectedDate(isoToday());
+  };
+  const handleSelectDate = (date: string) => {
+    setLoadingDay(true);
+    setSelectedDate(date);
   };
 
   return (
@@ -133,7 +141,7 @@ export default function CalendarPage() {
             month={month}
             data={dataMap}
             selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
+            onSelectDate={handleSelectDate}
             onPrev={handlePrev}
             onNext={handleNext}
             onToday={handleToday}

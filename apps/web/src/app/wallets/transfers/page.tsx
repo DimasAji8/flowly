@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, ChevronLeft, ChevronRight, MoveRight } from "lucide-react";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/back-button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { Card } from "@/components/ui/card";
 import { ActionMenu } from "@/components/ui/action-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api-client";
 import { transfersService } from "@/services/transfers.service";
 import type { Transfer } from "@/types/finance";
@@ -19,55 +19,51 @@ const MONTH_NAMES = [
 ];
 
 export default function TransferHistoryPage() {
-  const [year, setYear] = useState(0);
-  const [month, setMonth] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const d = new Date();
-    setYear(d.getFullYear());
-    setMonth(d.getMonth() + 1);
-    setMounted(true);
-  }, []);
+  const [year, setYear] = useState(() => new Date().getFullYear());
+  const [month, setMonth] = useState(() => new Date().getMonth() + 1);
 
   const [items, setItems] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const load = useCallback(() => {
-    if (!mounted || !year || !month) return;
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
     transfersService.list(year, month)
       .then(setItems)
       .catch((e: unknown) => setError(e instanceof ApiError ? e.message : "Gagal memuat data"))
       .finally(() => setLoading(false));
-  }, [year, month, mounted]);
-
-  useEffect(() => { load(); }, [load]);
+  }, [year, month, refreshKey]);
 
   const handleDelete = async (id: string) => {
     try {
       await transfersService.remove(id);
       toast.success("Transfer dibatalkan");
       setConfirmId(null);
-      load();
+      setLoading(true);
+      setError(null);
+      setRefreshKey((k) => k + 1);
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Gagal membatalkan transfer");
     }
   };
 
   const prevMonth = () => {
+    setLoading(true); setError(null);
     if (month === 1) { setMonth(12); setYear((y) => y - 1); }
     else setMonth((m) => m - 1);
   };
   const nextMonth = () => {
+    setLoading(true); setError(null);
     if (month === 12) { setMonth(1); setYear((y) => y + 1); }
     else setMonth((m) => m + 1);
   };
-  const isCurrentMonth = mounted && year === new Date().getFullYear() && month === new Date().getMonth() + 1;
-  const goToCurrentMonth = () => { const d = new Date(); setYear(d.getFullYear()); setMonth(d.getMonth() + 1); };
+  const isCurrentMonth = year === new Date().getFullYear() && month === new Date().getMonth() + 1;
+  const goToCurrentMonth = () => {
+    const d = new Date();
+    setLoading(true); setError(null);
+    setYear(d.getFullYear()); setMonth(d.getMonth() + 1);
+  };
 
   return (
     <div className="flex flex-col gap-5 max-w-2xl">
@@ -103,34 +99,74 @@ export default function TransferHistoryPage() {
       )}
 
       {loading ? (
-        <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
-          Memuat…
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-2xl" />
+          ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-secondary">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-secondary">
           Belum ada transfer bulan ini.
         </div>
       ) : (
-        <Card padding="none">
-          <ul className="divide-y divide-border-subtle">
-            {items.map((t) => (
-              <li key={t.id} className="flex items-center gap-3 px-5 py-3.5">
-                <div className="flex flex-1 flex-col gap-0.5">
-                  <span className="text-sm font-medium text-foreground">
-                    {t.fromWalletName} ke {t.toWalletName}
+        <div className="flex flex-col gap-2">
+          {/* Summary */}
+          <div className="flex gap-2 mb-1">
+            <div className="flex-1 rounded-2xl border border-border-subtle bg-card px-4 py-3" style={{ boxShadow: "var(--shadow-card)" }}>
+              <p className="text-[11px] text-muted uppercase tracking-wide">Total transfer</p>
+              <p className="mt-0.5 text-base font-bold tabular-nums text-foreground">
+                {formatCurrency(items.reduce((s, t) => s + Number(t.amount), 0))}
+              </p>
+            </div>
+            <div className="flex-1 rounded-2xl border border-border-subtle bg-card px-4 py-3" style={{ boxShadow: "var(--shadow-card)" }}>
+              <p className="text-[11px] text-muted uppercase tracking-wide">Jumlah</p>
+              <p className="mt-0.5 text-base font-bold tabular-nums text-foreground">
+                {items.length}×
+              </p>
+            </div>
+          </div>
+
+          {/* Transfer list */}
+          {items.map((t) => (
+            <div
+              key={t.id}
+              className="flex items-center gap-3 rounded-2xl border border-border-subtle bg-card px-4 py-3.5"
+              style={{ boxShadow: "var(--shadow-card)" }}
+            >
+              {/* Icon */}
+              <div
+                className="grid size-10 shrink-0 place-items-center rounded-xl"
+                style={{ background: "var(--color-accent-soft)" }}
+              >
+                <MoveRight className="size-4.5" style={{ color: "var(--color-accent)" }} strokeWidth={2.5} />
+              </div>
+
+              {/* Wallet names + meta */}
+              <div className="flex flex-1 flex-col gap-1 min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="rounded-md bg-card-subtle px-2 py-0.5 text-xs font-medium text-foreground truncate max-w-20">
+                    {t.fromWalletName}
                   </span>
-                  <span className="text-xs text-muted">
-                    {t.note ? `${t.note} · ` : ""}{formatRelativeDate(t.transferDate)}
+                  <ArrowRight className="size-3 shrink-0 text-muted" strokeWidth={2} />
+                  <span className="rounded-md bg-accent-soft px-2 py-0.5 text-xs font-medium truncate max-w-20" style={{ color: "var(--color-accent)" }}>
+                    {t.toWalletName}
                   </span>
                 </div>
-                <span className="text-sm font-semibold tabular-nums text-foreground">
+                <span className="text-[11px] text-muted">
+                  {t.note ? `${t.note} · ` : ""}{formatRelativeDate(t.transferDate)}
+                </span>
+              </div>
+
+              {/* Amount + action */}
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="text-sm font-bold tabular-nums" style={{ color: "var(--color-accent)" }}>
                   {formatCurrency(t.amount)}
                 </span>
                 <ActionMenu onDelete={() => setConfirmId(t.id)} />
-              </li>
-            ))}
-          </ul>
-        </Card>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       <ConfirmModal

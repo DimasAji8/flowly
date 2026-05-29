@@ -1,6 +1,6 @@
 export type TransactionType = "income" | "expense";
 export type RecurringFrequency = "daily" | "weekly" | "monthly";
-export type WalletType = "bank" | "e_wallet" | "cash" | "credit" | "other";
+export type WalletType = "bank" | "e_wallet" | "cash" | "credit" | "savings" | "other";
 
 export interface Wallet {
   id: string;

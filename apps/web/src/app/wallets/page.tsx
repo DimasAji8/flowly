@@ -29,6 +29,7 @@ const WALLET_TYPE_OPTIONS: { value: WalletType; label: string }[] = [
   { value: "e_wallet", label: "E-Wallet" },
   { value: "cash", label: "Tunai" },
   { value: "credit", label: "Kartu Kredit" },
+  { value: "savings", label: "Tabungan" },
   { value: "other", label: "Lainnya" },
 ];
 
@@ -37,10 +38,11 @@ const WALLET_TYPE_LABEL: Record<WalletType, string> = {
   e_wallet: "E-Wallet",
   cash: "Tunai",
   credit: "Kartu Kredit",
+  savings: "Tabungan",
   other: "Lainnya",
 };
 
-const WALLET_TYPE_ORDER: WalletType[] = ["bank", "e_wallet", "cash", "credit", "other"];
+const WALLET_TYPE_ORDER: WalletType[] = ["bank", "savings", "e_wallet", "cash", "credit", "other"];
 
 function formatRupiah(raw: string): string {
   const digits = raw.replace(/\D/g, "");

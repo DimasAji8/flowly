@@ -25,10 +25,11 @@ function DesktopHeader() {
       <button
         type="button"
         onClick={() => router.back()}
-        aria-label="Back"
-        className="grid size-8 place-items-center rounded-full hover:bg-card-subtle text-secondary transition-colors"
+        aria-label="Kembali"
+        className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-foreground transition-colors"
       >
         <ArrowLeft className="size-4" aria-hidden />
+        Kembali
       </button>
     </div>
   );

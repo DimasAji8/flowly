@@ -5,9 +5,10 @@ interface SummaryCardsProps {
   expense: string;
   net: string;
   month: string;
+  totalBalance?: number;
 }
 
-export function SummaryCards({ income, expense, net, month }: SummaryCardsProps) {
+export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
   const netNum = Number(net);
   const isPositive = netNum >= 0;
 
@@ -31,22 +32,26 @@ export function SummaryCards({ income, expense, net, month }: SummaryCardsProps)
         <div className="pointer-events-none absolute right-16 bottom-4 size-20 rounded-full opacity-5" style={{ background: "white" }} aria-hidden />
 
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/60">
-          Arus Kas · {month}
+          Total Saldo · semua dompet
         </p>
         <p className="mt-2 text-4xl font-bold tabular-nums tracking-tight text-white drop-shadow-sm">
-          {formatCurrency(net)}
+          {totalBalance !== undefined ? formatCurrency(totalBalance) : "—"}
         </p>
 
+
         {/* Income & Expense inline */}
-        <div className="mt-5 flex gap-4 border-t border-white/10 pt-4">
-          <div className="flex flex-1 flex-col gap-0.5">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pemasukan</p>
-            <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(income)}</p>
-          </div>
-          <div className="w-px bg-white/10" aria-hidden />
-          <div className="flex flex-1 flex-col gap-0.5">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pengeluaran</p>
-            <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(expense)}</p>
+        <div className="mt-5 border-t border-white/10 pt-4">
+          <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-white/40 mb-2.5 text-center">Bulan ini</p>
+          <div className="flex gap-4">
+            <div className="flex flex-1 flex-col gap-0.5">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pemasukan</p>
+              <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(income)}</p>
+            </div>
+            <div className="w-px bg-white/10" aria-hidden />
+            <div className="flex flex-1 flex-col gap-0.5">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pengeluaran</p>
+              <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(expense)}</p>
+            </div>
           </div>
         </div>
       </div>

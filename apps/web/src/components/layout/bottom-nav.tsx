@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CalendarDays, CircleUserRound, Coins, LayoutDashboard, Plus, type LucideIcon } from "lucide-react";
+import { CalendarDays, CircleUserRound, LayoutDashboard, Plus, Wallet, type LucideIcon } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 
@@ -18,7 +18,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: ROUTES.dashboard, label: "Beranda", icon: LayoutDashboard },
   { href: ROUTES.calendar, label: "Kalender", icon: CalendarDays },
   // slot tengah kosong untuk FAB
-  { href: ROUTES.transactions, label: "Transaksi", icon: Coins, matchPrefix: "/transactions" },
+  { href: ROUTES.wallets, label: "Dompet", icon: Wallet, matchPrefix: "/wallets" },
   { href: ROUTES.profile, label: "Profil", icon: CircleUserRound },
 ];
 
@@ -94,7 +94,7 @@ export function BottomNav() {
     <>
       <nav
         aria-label="Primary"
-        className="sticky bottom-0 z-30 w-full border-t border-border-subtle bg-[var(--color-bg)]/90 backdrop-blur-md md:hidden"
+        className="sticky bottom-0 z-30 w-full border-t border-border-subtle bg-(--color-bg)/90 backdrop-blur-md md:hidden"
       >
         <div className="flex items-center">
           {/* Left items */}

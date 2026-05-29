@@ -14,9 +14,11 @@ import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
 import { transactionsService } from "@/services/transactions.service";
+import { transfersService } from "@/services/transfers.service";
+import { walletsService } from "@/services/wallets.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useWorkspaceStore } from "@/store/workspace.store";
-import type { MonthlySummary, Transaction, CategoryGroup, SavingsGoal } from "@/types/finance";
+import type { MonthlySummary, Transaction, CategoryGroup, SavingsGoal, Wallet, Transfer } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
 
 type CategorySpend = {
@@ -38,6 +40,8 @@ export default function DashboardPage() {
   const [recent, setRecent] = useState<Transaction[]>([]);
   const [allTx, setAllTx] = useState<Transaction[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
+  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -74,8 +78,12 @@ export default function DashboardPage() {
       transactionsService.list({ limit: 500, page: 1, from, to }),
       savingsGoalsService.list(),
       fetchTargets(),
+      walletsService.list(),
+      transfersService.list(year, month),
     ])
-      .then(([s, all, goals]) => {
+      .then(([s, all, goals, , ws, tf]) => {
+        setWallets(ws);
+        setTransfers(tf);
         if (cancelled) return;
         setSummary(s);
         setRecent(all.data
@@ -124,6 +132,11 @@ export default function DashboardPage() {
   }, [allTx]);
 
   const totalIncome = Number(summary?.income ?? 0);
+  const totalBalance = wallets.reduce((sum, w) => sum + Number(w.balance), 0);
+  const savingsWalletIds = new Set(wallets.filter((w) => w.type === "savings").map((w) => w.id));
+  const savingsTransferAmount = transfers
+    .filter((t) => savingsWalletIds.has(t.toWalletId))
+    .reduce((sum, t) => sum + Number(t.amount), 0);
   const avatarSrc = user?.gender === "m" ? "/svg/m.svg" : user?.gender === "f" ? "/svg/f.svg" : null;
 
   return (
@@ -168,6 +181,7 @@ export default function DashboardPage() {
           expense={summary.expense}
           net={summary.net}
           month={formatMonthYear(summary.period.year, summary.period.month)}
+          totalBalance={totalBalance}
         />
       )}
 
@@ -212,6 +226,7 @@ export default function DashboardPage() {
             categorySpends={categorySpends}
             totalIncome={totalIncome}
             targets={targets}
+            savingsTransferAmount={savingsTransferAmount}
           />
         )}
 

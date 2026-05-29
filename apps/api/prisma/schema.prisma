@@ -43,6 +43,7 @@ enum WalletType {
   e_wallet
   cash
   credit
+  savings
   other
 }
 
