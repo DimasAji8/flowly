@@ -11,8 +11,8 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { SavingsGoalModal } from "@/components/savings-goals/savings-goal-modal";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
-import { walletsService } from "@/services/wallets.service";
-import type { SavingsGoal, Wallet } from "@/types/finance";
+import { useWalletStore } from "@/store/wallets.store";
+import type { SavingsGoal } from "@/types/finance";
 import { formatCurrency } from "@/utils/format-currency";
 import { formatDateLong } from "@/utils/format-date";
 
@@ -45,7 +45,7 @@ function getGoalStatus(goal: SavingsGoal): GoalStatus {
 
 export default function SavingsGoalsPage() {
   const [items, setItems] = useState<SavingsGoal[]>([]);
-  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const { wallets, fetch: fetchWallets } = useWalletStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -56,12 +56,8 @@ export default function SavingsGoalsPage() {
 
   const reload = async () => {
     try {
-      const [goals, walletList] = await Promise.all([
-        savingsGoalsService.list(),
-        walletsService.list(),
-      ]);
+      const goals = await savingsGoalsService.list();
       setItems(goals);
-      setWallets(walletList);
       setError(null);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Gagal memuat target tabungan");
@@ -72,11 +68,11 @@ export default function SavingsGoalsPage() {
     let cancelled = false;
     async function fetchInitial() {
       try {
-        const [goals, walletList] = await Promise.all([
+        const [goals] = await Promise.all([
           savingsGoalsService.list(),
-          walletsService.list(),
+          fetchWallets(),
         ]);
-        if (!cancelled) { setItems(goals); setWallets(walletList); setError(null); }
+        if (!cancelled) { setItems(goals); setError(null); }
       } catch (e) {
         if (!cancelled) setError(e instanceof ApiError ? e.message : "Gagal memuat target tabungan");
       } finally {
@@ -85,6 +81,7 @@ export default function SavingsGoalsPage() {
     }
     fetchInitial();
     return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const walletNameById = useMemo(

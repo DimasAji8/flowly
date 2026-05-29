@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ApiError } from "@/lib/api-client";
 import { walletsService } from "@/services/wallets.service";
+import { useWalletStore } from "@/store/wallets.store";
 import type { Wallet, WalletType } from "@/types/finance";
 import { formatCurrency } from "@/utils/format-currency";
 import { ROUTES } from "@/constants/routes";
@@ -51,10 +52,12 @@ function parseRupiah(formatted: string): number {
 }
 
 export default function WalletsPage() {
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { wallets, loading, error, fetch: fetchWallets } = useWalletStore();
 
+  const reload = () => {
+    useWalletStore.getState().invalidate();
+    void useWalletStore.getState().fetch();
+  };
   const [addOpen, setAddOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
@@ -70,22 +73,9 @@ export default function WalletsPage() {
   const [transferFromId, setTransferFromId] = useState<string | undefined>();
   const [confirmWallet, setConfirmWallet] = useState<{ id: string; name: string } | null>(null);
 
-  const reload = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const w = await walletsService.list();
-      setWallets(w);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Gagal memuat data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    reload();
+    void fetchWallets();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreateWallet = async (e: React.FormEvent) => {
@@ -97,7 +87,7 @@ export default function WalletsPage() {
       setNewName(""); setNewBalanceDisplay(""); setNewType("cash");
       setAddOpen(false);
       toast.success("Dompet ditambahkan");
-      await reload();
+      reload();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Gagal membuat dompet");
     } finally {
@@ -110,7 +100,7 @@ export default function WalletsPage() {
       await walletsService.remove(id);
       toast.success(`Dompet "${name}" dihapus`);
       setConfirmWallet(null);
-      await reload();
+      reload();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Gagal menghapus dompet");
     }
@@ -130,7 +120,7 @@ export default function WalletsPage() {
       await walletsService.update(editWallet.id, { name: editName.trim(), type: editType });
       setEditWallet(null);
       toast.success("Dompet diperbarui");
-      await reload();
+      reload();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Gagal memperbarui dompet");
     } finally {

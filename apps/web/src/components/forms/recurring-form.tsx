@@ -17,8 +17,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ApiError } from "@/lib/api-client";
-import { categoriesService } from "@/services/categories.service";
-import { walletsService } from "@/services/wallets.service";
+import { useWalletStore } from "@/store/wallets.store";
+import { useCategoryStore } from "@/store/categories.store";
 import type {
   Category,
   TransactionType,
@@ -69,8 +69,8 @@ export function RecurringForm({
   submitLabel = "Simpan",
   hideTypeToggle = false,
 }: RecurringFormProps) {
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { wallets, fetch: fetchWallets } = useWalletStore();
+  const { categories, fetch: fetchCategories } = useCategoryStore();
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -110,11 +110,11 @@ export function RecurringForm({
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([walletsService.list(), categoriesService.list()])
-      .then(([w, c]) => {
+    Promise.all([fetchWallets(), fetchCategories()])
+      .then(() => {
         if (cancelled) return;
-        setWallets(w);
-        setCategories(c);
+        const w = useWalletStore.getState().wallets;
+        const c = useCategoryStore.getState().categories;
         if (!isEditing) {
           if (w[0]) setValue("walletId", w[0].id);
           const cat = c.find((x) => x.type === "expense");

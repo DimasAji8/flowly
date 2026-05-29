@@ -13,6 +13,7 @@ import { Modal } from "@/components/ui/modal";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ApiError } from "@/lib/api-client";
 import { categoriesService } from "@/services/categories.service";
+import { useCategoryStore } from "@/store/categories.store";
 import type { Category, TransactionType } from "@/types/finance";
 
 const DEFAULT_COLOR = "#2563EB";
@@ -44,8 +45,7 @@ const EMOJI_SUGGESTIONS = {
 };
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, loading, fetch: fetchCategories } = useCategoryStore();
   const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
@@ -57,30 +57,14 @@ export default function CategoriesPage() {
   const [addStep, setAddStep] = useState<"pick" | "form">("pick");
   const [creating, setCreating] = useState(false);
 
-  const reload = async () => {
-    try {
-      const data = await categoriesService.list();
-      setCategories(data);
-      setError(null);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Failed to load categories");
-    }
+  const reload = () => {
+    useCategoryStore.getState().invalidate();
+    void useCategoryStore.getState().fetch();
   };
 
   useEffect(() => {
-    let cancelled = false;
-    async function fetchInitial() {
-      try {
-        const data = await categoriesService.list();
-        if (!cancelled) { setCategories(data); setError(null); }
-      } catch (e) {
-        if (!cancelled) setError(e instanceof ApiError ? e.message : "Failed to load categories");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    fetchInitial();
-    return () => { cancelled = true; };
+    void fetchCategories();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -99,7 +83,7 @@ export default function CategoriesPage() {
       setAddOpen(false);
       setAddStep("pick");
       toast.success("Kategori ditambahkan");
-      await reload();
+      reload();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Failed to create category");
     } finally {
@@ -114,7 +98,7 @@ export default function CategoriesPage() {
       await categoriesService.remove(id);
       toast.success(`Kategori "${catName}" dihapus`);
       setConfirmDelete(null);
-      await reload();
+      reload();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Failed to delete category");
     }

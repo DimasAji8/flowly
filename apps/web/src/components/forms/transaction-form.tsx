@@ -20,9 +20,9 @@ import {
   createTransactionSchema,
   type CreateTransactionFormValues,
 } from "@/lib/transaction-schemas";
-import { categoriesService } from "@/services/categories.service";
-import { walletsService } from "@/services/wallets.service";
-import type { Category, TransactionType, Wallet } from "@/types/finance";
+import { useWalletStore } from "@/store/wallets.store";
+import { useCategoryStore } from "@/store/categories.store";
+import type { TransactionType } from "@/types/finance";
 import { todayIsoDate, formatDateLong } from "@/utils/format-date";
 
 export interface TransactionFormProps {
@@ -49,8 +49,8 @@ export function TransactionForm({
   submitLabel = "Save",
   hideTypeToggle = false,
 }: TransactionFormProps) {
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { wallets, fetch: fetchWallets } = useWalletStore();
+  const { categories, fetch: fetchCategories } = useCategoryStore();
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [amountDisplay, setAmountDisplay] = useState(
@@ -82,11 +82,11 @@ export function TransactionForm({
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([walletsService.list(), categoriesService.list()])
-      .then(([w, c]) => {
+    Promise.all([fetchWallets(), fetchCategories()])
+      .then(() => {
         if (cancelled) return;
-        setWallets(w);
-        setCategories(c);
+        const w = useWalletStore.getState().wallets;
+        const c = useCategoryStore.getState().categories;
         if (!isEditing) {
           if (w[0]) setValue("walletId", w[0].id);
           const defaultCat = c.find((cat) => cat.type === "expense");
@@ -98,7 +98,8 @@ export function TransactionForm({
         setBootstrapError(e instanceof ApiError ? e.message : "Failed to load form data");
       });
     return () => { cancelled = true; };
-  }, [setValue, isEditing]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing, setValue]);
 
   useEffect(() => {
     if (categories.length === 0) return;
