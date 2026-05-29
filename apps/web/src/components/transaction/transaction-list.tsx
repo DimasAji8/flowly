@@ -136,25 +136,13 @@ export function TransactionList({ items, loading, grouped = false, onItemClick }
   return (
     <div className="flex flex-col gap-4">
       {visible.map(({ date, transactions }) => {
-        const dayIncome = transactions.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-        const dayExpense = transactions.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
-
         return (
           <div key={date}>
             {/* Group header */}
-            <div className="flex items-center justify-between px-3 pb-1.5">
+            <div className="px-3 pb-1.5">
               <span className="text-xs font-semibold text-secondary">
                 {dateLabel(date)}
               </span>
-              {(() => {
-                const net = dayIncome - dayExpense;
-                const color = net >= 0 ? "var(--color-success)" : "var(--color-danger)";
-                return (
-                  <span className="text-[11px] font-semibold tabular-nums" style={{ color }}>
-                    {net >= 0 ? "+" : "−"}Rp {formatAmount(Math.abs(net))}
-                  </span>
-                );
-              })()}
             </div>
             {/* Items */}
             <div className="rounded-2xl border border-border-subtle bg-card" style={{ boxShadow: "var(--shadow-card)" }}>
