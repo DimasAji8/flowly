@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { CalendarIcon, Check, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
@@ -59,6 +60,8 @@ export function SavingsGoalModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dateOpen, setDateOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingPayload, setPendingPayload] = useState<null | Parameters<typeof savingsGoalsService.create>[0]>(null);
 
   const selectedWallet = useMemo(
     () => wallets.find((wallet) => wallet.id === form.linkedWalletId),
@@ -71,57 +74,44 @@ export function SavingsGoalModal({
     onClose();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim()) {
-      setError("Nama target wajib diisi");
-      return;
-    }
-
+    if (!form.name.trim()) { setError("Nama target wajib diisi"); return; }
     const targetAmount = parseRupiah(form.targetAmount);
     const currentAmount = parseRupiah(form.currentAmount || "0");
+    if (!Number.isFinite(targetAmount) || targetAmount <= 0) { setError("Target nominal harus lebih dari 0"); return; }
+    if (!Number.isFinite(currentAmount) || currentAmount < 0) { setError("Nominal terkumpul tidak valid"); return; }
+    if (!form.targetDate) { setError("Tanggal target wajib diisi"); return; }
+    setError(null);
+    setPendingPayload({
+      name: form.name.trim(),
+      targetAmount,
+      currentAmount,
+      targetDate: form.targetDate,
+      linkedWalletId: form.linkedWalletId || undefined,
+      note: form.note.trim() || undefined,
+    });
+    setConfirmOpen(true);
+  };
 
-    if (!Number.isFinite(targetAmount) || targetAmount <= 0) {
-      setError("Target nominal harus lebih dari 0");
-      return;
-    }
-
-    if (!Number.isFinite(currentAmount) || currentAmount < 0) {
-      setError("Nominal terkumpul tidak valid");
-      return;
-    }
-
-    if (!form.targetDate) {
-      setError("Tanggal target wajib diisi");
-      return;
-    }
-
+  const handleConfirm = async () => {
+    if (!pendingPayload) return;
     try {
       setLoading(true);
       setError(null);
-      const payload = {
-        name: form.name.trim(),
-        targetAmount,
-        currentAmount,
-        targetDate: form.targetDate,
-        linkedWalletId: form.linkedWalletId || undefined,
-        note: form.note.trim() || undefined,
-      };
-
       if (isEdit && goal) {
-        await savingsGoalsService.update(goal.id, payload);
+        await savingsGoalsService.update(goal.id, pendingPayload);
         toast.success("Target tabungan diperbarui");
       } else {
-        await savingsGoalsService.create(payload);
+        await savingsGoalsService.create(pendingPayload);
         toast.success("Target tabungan ditambahkan");
       }
-
+      setConfirmOpen(false);
       handleClose();
       await onSuccess();
     } catch (e) {
-      setError(
-        e instanceof ApiError ? e.message : "Gagal menyimpan target tabungan",
-      );
+      setError(e instanceof ApiError ? e.message : "Gagal menyimpan target tabungan");
+      setConfirmOpen(false);
     } finally {
       setLoading(false);
     }
@@ -250,6 +240,19 @@ export function SavingsGoalModal({
           </Button>
         </div>
       </form>
+      <ConfirmModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirm}
+        title={isEdit ? "Simpan perubahan?" : "Tambah target tabungan?"}
+        description={pendingPayload ? [
+          pendingPayload.name,
+          `Target: Rp ${formatRupiah(String(pendingPayload.targetAmount))}`,
+        ].join("  ·  ") : undefined}
+        confirmLabel={isEdit ? "Simpan" : "Tambah"}
+        confirmVariant="primary"
+        loading={loading}
+      />
     </Modal>
   );
 }

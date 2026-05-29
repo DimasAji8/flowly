@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ChevronDown, Check, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { FormError } from "@/components/ui/form-error";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
@@ -73,6 +74,9 @@ export function RecurringForm({
   const { categories, fetch: fetchCategories } = useCategoryStore();
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingValues, setPendingValues] = useState<RecurringFormValues | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   const isEditing = Boolean(defaultValues?.amount);
 
@@ -146,13 +150,25 @@ export function RecurringForm({
     [categories, selectedType],
   );
 
-  const submit = async (values: RecurringFormValues) => {
+  const submit = (values: RecurringFormValues) => {
     setSubmitError(null);
+    setPendingValues(values);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = async () => {
+    if (!pendingValues) return;
+    setConfirming(true);
     try {
-      const noteTrimmed = values.note?.trim() ?? "";
-      await onSubmit({ ...values, note: noteTrimmed || undefined });
+      const noteTrimmed = pendingValues.note?.trim() ?? "";
+      await onSubmit({ ...pendingValues, note: noteTrimmed || undefined });
+      setConfirmOpen(false);
+      setPendingValues(null);
     } catch (e) {
       setSubmitError(e instanceof ApiError ? e.message : "Gagal menyimpan");
+      setConfirmOpen(false);
+    } finally {
+      setConfirming(false);
     }
   };
 
@@ -374,6 +390,25 @@ export function RecurringForm({
           {submitLabel}
         </Button>
       </div>
+
+      {pendingValues && (
+        <ConfirmModal
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={handleConfirm}
+          title="Konfirmasi Transaksi Berulang"
+          description={[
+            pendingValues.type === "expense" ? "Pengeluaran" : "Pemasukan",
+            `Rp ${formatRupiah(String(pendingValues.amount))}`,
+            `· ${filteredCategories.find((c) => c.id === pendingValues.categoryId)?.name ?? ""}`,
+            `· ${wallets.find((w) => w.id === pendingValues.walletId)?.name ?? ""}`,
+            `· ${FREQ_OPTIONS.find((f) => f.value === pendingValues.frequency)?.label ?? ""}`,
+          ].filter(Boolean).join("  ")}
+          confirmLabel={submitLabel}
+          confirmVariant="primary"
+          loading={confirming}
+        />
+      )}
     </form>
   );
 }

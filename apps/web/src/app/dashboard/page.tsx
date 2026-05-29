@@ -78,7 +78,7 @@ export default function DashboardPage() {
         setRecent(all.data
           .slice()
           .sort((a, b) => b.transactionDate.localeCompare(a.transactionDate))
-          .slice(0, 5)
+          .slice(0, 3)
         );
         setAllTx(all.data);
         setSavingsGoals(goals);
@@ -184,7 +184,7 @@ export default function DashboardPage() {
           </div>
           {loading ? (
             <div className="flex flex-col gap-2">
-              {Array.from({ length: 5 }).map((_, i) => (
+              {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-14 rounded-xl" />
               ))}
             </div>

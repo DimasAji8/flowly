@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { transfersService } from "@/services/transfers.service";
@@ -95,6 +96,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
     amountValue: 0,
     note: "",
   });
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
@@ -102,12 +104,16 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
     onClose();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fromId || !form.toId) {
       toast.error("Pilih dompet asal dan tujuan");
       return;
     }
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = async () => {
     try {
       setLoading(true);
       await transfersService.create({
@@ -118,10 +124,12 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
         transferDate: isoToday(),
       });
       toast.success("Transfer berhasil");
+      setConfirmOpen(false);
       handleClose();
       onSuccess();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Gagal transfer");
+      setConfirmOpen(false);
     } finally {
       setLoading(false);
     }
@@ -130,8 +138,12 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
   const fromOptions = wallets.filter((w) => w.id !== form.toId);
   const toOptions = wallets.filter((w) => w.id !== form.fromId);
 
+  const fromWallet = wallets.find((w) => w.id === form.fromId);
+  const toWallet = wallets.find((w) => w.id === form.toId);
+
   return (
-    <Modal open={open} onClose={handleClose} title="Transfer antar dompet">
+    <>
+      <Modal open={open} onClose={handleClose} title="Transfer antar dompet">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex items-end gap-2">
           <div className="flex-1">
@@ -174,6 +186,21 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
           </Button>
         </div>
       </form>
-    </Modal>
+      </Modal>
+      <ConfirmModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirm}
+        title="Konfirmasi Transfer"
+        description={[
+          `${fromWallet?.name ?? "-"}  →  ${toWallet?.name ?? "-"}`,
+          `Rp ${form.amountDisplay}`,
+          form.note ? `"${form.note}"` : "",
+        ].filter(Boolean).join("  ·  ")}
+        confirmLabel="Ya, Transfer"
+        confirmVariant="primary"
+        loading={loading}
+      />
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, Check, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { FormError } from "@/components/ui/form-error";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
@@ -53,6 +54,9 @@ export function TransactionForm({
   const { categories, fetch: fetchCategories } = useCategoryStore();
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingValues, setPendingValues] = useState<CreateTransactionFormValues | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const [amountDisplay, setAmountDisplay] = useState(
     defaultValues?.amount ? formatRupiah(String(defaultValues.amount)) : ""
   );
@@ -114,13 +118,25 @@ export function TransactionForm({
     [categories, selectedType],
   );
 
-  const submit = async (values: CreateTransactionFormValues) => {
+  const submit = (values: CreateTransactionFormValues) => {
     setSubmitError(null);
+    setPendingValues(values);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = async () => {
+    if (!pendingValues) return;
+    setConfirming(true);
     try {
-      const noteTrimmed = values.note?.trim() ?? "";
-      await onSubmit({ ...values, note: noteTrimmed || undefined });
+      const noteTrimmed = pendingValues.note?.trim() ?? "";
+      await onSubmit({ ...pendingValues, note: noteTrimmed || undefined });
+      setConfirmOpen(false);
+      setPendingValues(null);
     } catch (e) {
       setSubmitError(e instanceof ApiError ? e.message : "Failed to save transaction");
+      setConfirmOpen(false);
+    } finally {
+      setConfirming(false);
     }
   };
 
@@ -293,6 +309,25 @@ export function TransactionForm({
           {submitLabel}
         </Button>
       </div>
+
+      {pendingValues && (
+        <ConfirmModal
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={handleConfirm}
+          title="Konfirmasi Transaksi"
+          description={[
+            pendingValues.type === "expense" ? "Pengeluaran" : "Pemasukan",
+            `Rp ${formatRupiah(String(pendingValues.amount))}`,
+            `· ${filteredCategories.find((c) => c.id === pendingValues.categoryId)?.name ?? ""}`,
+            `· ${wallets.find((w) => w.id === pendingValues.walletId)?.name ?? ""}`,
+            pendingValues.note ? `· "${pendingValues.note.trim()}"` : "",
+          ].filter(Boolean).join("  ")}
+          confirmLabel={submitLabel}
+          confirmVariant="primary"
+          loading={confirming}
+        />
+      )}
     </form>
   );
 }

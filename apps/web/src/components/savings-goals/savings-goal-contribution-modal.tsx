@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ApiError } from "@/lib/api-client";
@@ -35,35 +36,43 @@ export function SavingsGoalContributionModal({
   const [amountDisplay, setAmountDisplay] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!open) {
       setAmountDisplay("");
       setError(null);
+      setConfirmOpen(false);
     }
   }, [open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!goal) return;
-
     const contribution = parseRupiah(amountDisplay);
     if (!Number.isFinite(contribution) || contribution <= 0) {
       setError("Nominal setoran harus lebih dari 0");
       return;
     }
+    setError(null);
+    setConfirmOpen(true);
+  };
 
+  const handleConfirm = async () => {
+    if (!goal) return;
+    const contribution = parseRupiah(amountDisplay);
     try {
       setLoading(true);
-      setError(null);
       await savingsGoalsService.update(goal.id, {
         currentAmount: Number(goal.currentAmount) + contribution,
       });
       toast.success("Setoran tabungan ditambahkan");
+      setConfirmOpen(false);
       onClose();
       await onSuccess();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Gagal menambah setoran");
+      setConfirmOpen(false);
     } finally {
       setLoading(false);
     }
@@ -112,6 +121,19 @@ export function SavingsGoalContributionModal({
           </Button>
         </div>
       </form>
+      <ConfirmModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirm}
+        title="Konfirmasi Setoran"
+        description={[
+          goal?.name,
+          `+ Rp ${amountDisplay}`,
+        ].filter(Boolean).join("  ·  ")}
+        confirmLabel="Ya, Tambah Setoran"
+        confirmVariant="primary"
+        loading={loading}
+      />
     </Modal>
   );
 }
