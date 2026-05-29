@@ -30,6 +30,15 @@ export class CurrentWorkspaceResponse {
   @ApiProperty({ example: 1 })
   memberCount!: number;
 
+  @ApiProperty({ example: 60 })
+  needsTarget!: number;
+
+  @ApiProperty({ example: 30 })
+  wantsTarget!: number;
+
+  @ApiProperty({ example: 20 })
+  savingsTarget!: number;
+
   @ApiProperty({ example: '2026-05-22T03:39:15.512Z' })
   createdAt!: string;
 

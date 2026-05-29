@@ -71,11 +71,14 @@ model User {
 // =====================================================
 
 model Workspace {
-  id        String   @id @default(cuid())
-  name      String
-  ownerId   String   @map("owner_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(cuid())
+  name            String
+  ownerId         String   @map("owner_id")
+  needsTarget     Int      @default(50) @map("needs_target")
+  wantsTarget     Int      @default(30) @map("wants_target")
+  savingsTarget   Int      @default(20) @map("savings_target")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   owner                 User                   @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members               WorkspaceMember[]

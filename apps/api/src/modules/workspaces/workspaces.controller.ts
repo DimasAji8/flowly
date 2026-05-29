@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -6,6 +6,7 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { IsInt, Min, Max, IsOptional } from 'class-validator';
 import { WorkspacesService } from './workspaces.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
@@ -17,6 +18,12 @@ import {
   CurrentWorkspaceResponse,
   WorkspaceListItemResponse,
 } from './dto/workspace-response.dto';
+
+class UpdateAllocationTargetsBody {
+  @IsOptional() @IsInt() @Min(0) @Max(100) needsTarget?: number;
+  @IsOptional() @IsInt() @Min(0) @Max(100) wantsTarget?: number;
+  @IsOptional() @IsInt() @Min(0) @Max(100) savingsTarget?: number;
+}
 
 @ApiTags('workspaces')
 @ApiBearerAuth('access-token')
@@ -43,15 +50,20 @@ export class WorkspacesController {
   @Get('current')
   @UseGuards(WorkspaceGuard)
   @ApiSecurity('workspace-id')
-  @ApiOperation({
-    summary: 'Detail workspace aktif',
-    description:
-      'Wajib kirim header `X-Workspace-Id`. User harus member dari workspace tersebut.',
-  })
+  @ApiOperation({ summary: 'Detail workspace aktif' })
   @ApiResponse({ status: 200, type: CurrentWorkspaceResponse })
-  @ApiResponse({ status: 400, description: 'Header X-Workspace-Id missing' })
-  @ApiResponse({ status: 403, description: 'Bukan member workspace' })
   current(@CurrentWorkspace() workspace: WorkspaceContext) {
     return this.workspacesService.getById(workspace.id);
+  }
+
+  @Patch('current/allocation')
+  @UseGuards(WorkspaceGuard)
+  @ApiSecurity('workspace-id')
+  @ApiOperation({ summary: 'Update target alokasi anggaran (needs/wants/savings %)' })
+  updateAllocation(
+    @CurrentWorkspace() workspace: WorkspaceContext,
+    @Body() body: UpdateAllocationTargetsBody,
+  ) {
+    return this.workspacesService.updateAllocationTargets(workspace.id, body);
   }
 }

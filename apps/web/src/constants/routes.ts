@@ -12,6 +12,7 @@ export const ROUTES = {
   walletTransfers: "/wallets/transfers",
   categories: "/categories",
   recurring: "/recurring",
+  profileAllocation: "/profile/allocation",
 } as const;
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];

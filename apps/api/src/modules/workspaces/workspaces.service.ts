@@ -1,6 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
+export interface UpdateAllocationTargetsDto {
+  needsTarget?: number;
+  wantsTarget?: number;
+  savingsTarget?: number;
+}
+
 @Injectable()
 export class WorkspacesService {
   constructor(private readonly prisma: PrismaService) {}
@@ -56,8 +62,32 @@ export class WorkspacesService {
       name: workspace.name,
       ownerId: workspace.ownerId,
       memberCount: workspace._count.members,
+      needsTarget: workspace.needsTarget,
+      wantsTarget: workspace.wantsTarget,
+      savingsTarget: workspace.savingsTarget,
       createdAt: workspace.createdAt,
       updatedAt: workspace.updatedAt,
+    };
+  }
+
+  async updateAllocationTargets(
+    workspaceId: string,
+    dto: UpdateAllocationTargetsDto,
+  ) {
+    const data: Record<string, number> = {};
+    if (dto.needsTarget !== undefined) data.needsTarget = dto.needsTarget;
+    if (dto.wantsTarget !== undefined) data.wantsTarget = dto.wantsTarget;
+    if (dto.savingsTarget !== undefined) data.savingsTarget = dto.savingsTarget;
+
+    const workspace = await this.prisma.workspace.update({
+      where: { id: workspaceId },
+      data,
+    });
+
+    return {
+      needsTarget: workspace.needsTarget,
+      wantsTarget: workspace.wantsTarget,
+      savingsTarget: workspace.savingsTarget,
     };
   }
 }

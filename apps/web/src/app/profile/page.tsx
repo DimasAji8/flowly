@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { ChevronRight, Tag, Wallet, LogOut, Repeat, Sun, Moon, Target } from "lucide-react";
+import { ChevronRight, Tag, Wallet, LogOut, Repeat, Sun, Moon, Target, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
@@ -101,6 +101,12 @@ export default function ProfilePage() {
               icon={<Repeat className="size-4" aria-hidden />}
               label="Berulang"
               description="Transaksi berulang otomatis"
+            />
+            <ManageRow
+              href={ROUTES.profileAllocation}
+              icon={<PieChart className="size-4" aria-hidden />}
+              label="Target Alokasi"
+              description="Atur target kebutuhan, keinginan & tabungan"
             />
           </ul>
         </Card>

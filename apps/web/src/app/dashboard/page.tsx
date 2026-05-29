@@ -15,6 +15,7 @@ import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
 import { transactionsService } from "@/services/transactions.service";
 import { useAuthStore } from "@/store/auth.store";
+import { useWorkspaceStore } from "@/store/workspace.store";
 import type { MonthlySummary, Transaction, CategoryGroup, SavingsGoal } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
 
@@ -31,6 +32,7 @@ export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const refreshMe = useAuthStore((s) => s.refreshMe);
   const { resolvedTheme } = useTheme();
+  const { targets, fetch: fetchTargets } = useWorkspaceStore();
 
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
@@ -71,6 +73,7 @@ export default function DashboardPage() {
       transactionsService.monthlySummary(),
       transactionsService.list({ limit: 500, page: 1, from, to }),
       savingsGoalsService.list(),
+      fetchTargets(),
     ])
       .then(([s, all, goals]) => {
         if (cancelled) return;
@@ -208,6 +211,7 @@ export default function DashboardPage() {
           <SpendingInsights
             categorySpends={categorySpends}
             totalIncome={totalIncome}
+            targets={targets}
           />
         )}
 
