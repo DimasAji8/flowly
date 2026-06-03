@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/constants/routes";
@@ -29,6 +30,52 @@ const T = {
   fontDisplay: `"SF Pro Display", system-ui, -apple-system, sans-serif`,
   fontText: `"SF Pro Text", system-ui, -apple-system, sans-serif`,
 };
+
+// ─── Logo component ──────────────────────────────────────────────────────────
+function FlowlyLogo({ variant = "dark", size = "sm" }: { variant?: "dark" | "light" | "text-light" | "text-dark"; size?: "sm" | "md" | "lg" }) {
+  const iconH = size === "sm" ? 24 : size === "md" ? 32 : 44;
+
+  if (variant === "text-light") {
+    // Full wordmark for light backgrounds
+    return (
+      <Image
+        src="/img/logo-text-light.webp"
+        alt="Flowly"
+        height={size === "lg" ? 52 : 36}
+        width={size === "lg" ? 260 : 180}
+        style={{ objectFit: "contain", display: "block" }}
+        priority
+      />
+    );
+  }
+
+  if (variant === "text-dark") {
+    // Full wordmark for dark backgrounds
+    return (
+      <Image
+        src="/img/logo-text-dark.webp"
+        alt="Flowly"
+        height={size === "lg" ? 52 : 36}
+        width={size === "lg" ? 260 : 180}
+        style={{ objectFit: "contain", display: "block" }}
+        priority
+      />
+    );
+  }
+
+  // Icon-only variants
+  const src = variant === "dark" ? "/svg/logo-dark.svg" : "/img/logo-light.webp";
+  return (
+    <Image
+      src={src}
+      alt="Flowly"
+      height={iconH}
+      width={iconH}
+      style={{ objectFit: "contain", display: "block" }}
+      priority={variant === "dark"}
+    />
+  );
+}
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 function GlobalNav() {
@@ -64,16 +111,9 @@ function GlobalNav() {
       {/* Logo */}
       <Link
         href="/"
-        style={{
-          color: T.onDark,
-          fontFamily: T.fontDisplay,
-          fontSize: 17,
-          fontWeight: 600,
-          letterSpacing: "-0.374px",
-          textDecoration: "none",
-        }}
+        style={{ textDecoration: "none", display: "flex", alignItems: "center" }}
       >
-        Flowly
+        <FlowlyLogo variant="dark" size="sm" />
       </Link>
 
       {/* Desktop nav links */}
@@ -340,8 +380,8 @@ function MockDashboard() {
           gap: 4,
         }}
       >
-        <div style={{ fontSize: 14, fontWeight: 600, color: T.ink, marginBottom: 12, letterSpacing: "-0.224px" }}>
-          Flowly
+        <div style={{ marginBottom: 12 }}>
+          <FlowlyLogo variant="light" size="sm" />
         </div>
         {["Dashboard", "Transactions", "Calendar", "Wallets", "Savings Goals", "Recurring", "Categories"].map(
           (item, i) => (
@@ -1267,17 +1307,8 @@ function Footer() {
       >
         {/* Brand */}
         <div>
-          <div
-            style={{
-              fontFamily: T.fontDisplay,
-              fontSize: 20,
-              fontWeight: 600,
-              color: T.ink,
-              letterSpacing: "-0.374px",
-              marginBottom: 10,
-            }}
-          >
-            Flowly
+          <div style={{ marginBottom: 10 }}>
+            <FlowlyLogo variant="text-light" size="md" />
           </div>
           <p
             style={{

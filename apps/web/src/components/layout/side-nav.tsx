@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import { NAV_ITEMS } from "./bottom-nav";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
@@ -14,7 +13,6 @@ import { useAuthStore } from "@/store/auth.store";
 export function SideNav() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
-  const { resolvedTheme } = useTheme();
   const avatarSrc = user?.gender === "m" ? "/svg/m.svg" : user?.gender === "f" ? "/svg/f.svg" : null;
 
   return (
@@ -23,7 +21,7 @@ export function SideNav() {
       className="hidden md:flex md:sticky md:top-0 md:h-dvh md:w-72 md:shrink-0 md:flex-col md:border-r md:border-border-subtle md:px-5 md:py-6"
     >
       <Link href={ROUTES.dashboard} className="mb-8 inline-flex items-center px-2">
-        <Image src={resolvedTheme === "dark" ? "/img/logo-text-dark.webp" : "/img/logo-text-light.webp"} alt="Flowly" width={160} height={40} className="h-10 w-auto" style={{ width: "auto" }} />
+        <Image src="/img/logo-blue.webp" alt="Flowly" width={240} height={60} className="h-16 w-auto" style={{ width: "auto" }} />
       </Link>
 
       <nav className="flex-1">
