@@ -39,3 +39,6 @@ apps/api/prisma/migrations/dev.db*
 
 # Docs (internal only)
 docs/
+
+# AI project memory (local only)
+.memory/
