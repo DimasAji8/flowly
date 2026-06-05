@@ -507,76 +507,149 @@ function GlobalNav() {
   );
 }
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
+// ─── Hero (two-column, Bibit-style) ───────────────────────────────────────────
 function HeroSection() {
   return (
-    <section style={{ background: T.canvas, padding: "96px 24px 0", textAlign: "center" }}>
-      <Reveal>
-        <h1
-          style={{
-            fontFamily: T.fontDisplay,
-            fontSize: "clamp(48px, 9vw, 96px)",
-            fontWeight: 600,
-            lineHeight: 1.04,
-            letterSpacing: "-0.03em",
-            color: T.ink,
-            margin: "24px auto 0",
-          }}
-        >
-          Teman Kas
-        </h1>
-        <p
-          style={{
-            fontFamily: T.fontDisplay,
-            fontSize: "clamp(21px, 3.4vw, 30px)",
-            fontWeight: 500,
-            lineHeight: 1.25,
-            letterSpacing: "-0.01em",
-            color: T.ink,
-            maxWidth: 640,
-            margin: "16px auto 0",
-          }}
-        >
-          Tahu ke mana uangmu pergi.
-        </p>
-        <div style={{ display: "flex", gap: 24, justifyContent: "center", marginTop: 18, flexWrap: "wrap" }}>
-          <Link href={ROUTES.register} style={{ color: T.primary, fontFamily: T.fontText, fontSize: "clamp(17px,2.4vw,21px)", textDecoration: "none" }}>
-            Mulai gratis ›
-          </Link>
-          <a href="#overview" style={{ color: T.primary, fontFamily: T.fontText, fontSize: "clamp(17px,2.4vw,21px)", textDecoration: "none" }}>
-            Lihat fiturnya ›
-          </a>
-        </div>
-      </Reveal>
+    <section style={{ background: T.canvas, padding: "104px 24px 0" }}>
+      <div className="lp-hero-grid" style={{ maxWidth: 1100, margin: "0 auto" }}>
+        {/* Left: copy + CTA */}
+        <Reveal className="lp-hero-copy">
+          <h1
+            style={{
+              fontFamily: T.fontDisplay,
+              fontSize: "clamp(36px, 5.4vw, 60px)",
+              fontWeight: 700,
+              lineHeight: 1.08,
+              letterSpacing: "-0.02em",
+              color: T.ink,
+            }}
+          >
+            Tahu ke mana{" "}
+            <span style={{ color: T.primary, textDecoration: "underline", textDecorationThickness: "3px", textUnderlineOffset: "6px" }}>
+              uangmu
+            </span>{" "}
+            pergi.
+          </h1>
+          <p
+            style={{
+              fontFamily: T.fontText,
+              fontSize: "clamp(16px, 2vw, 19px)",
+              lineHeight: 1.5,
+              color: T.textMuted,
+              maxWidth: 440,
+              margin: "20px 0 0",
+            }}
+          >
+            Teman Kas adalah jurnal arus kas yang tenang dan rapi. Catat pemasukan,
+            pengeluaran, dan tujuan menabung — semuanya di satu tempat.
+          </p>
+          <div style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
+            <Link
+              href={ROUTES.register}
+              style={{
+                background: T.primary,
+                color: T.onDark,
+                fontFamily: T.fontText,
+                fontSize: 16,
+                fontWeight: 500,
+                borderRadius: 9999,
+                padding: "13px 28px",
+                textDecoration: "none",
+                transition: "background-color 0.15s",
+              }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.backgroundColor = T.primaryFocus)}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.backgroundColor = T.primary)}
+            >
+              Mulai gratis
+            </Link>
+            <a
+              href="#overview"
+              style={{
+                color: T.ink,
+                fontFamily: T.fontText,
+                fontSize: 16,
+                fontWeight: 500,
+                borderRadius: 9999,
+                padding: "12px 26px",
+                textDecoration: "none",
+                border: `1px solid ${T.hairline}`,
+                transition: "border-color 0.15s, background 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = T.primary;
+                el.style.background = T.primarySoft;
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = T.hairline;
+                el.style.background = "transparent";
+              }}
+            >
+              Lihat fiturnya
+            </a>
+          </div>
+        </Reveal>
 
-      {/* Big hero image (lifestyle) */}
-      <Reveal delay={100}>
-        <div
-          style={{
-            maxWidth: 1100,
-            margin: "44px auto 0",
-            position: "relative",
-            aspectRatio: "16 / 9",
-            borderRadius: 28,
-            overflow: "hidden",
-          }}
-        >
-          <Image src={IMG.heroLifestyle} alt="Mengatur keuangan pribadi" fill priority sizes="(max-width: 1100px) 100vw, 1100px" style={{ objectFit: "cover" }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 100%)" }} />
-          {/* phone floating over image */}
-          <div className="lp-hero-phone" style={{ position: "absolute", right: "8%", bottom: "-6%", transform: "scale(0.72)", transformOrigin: "bottom right" }}>
-            <PhoneFrame>
-              <ScreenDashboard />
-            </PhoneFrame>
+        {/* Right: phone on soft blob */}
+        <Reveal delay={100} className="lp-hero-visual">
+          <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            {/* soft blob backdrop */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                width: "108%",
+                aspectRatio: "1 / 1",
+                background: "radial-gradient(circle at 50% 42%, rgba(0,102,204,0.12) 0%, rgba(0,102,204,0.04) 45%, rgba(0,102,204,0) 70%)",
+                borderRadius: "46% 54% 52% 48% / 50% 46% 54% 50%",
+              }}
+            />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <PhoneFrame scale={0.86}>
+                <ScreenDashboard />
+              </PhoneFrame>
+            </div>
           </div>
-          <div style={{ position: "absolute", left: 28, bottom: 26, textAlign: "left", maxWidth: 460 }}>
-            <p style={{ fontFamily: T.fontDisplay, fontSize: "clamp(20px,2.6vw,30px)", fontWeight: 600, color: T.onDark, letterSpacing: "-0.02em", lineHeight: 1.18, margin: 0 }}>
-              Catat pemasukan & pengeluaran dalam hitungan detik.
-            </p>
-          </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
+
+      <StatsStrip />
     </section>
+  );
+}
+
+// ─── Stats strip ──────────────────────────────────────────────────────────────
+function StatsStrip() {
+  const stats = [
+    { top: "Catat transaksi", big: "< 5 detik", sub: "Cepat & satu tangan" },
+    { top: "Selalu", big: "Gratis", sub: "Untuk memulai" },
+    { top: "Bisa dibagi", big: "Multi-user", sub: "Workspace bersama" },
+    { top: "Tanpa", big: "Iklan", sub: "Tenang & fokus" },
+  ];
+  return (
+    <Reveal delay={150}>
+      <div
+        style={{
+          maxWidth: 1100,
+          margin: "64px auto 0",
+          border: `1px solid ${T.hairline}`,
+          borderRadius: 24,
+          padding: "32px 16px",
+        }}
+        className="lp-stats-grid"
+      >
+        {stats.map((s) => (
+          <div key={s.big} style={{ textAlign: "center", padding: "8px 12px" }}>
+            <div style={{ fontFamily: T.fontText, fontSize: 13, color: T.textMuted, marginBottom: 6 }}>{s.top}</div>
+            <div style={{ fontFamily: T.fontDisplay, fontSize: "clamp(22px, 3vw, 30px)", fontWeight: 700, color: T.primary, letterSpacing: "-0.02em" }}>
+              {s.big}
+            </div>
+            <div style={{ fontFamily: T.fontText, fontSize: 13, fontWeight: 600, color: T.ink, marginTop: 6 }}>{s.sub}</div>
+          </div>
+        ))}
+      </div>
+    </Reveal>
   );
 }
 
@@ -812,6 +885,37 @@ export default function LandingPage() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
 
+        /* Hero two-column */
+        .lp-hero-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 48px;
+          align-items: center;
+        }
+        .lp-hero-copy { display: flex; flex-direction: column; }
+
+        /* Hero stats strip */
+        .lp-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .lp-stats-grid > div + div {
+          border-left: 1px solid ${T.hairline};
+        }
+
+        @media (max-width: 880px) {
+          .lp-hero-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+          .lp-hero-copy { align-items: center; }
+          .lp-hero-copy > div { justify-content: center; }
+        }
+        @media (max-width: 720px) {
+          .lp-stats-grid { grid-template-columns: 1fr 1fr; }
+          .lp-stats-grid > div:nth-child(2) { border-left: 1px solid ${T.hairline}; }
+          .lp-stats-grid > div:nth-child(3) { border-left: none; }
+          .lp-stats-grid > div:nth-child(3),
+          .lp-stats-grid > div:nth-child(4) { margin-top: 24px; }
+        }
+
         .lp-feature-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -824,10 +928,6 @@ export default function LandingPage() {
           .lp-feature-grid { grid-template-columns: 1fr; }
           .lp-feature-grid.lp-reverse { direction: ltr; }
           .lp-feature-grid > div:last-child { min-height: 280px !important; order: -1; }
-        }
-
-        @media (max-width: 640px) {
-          .lp-hero-phone { display: none !important; }
         }
 
         .lp-nav-burger { display: none; }
