@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/hooks/use-theme";
-import { ChevronRight, Tag, Wallet, LogOut, Repeat, Sun, Moon, Target, PieChart } from "lucide-react";
+import { LogOut, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
@@ -72,46 +71,6 @@ export default function ProfilePage() {
         </Card>
       </section>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">
-          Kelola
-        </h2>
-        <Card padding="none">
-          <ul className="divide-y divide-border-subtle">
-            <ManageRow
-              href={ROUTES.wallets}
-              icon={<Wallet className="size-4" aria-hidden />}
-              label="Dompet"
-              description="Kelola sumber uang"
-            />
-            <ManageRow
-              href={ROUTES.savingsGoals}
-              icon={<Target className="size-4" aria-hidden />}
-              label="Target Tabungan"
-              description="Kelola tujuan dan progress menabung"
-            />
-            <ManageRow
-              href={ROUTES.categories}
-              icon={<Tag className="size-4" aria-hidden />}
-              label="Kategori"
-              description="Kelola kategori pemasukan & pengeluaran"
-            />
-            <ManageRow
-              href={ROUTES.recurring}
-              icon={<Repeat className="size-4" aria-hidden />}
-              label="Berulang"
-              description="Transaksi berulang otomatis"
-            />
-            <ManageRow
-              href={ROUTES.profileAllocation}
-              icon={<PieChart className="size-4" aria-hidden />}
-              label="Target Alokasi"
-              description="Atur target kebutuhan, keinginan & tabungan"
-            />
-          </ul>
-        </Card>
-      </section>
-
       <Button
         variant="secondary"
         onClick={handleLogout}
@@ -121,42 +80,5 @@ export default function ProfilePage() {
         Keluar
       </Button>
     </div>
-  );
-}
-
-function ManageRow({
-  href,
-  icon,
-  label,
-  description,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-}) {
-  return (
-    <li>
-      <Link
-        href={href}
-        className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-card-subtle"
-      >
-        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
-          {icon}
-        </span>
-        <div className="flex flex-1 flex-col">
-          <span className="text-sm font-medium text-foreground">
-            {label}
-          </span>
-          <span className="text-xs text-muted">
-            {description}
-          </span>
-        </div>
-        <ChevronRight
-          className="size-4 text-muted"
-          aria-hidden
-        />
-      </Link>
-    </li>
   );
 }

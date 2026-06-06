@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { SavingsGoalsSummary } from "@/components/dashboard/savings-goals-summary";
+import { QuickActions } from "@/components/dashboard/quick-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { SpendingInsights } from "@/components/dashboard/spending-insights";
@@ -184,6 +185,8 @@ export default function DashboardPage() {
           totalBalance={totalBalance}
         />
       )}
+
+      <QuickActions />
 
       <div className="flex flex-col gap-6">
         <section className="flex flex-col gap-3">

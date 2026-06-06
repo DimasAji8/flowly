@@ -4,9 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/hooks/use-theme";
-import { NAV_ITEMS } from "./bottom-nav";
+import { LayoutDashboard, CalendarDays, ArrowLeftRight, Wallet, Target, Tag, Repeat, PieChart, CircleUserRound } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
+
+const SIDE_NAV_ITEMS = [
+  { href: ROUTES.dashboard,          label: "Beranda",       icon: LayoutDashboard },
+  { href: ROUTES.transactions,       label: "Transaksi",     icon: ArrowLeftRight, matchPrefix: "/transactions" },
+  { href: ROUTES.calendar,           label: "Kalender",      icon: CalendarDays },
+  { href: ROUTES.wallets,            label: "Dompet",        icon: Wallet, matchPrefix: "/wallets" },
+  { href: ROUTES.savingsGoals,       label: "Tabungan",      icon: Target },
+  { href: ROUTES.categories,         label: "Kategori",      icon: Tag },
+  { href: ROUTES.recurring,          label: "Berulang",      icon: Repeat },
+  { href: ROUTES.profileAllocation,  label: "Alokasi",       icon: PieChart },
+  { href: ROUTES.profile,            label: "Profil",        icon: CircleUserRound },
+];
 
 /**
  * Sidebar navigation untuk desktop (≥ md). Sticky di kiri.
@@ -28,7 +40,7 @@ export function SideNav() {
 
       <nav className="flex-1">
         <ul className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => {
+          {SIDE_NAV_ITEMS.map((item) => {
             const isActive = item.matchPrefix
               ? pathname.startsWith(item.matchPrefix)
               : pathname === item.href;
