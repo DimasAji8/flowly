@@ -91,25 +91,15 @@ export default function ReportsPage() {
 
   const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
 
-  const prevMonth = () => {
-    if (month === 1) { setMonth(12); setYear((y) => y - 1); }
-    else setMonth((m) => m - 1);
-  };
-  const nextMonth = () => {
-    if (month === 12) { setMonth(1); setYear((y) => y + 1); }
-    else setMonth((m) => m + 1);
-  };
-
   return (
     <div className="flex flex-col gap-5 max-w-2xl flowly-enter">
       <BackButton />
       <header>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">Laporan</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">Analisis</h1>
       </header>
 
-      {/* Filter bulan — sama persis dengan transactions page */}
       <div className="flex items-center justify-between rounded-2xl border border-border-subtle bg-card px-4 py-3" style={{ boxShadow: "var(--shadow-card)" }}>
-        <button type="button" onClick={prevMonth} className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-foreground transition-colors">
+        <button type="button" onClick={() => { if (month === 1) { setMonth(12); setYear((y) => y - 1); } else setMonth((m) => m - 1); }} className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-foreground transition-colors">
           <ChevronLeft className="size-4" />
         </button>
         <div className="text-center">
@@ -120,7 +110,7 @@ export default function ReportsPage() {
             </button>
           )}
         </div>
-        <button type="button" onClick={nextMonth} disabled={isCurrentMonth} className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+        <button type="button" onClick={() => { if (month === 12) { setMonth(1); setYear((y) => y + 1); } else setMonth((m) => m + 1); }} disabled={isCurrentMonth} className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
           <ChevronRight className="size-4" />
         </button>
       </div>

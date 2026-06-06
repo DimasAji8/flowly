@@ -10,7 +10,7 @@ const ACTIONS = [
   { href: ROUTES.categories,       icon: Tag,       label: "Kategori"  },
   { href: ROUTES.recurring,        icon: Repeat,    label: "Berulang"  },
   { href: ROUTES.profileAllocation,icon: PieChart,  label: "Alokasi"   },
-  { href: ROUTES.reports,          icon: BarChart2, label: "Laporan"   },
+  { href: ROUTES.reports,          icon: BarChart2, label: "Analisis"  },
 ];
 
 export function QuickActions() {
@@ -23,7 +23,7 @@ export function QuickActions() {
             href={href}
             className="flex flex-col items-center gap-1.5 rounded-2xl p-3 transition-colors hover:bg-card-subtle"
           >
-            <span className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent">
+            <span className="grid size-11 place-items-center rounded-2xl bg-card-subtle text-secondary border border-border-subtle">
               <Icon className="size-5" strokeWidth={1.75} aria-hidden />
             </span>
             <span className="text-[11px] font-medium text-secondary leading-tight text-center">
