@@ -2,47 +2,32 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { SavingsGoalsSummary } from "@/components/dashboard/savings-goals-summary";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
-import { SpendingInsights } from "@/components/dashboard/spending-insights";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
 import { transactionsService } from "@/services/transactions.service";
-import { transfersService } from "@/services/transfers.service";
 import { walletsService } from "@/services/wallets.service";
 import { useAuthStore } from "@/store/auth.store";
-import { useWorkspaceStore } from "@/store/workspace.store";
-import type { MonthlySummary, Transaction, CategoryGroup, SavingsGoal, Wallet, Transfer } from "@/types/finance";
+import type { MonthlySummary, Transaction, SavingsGoal, Wallet } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
-
-type CategorySpend = {
-  categoryId: string;
-  categoryName: string;
-  categoryIcon: string;
-  categoryColor: string;
-  group: CategoryGroup | null;
-  amount: number;
-};
 
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const refreshMe = useAuthStore((s) => s.refreshMe);
   const { resolvedTheme } = useTheme();
-  const { targets, fetch: fetchTargets } = useWorkspaceStore();
 
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
-  const [allTx, setAllTx] = useState<Transaction[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -76,15 +61,11 @@ export default function DashboardPage() {
 
     Promise.all([
       transactionsService.monthlySummary(),
-      transactionsService.list({ limit: 500, page: 1, from, to }),
+      transactionsService.list({ limit: 5, page: 1, from, to }),
       savingsGoalsService.list(),
-      fetchTargets(),
       walletsService.list(),
-      transfersService.list(year, month),
     ])
-      .then(([s, all, goals, , ws, tf]) => {
-        setWallets(ws);
-        setTransfers(tf);
+      .then(([s, all, goals, ws]) => {
         if (cancelled) return;
         setSummary(s);
         setRecent(all.data
@@ -92,8 +73,8 @@ export default function DashboardPage() {
           .sort((a, b) => b.transactionDate.localeCompare(a.transactionDate))
           .slice(0, 3)
         );
-        setAllTx(all.data);
         setSavingsGoals(goals);
+        setWallets(ws);
         setError(null);
       })
       .catch((e: unknown) => {
@@ -111,33 +92,7 @@ export default function DashboardPage() {
     return () => window.removeEventListener("flowly:transaction-added", handler);
   }, [load]);
 
-  const categorySpends = useMemo<CategorySpend[]>(() => {
-    const map = new Map<string, CategorySpend>();
-    for (const tx of allTx) {
-      if (tx.type !== "expense") continue;
-      const existing = map.get(tx.categoryId);
-      if (existing) {
-        existing.amount += Number(tx.amount);
-      } else {
-        map.set(tx.categoryId, {
-          categoryId: tx.categoryId,
-          categoryName: tx.category.name,
-          categoryIcon: tx.category.icon,
-          categoryColor: tx.category.color,
-          group: (tx.category as { group?: CategoryGroup }).group ?? null,
-          amount: Number(tx.amount),
-        });
-      }
-    }
-    return Array.from(map.values());
-  }, [allTx]);
-
-  const totalIncome = Number(summary?.income ?? 0);
   const totalBalance = wallets.reduce((sum, w) => sum + Number(w.balance), 0);
-  const savingsWalletIds = new Set(wallets.filter((w) => w.type === "savings").map((w) => w.id));
-  const savingsTransferAmount = transfers
-    .filter((t) => savingsWalletIds.has(t.toWalletId))
-    .reduce((sum, t) => sum + Number(t.amount), 0);
   const avatarSrc = user?.gender === "m" ? "/svg/m.svg" : user?.gender === "f" ? "/svg/f.svg" : null;
 
   return (
@@ -220,22 +175,19 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {loading ? (
-          <div className="flex flex-col gap-3">
-            <Skeleton className="h-5 w-32 rounded-lg" />
-            <Skeleton className="h-40 rounded-2xl" />
-          </div>
-        ) : categorySpends.length > 0 && (
-          <SpendingInsights
-            categorySpends={categorySpends}
-            totalIncome={totalIncome}
-            targets={targets}
-            savingsTransferAmount={savingsTransferAmount}
-          />
-        )}
-
         {!loading && savingsGoals.length > 0 && (
           <SavingsGoalsSummary items={savingsGoals} />
+        )}
+
+        {!loading && (
+          <Link
+            href={ROUTES.reports}
+            className="flex items-center justify-between rounded-2xl border border-border-subtle bg-card px-4 py-3.5 text-sm transition-colors hover:bg-card-subtle"
+            style={{ boxShadow: "var(--shadow-card)" }}
+          >
+            <span className="font-medium text-foreground">Analisis pengeluaran</span>
+            <span className="text-xs text-muted">Lihat laporan →</span>
+          </Link>
         )}
       </div>
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/ui/back-button";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
-import { FilterChips } from "@/components/ui/filter-chips";
+import { FilterBar } from "@/components/ui/filter-bar";
 import { ActionMenu } from "@/components/ui/action-menu";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { RecurringModal } from "@/components/recurring/recurring-modal";
@@ -130,10 +130,10 @@ export default function RecurringListPage() {
         </Button>
       </header>
 
-      <div className="flex flex-col gap-2">
-        <FilterChips options={TYPE_OPTIONS} value={typeFilter} onChange={setTypeFilter} />
-        <FilterChips options={STATUS_OPTIONS} value={statusFilter} onChange={setStatusFilter} />
-      </div>
+      <FilterBar filters={[
+        { key: "type", type: "chip", label: "Tipe", options: TYPE_OPTIONS, value: typeFilter, onChange: setTypeFilter },
+        { key: "status", type: "chip", label: "Status", options: STATUS_OPTIONS, value: statusFilter, onChange: setStatusFilter },
+      ]} />
 
       {error && (
         <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">

@@ -13,6 +13,7 @@ export const ROUTES = {
   categories: "/categories",
   recurring: "/recurring",
   profileAllocation: "/profile/allocation",
+  reports: "/reports",
 } as const;
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];

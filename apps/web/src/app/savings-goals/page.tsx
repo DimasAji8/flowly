@@ -8,7 +8,7 @@ import { ActionMenu } from "@/components/ui/action-menu";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { FilterChips } from "@/components/ui/filter-chips";
+import { FilterBar } from "@/components/ui/filter-bar";
 import { SavingsGoalModal } from "@/components/savings-goals/savings-goal-modal";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
@@ -151,7 +151,12 @@ export default function SavingsGoalsPage() {
         </Button>
       </header>
 
-      <FilterChips options={GOAL_FILTER_OPTIONS} value={statusFilter} onChange={setStatusFilter} />
+      <FilterBar filters={[{
+        key: "status", type: "chip", label: "Status",
+        options: GOAL_FILTER_OPTIONS,
+        value: statusFilter,
+        onChange: setStatusFilter,
+      }]} />
 
       {error && (
         <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">

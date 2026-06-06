@@ -10,7 +10,7 @@ const ACTIONS = [
   { href: ROUTES.categories,       icon: Tag,       label: "Kategori"  },
   { href: ROUTES.recurring,        icon: Repeat,    label: "Berulang"  },
   { href: ROUTES.profileAllocation,icon: PieChart,  label: "Alokasi"   },
-  { href: ROUTES.transactions,     icon: BarChart2, label: "Transaksi" },
+  { href: ROUTES.reports,          icon: BarChart2, label: "Laporan"   },
 ];
 
 export function QuickActions() {

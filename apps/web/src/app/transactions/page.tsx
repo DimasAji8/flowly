@@ -6,7 +6,7 @@ import Link from "next/link";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { DeleteTransactionModal } from "@/components/transaction/delete-transaction-modal";
-import { FilterChips } from "@/components/ui/filter-chips";
+import { FilterBar, type FilterConfig } from "@/components/ui/filter-bar";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
 import { useWalletStore } from "@/store/wallets.store";
@@ -161,36 +161,13 @@ export default function TransactionsPage() {
         </button>
       </div>
 
-      {/* Filter tipe, dompet, kategori */}
-      <div className="flex flex-col gap-2">
-        <FilterChips options={TYPE_OPTIONS} value={typeFilter} onChange={(v) => { setTypeFilter(v); setCategoryFilter("all"); }} />
-        {mounted && (
-          <div className="flex flex-wrap gap-2">
-            <select
-              value={walletFilter}
-              onChange={(e) => setWalletFilter(e.target.value)}
-              className="rounded-full border border-border-subtle bg-card-subtle px-3 py-1 text-xs font-semibold text-secondary transition-colors hover:border-border focus:outline-none"
-            >
-              <option value="all">Semua dompet</option>
-              {wallets.map((w) => (
-                <option key={w.id} value={w.id}>{w.name}</option>
-              ))}
-            </select>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="rounded-full border border-border-subtle bg-card-subtle px-3 py-1 text-xs font-semibold text-secondary transition-colors hover:border-border focus:outline-none"
-            >
-              <option value="all">Semua kategori</option>
-              {categories
-                .filter((c) => typeFilter === "all" || c.type === typeFilter)
-                .map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-            </select>
-          </div>
-        )}
-      </div>
+      {mounted && (
+        <FilterBar filters={[
+          { key: "type", type: "chip", label: "Tipe", options: TYPE_OPTIONS, value: typeFilter, onChange: (v) => { setTypeFilter(v); setCategoryFilter("all"); } },
+          { key: "wallet", type: "dropdown", label: "Dompet", value: walletFilter, onChange: setWalletFilter, options: [{ value: "all", label: "Semua dompet" }, ...wallets.map((w) => ({ value: w.id, label: w.name }))] },
+          { key: "category", type: "dropdown", label: "Kategori", value: categoryFilter, onChange: setCategoryFilter, options: [{ value: "all", label: "Semua kategori" }, ...categories.filter((c) => typeFilter === "all" || c.type === typeFilter).map((c) => ({ value: c.id, label: c.name }))] },
+        ]} />
+      )}
 
       {error && (
         <div className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">

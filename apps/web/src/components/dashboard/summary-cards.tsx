@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { formatCurrency } from "@/utils/format-currency";
 
 interface SummaryCardsProps {
@@ -11,10 +13,13 @@ interface SummaryCardsProps {
 export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
   const netNum = Number(net);
   const isPositive = netNum >= 0;
+  const [hidden, setHidden] = useState(false);
+
+  const mask = "••••••";
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Hero card — net cashflow */}
+      {/* Hero card */}
       <div
         className="relative overflow-hidden rounded-3xl p-6"
         style={{
@@ -26,38 +31,50 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
             : "0 8px 32px -8px rgba(185, 28, 28, 0.45), 0 2px 8px rgba(0,0,0,0.12)",
         }}
       >
-        {/* Decorative circles */}
         <div className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full opacity-10" style={{ background: "white" }} aria-hidden />
         <div className="pointer-events-none absolute -bottom-12 -left-6 size-32 rounded-full opacity-10" style={{ background: "white" }} aria-hidden />
         <div className="pointer-events-none absolute right-16 bottom-4 size-20 rounded-full opacity-5" style={{ background: "white" }} aria-hidden />
 
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/60">
-          Total Saldo · semua dompet
-        </p>
+        <div className="flex items-start justify-between">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/60">
+            Total Saldo · semua dompet
+          </p>
+          <button
+            type="button"
+            onClick={() => setHidden((h) => !h)}
+            className="text-white/50 hover:text-white/80 transition-colors"
+            aria-label={hidden ? "Tampilkan saldo" : "Sembunyikan saldo"}
+          >
+            {hidden ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </button>
+        </div>
+
         <p className="mt-2 text-4xl font-bold tabular-nums tracking-tight text-white drop-shadow-sm">
-          {totalBalance !== undefined ? formatCurrency(totalBalance) : "—"}
+          {hidden ? mask : totalBalance !== undefined ? formatCurrency(totalBalance) : "—"}
         </p>
 
-
-        {/* Income & Expense inline */}
         <div className="mt-5 border-t border-white/10 pt-4">
-          <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-white/40 mb-2.5 text-center">Bulan ini</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-white/40 mb-2.5 text-center">{month}</p>
           <div className="flex gap-4">
             <div className="flex flex-1 flex-col gap-0.5">
               <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pemasukan</p>
-              <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(income)}</p>
+              <p className="text-base font-semibold tabular-nums text-white/90">
+                {hidden ? mask : formatCurrency(income)}
+              </p>
             </div>
             <div className="w-px bg-white/10" aria-hidden />
             <div className="flex flex-1 flex-col gap-0.5">
               <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pengeluaran</p>
-              <p className="text-base font-semibold tabular-nums text-white/90">{formatCurrency(expense)}</p>
+              <p className="text-base font-semibold tabular-nums text-white/90">
+                {hidden ? mask : formatCurrency(expense)}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Expense ratio bar */}
-      {Number(income) > 0 && (
+      {!hidden && Number(income) > 0 && (
         <div
           className="rounded-2xl border border-border-subtle bg-card px-4 py-3.5"
           style={{ boxShadow: "var(--shadow-card)" }}

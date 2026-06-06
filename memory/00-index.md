@@ -6,14 +6,15 @@ ada temuan/keputusan baru.
 
 ## Index
 - `filter-plan.md` — audit kondisi filter saat ini + rekomendasi filter per halaman (SUDAH diimplementasi).
-- `navigation-menu-plan.md` — analisis penempatan menu (menu inti di Profil → usul Quick Actions grid di dashboard). Proposal, belum diimplementasi.
-- `dashboard-redesign-plan.md` — opsi redesign dashboard (3 opsi, rekomendasi Opsi 2 Hero Balance + Quick Actions). Proposal, belum diimplementasi.
+- `navigation-menu-plan.md` — analisis penempatan menu (SUDAH diimplementasi).
+- `dashboard-redesign-plan.md` — opsi redesign dashboard (SUDAH diimplementasi langkah 1-4).
+- `ui-components.md` — **WAJIB BACA** daftar komponen UI yang tersedia. Selalu gunakan sebelum buat komponen baru.
 
 ## Keputusan/diskusi yang masih terbuka
 - **Riwayat setoran savings goal**: saat ini hanya simpan `currentAmount` kumulatif,
   belum ada riwayat per setoran. Butuh skema backend baru jika ingin riwayat.
 - **Penempatan menu navigasi**: **SELESAI (langkah 1)**. QuickActions grid di dashboard sudah dibuat, Profil sudah dibersihkan (akun + tema + logout saja), SideNav desktop sudah memuat semua menu. Langkah selanjutnya: redesign HeroBalance.
-- **Redesign dashboard**: 3 opsi di dashboard-redesign-plan.md, rekomendasi Opsi 2 (Hero Balance + Quick Actions). Menunggu keputusan.
+- **Redesign dashboard**: **SELESAI langkah 2-4**. SummaryCards + toggle hide saldo. SpendingInsights dipindah ke `/reports`. Dashboard sekarang: header → SummaryCards → QuickActions → Transaksi terbaru → SavingsGoals → teaser Laporan.
 
 ## Keputusan yang sudah diambil
 - **Savings goal "Tercapai"**: default filter "Aktif" — goal selesai tidak tampil di default view, user bisa pilih chip "Tercapai" untuk melihat arsip. Selesai diimplementasi.
