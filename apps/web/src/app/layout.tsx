@@ -34,6 +34,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("h-full", "antialiased", playfair.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;if(t==='dark'){c.add('dark');}else{c.add('light');}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <ThemeProvider>
           <AuthHydrator>{children}</AuthHydrator>
