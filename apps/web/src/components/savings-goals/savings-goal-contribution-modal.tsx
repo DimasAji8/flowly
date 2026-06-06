@@ -79,48 +79,61 @@ export function SavingsGoalContributionModal({
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={goal ? `Tambah setoran · ${goal.name}` : "Tambah setoran"}
-    >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {goal && (
-          <div className="rounded-2xl border border-success/25 bg-success/8 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-success/80">
-              Saldo saat ini
-            </p>
-            <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">
-              {formatCurrency(goal.currentAmount)}
-            </p>
+    <>
+      <Modal
+        open={open}
+        onClose={onClose}
+        title={goal ? `Tambah setoran · ${goal.name}` : "Tambah setoran"}
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {goal && (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-2xl border border-success/25 bg-success/8 px-4 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-success/80">
+                  Saldo saat ini
+                </p>
+                <p className="mt-1 text-base font-semibold tabular-nums text-foreground">
+                  {formatCurrency(goal.currentAmount)}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-danger/25 bg-danger/5 px-4 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-danger/80">
+                  Sisa
+                </p>
+                <p className="mt-1 text-base font-semibold tabular-nums text-foreground">
+                  {formatCurrency(Math.max(Number(goal.targetAmount) - Number(goal.currentAmount), 0))}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <Input
+            label="Nominal setoran"
+            inputMode="numeric"
+            placeholder="0"
+            leftAdornment={<span className="font-medium">Rp</span>}
+            value={amountDisplay}
+            onChange={(e) => setAmountDisplay(formatRupiah(e.target.value))}
+            required
+          />
+
+          {error && (
+            <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
+              {error}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 pt-1">
+            <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+              Batal
+            </Button>
+            <Button type="submit" isLoading={loading} className="flex-1">
+              Simpan setoran
+            </Button>
           </div>
-        )}
+        </form>
+      </Modal>
 
-        <Input
-          label="Nominal setoran"
-          inputMode="numeric"
-          placeholder="0"
-          leftAdornment={<span className="font-medium">Rp</span>}
-          value={amountDisplay}
-          onChange={(e) => setAmountDisplay(formatRupiah(e.target.value))}
-          required
-        />
-
-        {error && (
-          <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
-            {error}
-          </div>
-        )}
-
-        <div className="flex items-center gap-3 pt-1">
-          <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
-            Batal
-          </Button>
-          <Button type="submit" isLoading={loading} className="flex-1">
-            Simpan setoran
-          </Button>
-        </div>
-      </form>
       <ConfirmModal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
@@ -134,6 +147,6 @@ export function SavingsGoalContributionModal({
         confirmVariant="primary"
         loading={loading}
       />
-    </Modal>
+    </>
   );
 }
