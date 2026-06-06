@@ -6,6 +6,8 @@ import { BackButton } from "@/components/ui/back-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SpendingInsights } from "@/components/dashboard/spending-insights";
+import { MonthlySummaryCard } from "@/components/reports/monthly-summary-card";
+import { CategorySpendingTable } from "@/components/reports/category-spending-table";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
 import { transfersService } from "@/services/transfers.service";
@@ -28,6 +30,8 @@ export default function ReportsPage() {
 
   const [categorySpends, setCategorySpends] = useState<CategorySpend[]>([]);
   const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpense, setTotalExpense] = useState(0);
+  const [netAmount, setNetAmount] = useState(0);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +72,8 @@ export default function ReportsPage() {
         }
         setCategorySpends(Array.from(spends.values()));
         setTotalIncome(Number(summary.income));
+        setTotalExpense(Number(summary.expense));
+        setNetAmount(Number(summary.net));
         setWallets(ws);
         setTransfers(tf);
       })
@@ -128,6 +134,15 @@ export default function ReportsPage() {
         />
       ) : (
         <>
+          <MonthlySummaryCard
+            income={totalIncome}
+            expense={totalExpense}
+            net={netAmount}
+          />
+          <CategorySpendingTable
+            categorySpends={categorySpends}
+            totalExpense={totalExpense}
+          />
           <SpendingInsights
             categorySpends={categorySpends}
             totalIncome={totalIncome}
