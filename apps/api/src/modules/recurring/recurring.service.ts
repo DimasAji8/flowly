@@ -20,10 +20,14 @@ export class RecurringService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(workspaceId: string): Promise<SerializedRecurring[]> {
+  async list(workspaceId: string, query: import('./dto/list-recurring.query').ListRecurringQuery = {}): Promise<SerializedRecurring[]> {
+    const where: Prisma.RecurringTransactionWhereInput = { workspaceId };
+    if (query.type !== undefined) where.type = query.type;
+    if (query.isActive !== undefined) where.isActive = query.isActive;
+
     const items = await this.prisma.recurringTransaction.findMany({
-      where: { workspaceId },
-      orderBy: { createdAt: 'desc' },
+      where,
+      orderBy: { nextRunAt: 'asc' },
     });
     return items.map(serializeRecurring);
   }

@@ -8,6 +8,7 @@ import { ActionMenu } from "@/components/ui/action-menu";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { FilterChips } from "@/components/ui/filter-chips";
 import { SavingsGoalModal } from "@/components/savings-goals/savings-goal-modal";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
@@ -43,11 +44,21 @@ function getGoalStatus(goal: SavingsGoal): GoalStatus {
   return "on-track";
 }
 
+type GoalFilter = "active" | "completed" | "paused" | "all";
+
+const GOAL_FILTER_OPTIONS = [
+  { label: "Semua", value: "all" as const },
+  { label: "Aktif", value: "active" as const },
+  { label: "Tercapai", value: "completed" as const },
+  { label: "Dijeda", value: "paused" as const },
+];
+
 export default function SavingsGoalsPage() {
   const [items, setItems] = useState<SavingsGoal[]>([]);
   const { wallets, fetch: fetchWallets } = useWalletStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<GoalFilter>("active");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
   const [contributionGoal, setContributionGoal] = useState<SavingsGoal | undefined>();
@@ -65,8 +76,7 @@ export default function SavingsGoalsPage() {
   };
 
   useEffect(() => {
-    let cancelled = false;
-    async function fetchInitial() {
+    let cancelled = false;    async function fetchInitial() {
       try {
         const [goals] = await Promise.all([
           savingsGoalsService.list(),
@@ -88,6 +98,17 @@ export default function SavingsGoalsPage() {
     () => new Map(wallets.map((w) => [w.id, w.name])),
     [wallets],
   );
+
+  const filteredItems = useMemo(() => {
+    if (statusFilter === "all") return items;
+    return items.filter((g) => {
+      const completed = Number(g.currentAmount) >= Number(g.targetAmount);
+      if (statusFilter === "completed") return completed;
+      if (statusFilter === "paused") return !completed && g.isPaused;
+      // "active" = belum selesai & tidak dijeda
+      return !completed && !g.isPaused;
+    });
+  }, [items, statusFilter]);
 
   const handleDelete = async (goal: SavingsGoal) => {
     try {
@@ -130,6 +151,8 @@ export default function SavingsGoalsPage() {
         </Button>
       </header>
 
+      <FilterChips options={GOAL_FILTER_OPTIONS} value={statusFilter} onChange={setStatusFilter} />
+
       {error && (
         <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
           {error}
@@ -140,13 +163,13 @@ export default function SavingsGoalsPage() {
         <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
           Memuat…
         </div>
-      ) : items.length === 0 ? (
+      ) : filteredItems.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-secondary">
-          Belum ada target tabungan. Buat target pertama untuk mulai melacak tujuan finansial.
+          {statusFilter === "all" ? "Belum ada target tabungan. Buat target pertama untuk mulai melacak tujuan finansial." : "Tidak ada target yang cocok dengan filter ini."}
         </div>
       ) : (
         <ul className="flex flex-col gap-4">
-          {items.map((goal) => {
+          {filteredItems.map((goal) => {
             const targetAmount = Number(goal.targetAmount);
             const currentAmount = Number(goal.currentAmount);
             const progress = targetAmount > 0

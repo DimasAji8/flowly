@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,6 +21,7 @@ import {
 import { SavingsGoalsService } from './savings-goals.service';
 import { CreateSavingsGoalDto } from './dto/create-savings-goal.dto';
 import { UpdateSavingsGoalDto } from './dto/update-savings-goal.dto';
+import { ListSavingsGoalsQuery } from './dto/list-savings-goals.query';
 import { SavingsGoalResponse } from './dto/savings-goal-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
@@ -37,8 +39,11 @@ export class SavingsGoalsController {
   @Get()
   @ApiOperation({ summary: 'List target tabungan' })
   @ApiResponse({ status: 200, type: SavingsGoalResponse, isArray: true })
-  list(@CurrentWorkspace() ws: WorkspaceContext) {
-    return this.service.list(ws.id);
+  list(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @Query() query: ListSavingsGoalsQuery,
+  ) {
+    return this.service.list(ws.id, query);
   }
 
   @Get(':id')

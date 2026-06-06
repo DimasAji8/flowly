@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,6 +21,7 @@ import {
 import { RecurringService } from './recurring.service';
 import { CreateRecurringDto } from './dto/create-recurring.dto';
 import { UpdateRecurringDto } from './dto/update-recurring.dto';
+import { ListRecurringQuery } from './dto/list-recurring.query';
 import { RecurringResponse } from './dto/recurring-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
@@ -37,8 +39,11 @@ export class RecurringController {
   @Get()
   @ApiOperation({ summary: 'List recurring transactions' })
   @ApiResponse({ status: 200, type: RecurringResponse, isArray: true })
-  list(@CurrentWorkspace() ws: WorkspaceContext) {
-    return this.service.list(ws.id);
+  list(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @Query() query: ListRecurringQuery,
+  ) {
+    return this.service.list(ws.id, query);
   }
 
   @Get(':id')

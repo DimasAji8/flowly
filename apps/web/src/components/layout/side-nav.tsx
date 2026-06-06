@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/hooks/use-theme";
 import { NAV_ITEMS } from "./bottom-nav";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";

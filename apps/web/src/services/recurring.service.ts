@@ -16,9 +16,18 @@ export interface CreateRecurringPayload {
   isActive?: boolean;
 }
 
+export interface ListRecurringQuery {
+  type?: TransactionType;
+  isActive?: boolean;
+}
+
 export const recurringService = {
-  list() {
-    return apiClient.get<RecurringTransaction[]>("/recurring", {
+  list(query: ListRecurringQuery = {}) {
+    const params = new URLSearchParams();
+    if (query.type !== undefined) params.set("type", query.type);
+    if (query.isActive !== undefined) params.set("isActive", String(query.isActive));
+    const qs = params.toString();
+    return apiClient.get<RecurringTransaction[]>(`/recurring${qs ? `?${qs}` : ""}`, {
       auth: true,
       workspaceScoped: true,
     });

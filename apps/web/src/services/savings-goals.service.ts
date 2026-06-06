@@ -11,9 +11,18 @@ export interface CreateSavingsGoalPayload {
   isPaused?: boolean;
 }
 
+export interface ListSavingsGoalsQuery {
+  isPaused?: boolean;
+  isCompleted?: boolean;
+}
+
 export const savingsGoalsService = {
-  list() {
-    return apiClient.get<SavingsGoal[]>("/savings-goals", {
+  list(query: ListSavingsGoalsQuery = {}) {
+    const params = new URLSearchParams();
+    if (query.isPaused !== undefined) params.set("isPaused", String(query.isPaused));
+    if (query.isCompleted !== undefined) params.set("isCompleted", String(query.isCompleted));
+    const qs = params.toString();
+    return apiClient.get<SavingsGoal[]>(`/savings-goals${qs ? `?${qs}` : ""}`, {
       auth: true,
       workspaceScoped: true,
     });

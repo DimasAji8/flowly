@@ -6,14 +6,23 @@ import Link from "next/link";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { DeleteTransactionModal } from "@/components/transaction/delete-transaction-modal";
+import { FilterChips } from "@/components/ui/filter-chips";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
-import type { Transaction } from "@/types/finance";
+import { useWalletStore } from "@/store/wallets.store";
+import { useCategoryStore } from "@/store/categories.store";
+import type { Transaction, TransactionType } from "@/types/finance";
 import { ROUTES } from "@/constants/routes";
 
 const MONTH_NAMES = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+];
+
+const TYPE_OPTIONS = [
+  { label: "Semua", value: "all" as const },
+  { label: "Pemasukan", value: "income" as const },
+  { label: "Pengeluaran", value: "expense" as const },
 ];
 
 export default function TransactionsPage() {
@@ -33,6 +42,13 @@ export default function TransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [typeFilter, setTypeFilter] = useState<TransactionType | "all">("all");
+  const [walletFilter, setWalletFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+
+  const { wallets, fetch: fetchWallets } = useWalletStore();
+  const { categories, fetch: fetchCategories } = useCategoryStore();
+
   const [addOpen, setAddOpen] = useState(false);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTxId, setDeleteTxId] = useState<string | null>(null);
@@ -45,15 +61,26 @@ export default function TransactionsPage() {
     const lastDay = new Date(year, month, 0).getDate();
     const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
     transactionsService
-      .list({ limit: 500, page: 1, from, to })
+      .list({
+        limit: 500, page: 1, from, to,
+        ...(typeFilter !== "all" ? { type: typeFilter } : {}),
+        ...(walletFilter !== "all" ? { walletId: walletFilter } : {}),
+        ...(categoryFilter !== "all" ? { categoryId: categoryFilter } : {}),
+      })
       .then((res) => setItems(res.data))
       .catch((e: unknown) => {
         setError(e instanceof ApiError ? e.message : "Gagal memuat transaksi");
       })
       .finally(() => setLoading(false));
-  }, [year, month, mounted]);
+  }, [year, month, mounted, typeFilter, walletFilter, categoryFilter]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    fetchWallets();
+    fetchCategories();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handler = () => load();
@@ -132,6 +159,37 @@ export default function TransactionsPage() {
         >
           <ChevronRight className="size-4" />
         </button>
+      </div>
+
+      {/* Filter tipe, dompet, kategori */}
+      <div className="flex flex-col gap-2">
+        <FilterChips options={TYPE_OPTIONS} value={typeFilter} onChange={(v) => { setTypeFilter(v); setCategoryFilter("all"); }} />
+        {mounted && (
+          <div className="flex flex-wrap gap-2">
+            <select
+              value={walletFilter}
+              onChange={(e) => setWalletFilter(e.target.value)}
+              className="rounded-full border border-border-subtle bg-card-subtle px-3 py-1 text-xs font-semibold text-secondary transition-colors hover:border-border focus:outline-none"
+            >
+              <option value="all">Semua dompet</option>
+              {wallets.map((w) => (
+                <option key={w.id} value={w.id}>{w.name}</option>
+              ))}
+            </select>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="rounded-full border border-border-subtle bg-card-subtle px-3 py-1 text-xs font-semibold text-secondary transition-colors hover:border-border focus:outline-none"
+            >
+              <option value="all">Semua kategori</option>
+              {categories
+                .filter((c) => typeFilter === "all" || c.type === typeFilter)
+                .map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {error && (

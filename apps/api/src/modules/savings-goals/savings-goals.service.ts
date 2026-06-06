@@ -16,11 +16,25 @@ import {
 export class SavingsGoalsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(workspaceId: string): Promise<SerializedSavingsGoal[]> {
+  async list(workspaceId: string, query: import('./dto/list-savings-goals.query').ListSavingsGoalsQuery = {}): Promise<SerializedSavingsGoal[]> {
+    const where: Prisma.SavingsGoalWhereInput = { workspaceId };
+    if (query.isPaused !== undefined) where.isPaused = query.isPaused;
+
     const items = await this.prisma.savingsGoal.findMany({
-      where: { workspaceId },
+      where,
       orderBy: [{ targetDate: 'asc' }, { createdAt: 'asc' }],
     });
+
+    // isCompleted filter (client-side karena tidak ada kolom boolean di DB)
+    if (query.isCompleted !== undefined) {
+      return items
+        .filter((g) =>
+          query.isCompleted
+            ? Number(g.currentAmount) >= Number(g.targetAmount)
+            : Number(g.currentAmount) < Number(g.targetAmount),
+        )
+        .map(serializeSavingsGoal);
+    }
     return items.map(serializeSavingsGoal);
   }
 

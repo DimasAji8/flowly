@@ -1,19 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/ui/back-button";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
+import { FilterChips } from "@/components/ui/filter-chips";
 import { ActionMenu } from "@/components/ui/action-menu";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { RecurringModal } from "@/components/recurring/recurring-modal";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { recurringService } from "@/services/recurring.service";
-import type { RecurringTransaction } from "@/types/finance";
+import type { RecurringTransaction, TransactionType } from "@/types/finance";
 import { formatAmount } from "@/utils/format-currency";
 
 const FREQ_LABEL: Record<RecurringTransaction["frequency"], string> = {
@@ -22,31 +23,78 @@ const FREQ_LABEL: Record<RecurringTransaction["frequency"], string> = {
   monthly: "Bulanan",
 };
 
+const TYPE_OPTIONS = [
+  { label: "Semua", value: "all" as const },
+  { label: "Pemasukan", value: "income" as const },
+  { label: "Pengeluaran", value: "expense" as const },
+];
+
+const STATUS_OPTIONS = [
+  { label: "Semua", value: "all" as const },
+  { label: "Aktif", value: "active" as const },
+  { label: "Non-aktif", value: "inactive" as const },
+];
+
 export default function RecurringListPage() {
   const router = useRouter();
   const [items, setItems] = useState<RecurringTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<TransactionType | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
-  const reload = async () => {
+  useEffect(() => {
+    let cancelled = false;
+    
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await recurringService.list({
+          ...(typeFilter !== "all" ? { type: typeFilter } : {}),
+          ...(statusFilter !== "all" ? { isActive: statusFilter === "active" } : {}),
+        });
+        if (!cancelled) {
+          setItems(data);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof ApiError ? e.message : "Failed to load");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [typeFilter, statusFilter]);
+
+  const fetchItems = useCallback(async () => {
+    setLoading(true);
     setError(null);
     try {
-      const data = await recurringService.list();
+      const data = await recurringService.list({
+        ...(typeFilter !== "all" ? { type: typeFilter } : {}),
+        ...(statusFilter !== "all" ? { isActive: statusFilter === "active" } : {}),
+      });
       setItems(data);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to load");
+    } finally {
+      setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    reload().finally(() => setLoading(false));
-  }, []);
+  }, [typeFilter, statusFilter]);
 
   const toggleActive = async (r: RecurringTransaction) => {
     try {
       await recurringService.update(r.id, { isActive: !r.isActive });
-      await reload();
+      await fetchItems();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to toggle");
     }
@@ -59,7 +107,7 @@ export default function RecurringListPage() {
     try {
       await recurringService.remove(id);
       setConfirmId(null);
-      await reload();
+      await fetchItems();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to delete");
     }
@@ -82,6 +130,11 @@ export default function RecurringListPage() {
         </Button>
       </header>
 
+      <div className="flex flex-col gap-2">
+        <FilterChips options={TYPE_OPTIONS} value={typeFilter} onChange={setTypeFilter} />
+        <FilterChips options={STATUS_OPTIONS} value={statusFilter} onChange={setStatusFilter} />
+      </div>
+
       {error && (
         <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
           {error}
@@ -94,7 +147,7 @@ export default function RecurringListPage() {
         </div>
       ) : items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-secondary">
-          Belum ada recurring transaction.
+          Tidak ada recurring transaction yang cocok dengan filter ini.
         </div>
       ) : (
         <Card padding="none">
@@ -159,7 +212,7 @@ export default function RecurringListPage() {
       <RecurringModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        onSuccess={reload}
+        onSuccess={fetchItems}
       />
 
       <ConfirmModal
