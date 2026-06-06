@@ -17,7 +17,7 @@ const SIDE_NAV_ITEMS = [
   { href: ROUTES.categories,         label: "Kategori",      icon: Tag },
   { href: ROUTES.recurring,          label: "Berulang",      icon: Repeat },
   { href: ROUTES.profileAllocation,  label: "Alokasi",       icon: PieChart },
-  { href: ROUTES.reports,            label: "Analisis",      icon: BarChart2 },
+  { href: ROUTES.reports,            label: "Laporan",      icon: BarChart2 },
   { href: ROUTES.profile,            label: "Profil",        icon: CircleUserRound },
 ];
 

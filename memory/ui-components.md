@@ -13,7 +13,7 @@ File ada di `apps/web/src/components/ui/`.
 | `Card` | `card.tsx` | Wrapper kartu. Props: `padding` (`none`, `md`). |
 | `Skeleton` | `skeleton.tsx` | Loading placeholder. |
 | `Chip` | `chip.tsx` | Badge/label kecil. Props: `tone` (`neutral`, `accent`, `success`, `danger`, `warning`), `size` (`sm`, `md`), `dot`, `dotColor`. |
-| `FilterBar` + `FilterBarChip` + `FilterBarDropdown` | `filter-bar.tsx` | **Filter satu baris scrollable** — semua filter chips & dropdown dalam satu row konsisten. `FilterBarChip` untuk toggle (Semua/Pemasukan/dll), `FilterBarDropdown` untuk daftar panjang (dompet/kategori). Dropdown aktif (bukan default) otomatis highlight accent. |
+| `FilterBar` | `filter-bar.tsx` | **Filter popover** — tombol "Filter" → popover dengan draft state + tombol Terapkan/Batal/Reset. Config array dengan type `chip` atau `dropdown`. Reset langsung apply. **Gunakan ini untuk semua filter di halaman list.** |
 | `EmptyState` | `empty-state.tsx` | State kosong. Props: `title`, `description`, `actionLabel`, `actionHref`, `onAction`. |
 | `FormError` | `form-error.tsx` | Pesan error form. |
 

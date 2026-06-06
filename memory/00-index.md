@@ -5,24 +5,28 @@ yang belum diimplementasi. Selalu dibaca di awal task dan di-update saat
 ada temuan/keputusan baru.
 
 ## Index
-- `filter-plan.md` — audit kondisi filter saat ini + rekomendasi filter per halaman (SUDAH diimplementasi).
-- `navigation-menu-plan.md` — analisis penempatan menu (SUDAH diimplementasi).
-- `dashboard-redesign-plan.md` — opsi redesign dashboard (SUDAH diimplementasi langkah 1-4).
-- `ui-components.md` — **WAJIB BACA** daftar komponen UI yang tersedia. Selalu gunakan sebelum buat komponen baru.
-
-## Keputusan/diskusi yang masih terbuka
-- **Riwayat setoran savings goal**: saat ini hanya simpan `currentAmount` kumulatif,
-  belum ada riwayat per setoran. Butuh skema backend baru jika ingin riwayat.
-- **Penempatan menu navigasi**: **SELESAI (langkah 1)**. QuickActions grid di dashboard sudah dibuat, Profil sudah dibersihkan (akun + tema + logout saja), SideNav desktop sudah memuat semua menu. Langkah selanjutnya: redesign HeroBalance.
-- **Redesign dashboard**: **SELESAI langkah 2-4**. SummaryCards + toggle hide saldo. SpendingInsights dipindah ke `/reports`. Dashboard sekarang: header → SummaryCards → QuickActions → Transaksi terbaru → SavingsGoals → teaser Laporan.
+- `filter-plan.md` — audit & implementasi filter (SELESAI).
+- `navigation-menu-plan.md` — penempatan menu (SELESAI: QuickActions di dashboard, Profil dibersihkan).
+- `dashboard-redesign-plan.md` — redesign dashboard (SELESAI: SummaryCards + toggle saldo, QuickActions, SpendingInsights dipindah ke /reports).
+- `ui-components.md` — **WAJIB BACA** daftar komponen UI yang tersedia.
+- `reports-plan.md` — rencana pengembangan halaman Laporan (belum diimplementasi).
 
 ## Keputusan yang sudah diambil
-- **Savings goal "Tercapai"**: default filter "Aktif" — goal selesai tidak tampil di default view, user bisa pilih chip "Tercapai" untuk melihat arsip. Selesai diimplementasi.
+- **Savings goal "Tercapai"**: default filter "Aktif". Selesai.
+- **Menu navigasi**: QuickActions grid di dashboard (6 icon), Profil = akun+tema+logout. Selesai.
+- **Dashboard**: SummaryCards + toggle sembunyikan saldo, QuickActions, tanpa SpendingInsights. Selesai.
+- **Halaman Laporan** (`/reports`): nama menu = "Laporan", konten pertama = SpendingInsights dengan judul section "Analisis Pengeluaran". Ke depan bisa tambah section lain.
+- **Filter**: semua halaman list pakai komponen `FilterBar` (popover + draft state + tombol Terapkan). Reset langsung apply tanpa Terapkan.
+- **Dark mode**: icon QuickActions pakai `bg-card-subtle text-secondary` agar tidak biru di dark mode.
+- **Theme**: tidak pakai `next-themes`, custom `useTheme` hook + script inline di `<head>`.
+
+## Keputusan/diskusi yang masih terbuka
+- **Riwayat setoran savings goal**: butuh skema backend baru.
+- **Halaman Laporan**: perlu dikembangkan — ringkasan income/expense, tabel pengeluaran per kategori, tren bulanan.
 
 ## Catatan arsitektur singkat
 - Monorepo: `apps/web` (Next.js 16 App Router, Tailwind v4) + `apps/api` (NestJS 11 + Prisma 6).
 - Web port 4000, API port 3333 (`/api/v1`).
 - Bahasa UI: Indonesia.
-- Tambah transaksi & setoran pakai pola single-modal multi-step (picker/form/confirm
-  sebagai step di dalam satu `Modal`), JANGAN render `ConfirmModal` nested di dalam `Modal`
-  (menyebabkan dua modal bertabrakan).
+- Modal bertingkat: gunakan step/state di dalam satu `Modal`, JANGAN nest `ConfirmModal` di dalam `Modal`.
+- Filter: selalu gunakan `FilterBar` dari `filter-bar.tsx`.

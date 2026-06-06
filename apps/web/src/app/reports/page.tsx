@@ -95,7 +95,7 @@ export default function ReportsPage() {
     <div className="flex flex-col gap-5 max-w-2xl flowly-enter">
       <BackButton />
       <header>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">Analisis</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">Laporan</h1>
       </header>
 
       <div className="flex items-center justify-between rounded-2xl border border-border-subtle bg-card px-4 py-3" style={{ boxShadow: "var(--shadow-card)" }}>
@@ -127,12 +127,14 @@ export default function ReportsPage() {
           description="Catat transaksi pengeluaran dengan kategori bergrup untuk melihat analisis."
         />
       ) : (
-        <SpendingInsights
-          categorySpends={categorySpends}
-          totalIncome={totalIncome}
-          targets={targets ?? undefined}
-          savingsTransferAmount={savingsTransferAmount}
-        />
+        <>
+          <SpendingInsights
+            categorySpends={categorySpends}
+            totalIncome={totalIncome}
+            targets={targets ?? undefined}
+            savingsTransferAmount={savingsTransferAmount}
+          />
+        </>
       )}
     </div>
   );
