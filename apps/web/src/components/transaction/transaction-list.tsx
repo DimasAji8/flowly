@@ -12,6 +12,7 @@ interface TransactionListProps {
   loading?: boolean;
   grouped?: boolean;
   onItemClick?: (tx: Transaction) => void;
+  onAdd?: () => void;
 }
 
 function TransactionItem({ tx, onItemClick, showDate = false }: {
@@ -87,7 +88,7 @@ function dateLabel(dateStr: string): string {
   return formatDateLong(dateStr);
 }
 
-export function TransactionList({ items, loading, grouped = false, onItemClick }: TransactionListProps) {
+export function TransactionList({ items, loading, grouped = false, onItemClick, onAdd }: TransactionListProps) {
   const [visibleGroups, setVisibleGroups] = useState(3);
   if (loading) {
     return (
@@ -112,7 +113,7 @@ export function TransactionList({ items, loading, grouped = false, onItemClick }
         title="Belum ada transaksi"
         description="Catat pemasukan atau pengeluaran pertamamu"
         actionLabel="+ Tambah transaksi"
-        actionHref={ROUTES.transactionsNew}
+        onAction={onAdd}
       />
     );
   }

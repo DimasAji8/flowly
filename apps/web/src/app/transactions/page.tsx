@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
@@ -87,9 +87,19 @@ export default function TransactionsPage() {
         Kembali
       </Link>
 
-      <h1 className="text-xl font-semibold text-foreground md:text-2xl">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-foreground md:text-2xl">
           Transaksi
         </h1>
+        <button
+          type="button"
+          onClick={() => setAddOpen(true)}
+          className="hidden md:inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
+        >
+          <Plus className="size-4" />
+          Tambah
+        </button>
+      </div>
 
       {/* Filter bulan */}
       <div className="flex items-center justify-between rounded-2xl border border-border-subtle bg-card px-4 py-3" style={{ boxShadow: "var(--shadow-card)" }}>
@@ -135,6 +145,7 @@ export default function TransactionsPage() {
         loading={loading}
         grouped
         onItemClick={(tx) => setEditTx(tx)}
+        onAdd={() => setAddOpen(true)}
       />
 
       <TransactionModal

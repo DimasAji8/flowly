@@ -211,6 +211,7 @@ export default function DashboardPage() {
                 items={recent}
                 loading={false}
                 onItemClick={(tx) => setEditTx(tx)}
+                onAdd={() => setAddOpen(true)}
               />
             </div>
           )}
