@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
-import { useTheme } from "@/hooks/use-theme";
 import { SavingsGoalsSummary } from "@/components/dashboard/savings-goals-summary";
 import { QuickActions } from "@/components/dashboard/quick-actions";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { TransactionList } from "@/components/transaction/transaction-list";
@@ -22,7 +21,6 @@ import { formatMonthYear } from "@/utils/format-date";
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const refreshMe = useAuthStore((s) => s.refreshMe);
-  const { resolvedTheme } = useTheme();
 
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
@@ -97,27 +95,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8 flowly-enter">
-      <header className="flex items-center justify-between" suppressHydrationWarning>
-        {/* Logo: hanya tampil di mobile */}
-        <Image src={resolvedTheme === "dark" ? "/img/logo-black.webp" : "/img/logo-blue.webp"} alt="Flowly" width={48} height={48} className="h-12 w-auto md:hidden" />
-        {/* Desktop: greeting */}
-        <p className="hidden md:block text-xl font-medium text-foreground" suppressHydrationWarning>
-          {greeting}, {user?.name?.split(" ")[0] ?? "..."}
-        </p>
-        <div className="flex items-center gap-2.5">
-          <h1 className="text-sm font-semibold text-foreground md:hidden" suppressHydrationWarning>
-            {user?.name ?? "..."}
-          </h1>
-          {avatarSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarSrc} alt={user?.name ?? "avatar"} width={36} height={36} className="size-9 rounded-full object-cover shrink-0 md:hidden" />
-          ) : (
-            <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent select-none md:hidden">
-              {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
-            </div>
-          )}
-        </div>
-      </header>
+      <DashboardHeader greeting={greeting} name={user?.name ?? ""} avatarSrc={avatarSrc} />
 
       {error && (
         <div className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
@@ -125,21 +103,24 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {loading ? (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          <Skeleton className="col-span-2 h-28 md:col-span-1 rounded-2xl" />
-          <Skeleton className="h-28 rounded-2xl" />
-          <Skeleton className="h-28 rounded-2xl" />
-        </div>
-      ) : summary && (
-        <SummaryCards
-          income={summary.income}
-          expense={summary.expense}
-          net={summary.net}
-          month={formatMonthYear(summary.period.year, summary.period.month)}
-          totalBalance={totalBalance}
-        />
-      )}
+      {/* SummaryCards overlap ke header */}
+      <div className="-mt-16">
+        {loading ? (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+            <Skeleton className="col-span-2 h-28 md:col-span-1 rounded-2xl" />
+            <Skeleton className="h-28 rounded-2xl" />
+            <Skeleton className="h-28 rounded-2xl" />
+          </div>
+        ) : summary && (
+          <SummaryCards
+            income={summary.income}
+            expense={summary.expense}
+            net={summary.net}
+            month={formatMonthYear(summary.period.year, summary.period.month)}
+            totalBalance={totalBalance}
+          />
+        )}
+      </div>
 
       <QuickActions />
 
