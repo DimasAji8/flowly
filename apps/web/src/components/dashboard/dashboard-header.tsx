@@ -41,10 +41,10 @@ export function DashboardHeader({ greeting, name, avatarSrc }: DashboardHeaderPr
 
       <div className="relative flex items-center justify-between gap-3" suppressHydrationWarning>
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/40" suppressHydrationWarning>
+          <p className="text-xs font-medium uppercase tracking-[0.08em] text-foreground/50" suppressHydrationWarning>
             {greeting}
           </p>
-          <h1 className="truncate text-2xl font-bold tracking-tight text-white" suppressHydrationWarning>
+          <h1 className="truncate text-2xl font-bold tracking-tight text-foreground" suppressHydrationWarning>
             {name || "..."}
           </h1>
         </div>
@@ -54,7 +54,7 @@ export function DashboardHeader({ greeting, name, avatarSrc }: DashboardHeaderPr
             className="size-11 shrink-0 rounded-full object-cover ring-1 ring-white/20"
           />
         ) : (
-          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-white/10 text-base font-semibold text-white ring-1 ring-white/20 select-none">
+          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-foreground/10 text-base font-semibold text-foreground ring-1 ring-foreground/20 select-none">
             {initial}
           </div>
         )}

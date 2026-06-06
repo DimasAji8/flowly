@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Urbanist, Geist } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthHydrator } from "@/components/layout/auth-hydrator";
 import { ToastProvider } from "@/components/ui/toast-provider";
@@ -34,14 +35,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("h-full", "antialiased", playfair.variable, "font-sans", geist.variable)} suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;if(t==='dark'){c.add('dark');}else{c.add('light');}}catch(e){}`,
-          }}
-        />
-      </head>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+        <Script id="theme-init" strategy="beforeInteractive">{`try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;if(t==='dark'){c.add('dark');}else{c.add('light');}}catch(e){}`}</Script>
         <ThemeProvider>
           <AuthHydrator>{children}</AuthHydrator>
           <ToastProvider />
