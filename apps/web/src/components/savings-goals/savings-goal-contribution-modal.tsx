@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ApiError } from "@/lib/api-client";
@@ -27,35 +26,25 @@ function parseRupiah(formatted: string): number {
   return Number(formatted.replace(/\./g, "")) || 0;
 }
 
-export function SavingsGoalContributionModal({
-  open,
-  goal,
-  onClose,
-  onSuccess,
-}: SavingsGoalContributionModalProps) {
+export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }: SavingsGoalContributionModalProps) {
   const [amountDisplay, setAmountDisplay] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [step, setStep] = useState<"form" | "confirm">("form");
 
   useEffect(() => {
-    if (!open) {
-      setAmountDisplay("");
-      setError(null);
-      setConfirmOpen(false);
-    }
+    if (!open) { setAmountDisplay(""); setError(null); setStep("form"); }
   }, [open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!goal) return;
     const contribution = parseRupiah(amountDisplay);
     if (!Number.isFinite(contribution) || contribution <= 0) {
       setError("Nominal setoran harus lebih dari 0");
       return;
     }
     setError(null);
-    setConfirmOpen(true);
+    setStep("confirm");
   };
 
   const handleConfirm = async () => {
@@ -67,39 +56,39 @@ export function SavingsGoalContributionModal({
         currentAmount: Number(goal.currentAmount) + contribution,
       });
       toast.success("Setoran tabungan ditambahkan");
-      setConfirmOpen(false);
       onClose();
       await onSuccess();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Gagal menambah setoran");
-      setConfirmOpen(false);
+      setStep("form");
     } finally {
       setLoading(false);
     }
   };
 
+  const title = step === "confirm"
+    ? "Konfirmasi setoran"
+    : goal ? `Tambah setoran · ${goal.name}` : "Tambah setoran";
+
   return (
-    <>
-      <Modal
-        open={open}
-        onClose={onClose}
-        title={goal ? `Tambah setoran · ${goal.name}` : "Tambah setoran"}
-      >
+    <Modal
+      open={open}
+      onClose={onClose}
+      onBack={step === "confirm" ? () => setStep("form") : undefined}
+      title={title}
+    >
+      {step === "form" ? (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {goal && (
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-2xl border border-success/25 bg-success/8 px-4 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-success/80">
-                  Saldo saat ini
-                </p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-success/80">Saldo saat ini</p>
                 <p className="mt-1 text-base font-semibold tabular-nums text-foreground">
                   {formatCurrency(goal.currentAmount)}
                 </p>
               </div>
               <div className="rounded-2xl border border-danger/25 bg-danger/5 px-4 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-danger/80">
-                  Sisa
-                </p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-danger/80">Sisa</p>
                 <p className="mt-1 text-base font-semibold tabular-nums text-foreground">
                   {formatCurrency(Math.max(Number(goal.targetAmount) - Number(goal.currentAmount), 0))}
                 </p>
@@ -124,29 +113,23 @@ export function SavingsGoalContributionModal({
           )}
 
           <div className="flex items-center gap-3 pt-1">
-            <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
-              Batal
-            </Button>
-            <Button type="submit" isLoading={loading} className="flex-1">
-              Simpan setoran
-            </Button>
+            <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Batal</Button>
+            <Button type="submit" className="flex-1">Simpan setoran</Button>
           </div>
         </form>
-      </Modal>
+      ) : (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-xl border border-border-subtle bg-card-subtle px-4 py-3 text-sm text-foreground">
+            <p className="font-medium">{goal?.name}</p>
+            <p className="mt-1 text-success font-semibold">+ Rp {amountDisplay}</p>
+          </div>
 
-      <ConfirmModal
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onConfirm={handleConfirm}
-        title="Konfirmasi Setoran"
-        description={[
-          goal?.name,
-          `+ Rp ${amountDisplay}`,
-        ].filter(Boolean).join("  ·  ")}
-        confirmLabel="Ya, Tambah Setoran"
-        confirmVariant="primary"
-        loading={loading}
-      />
-    </>
+          <div className="flex items-center gap-3 pt-1">
+            <Button type="button" variant="secondary" className="flex-1" onClick={() => setStep("form")}>Batal</Button>
+            <Button type="button" isLoading={loading} className="flex-1" onClick={handleConfirm}>Ya, tambah setoran</Button>
+          </div>
+        </div>
+      )}
+    </Modal>
   );
 }
