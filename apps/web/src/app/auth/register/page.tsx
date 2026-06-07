@@ -60,6 +60,14 @@ export default function RegisterPage() {
 
   return (
     <section className="flex flex-col gap-6">
+      <Link
+        href={ROUTES.home}
+        className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
+      >
+        <span>←</span>
+        <span>Kembali</span>
+      </Link>
+      
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold text-foreground">
           Buat akun baru
