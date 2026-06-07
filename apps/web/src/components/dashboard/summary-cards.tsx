@@ -13,7 +13,7 @@ interface SummaryCardsProps {
 export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
   const netNum = Number(net);
   const isPositive = netNum >= 0;
-  const [hidden, setHidden] = useState(false);
+  const [hidden, setHidden] = useState(true);
 
   const mask = "••••••";
 

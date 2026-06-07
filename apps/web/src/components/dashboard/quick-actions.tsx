@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Wallet, Target, Tag, Repeat, PieChart, BarChart2 } from "lucide-react";
+import { Target, Tag, Repeat, PieChart, BarChart2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 
 const ACTIONS = [
-  { href: ROUTES.wallets,          icon: Wallet,    label: "Dompet"    },
   { href: ROUTES.savingsGoals,     icon: Target,    label: "Tabungan"  },
   { href: ROUTES.categories,       icon: Tag,       label: "Kategori"  },
   { href: ROUTES.recurring,        icon: Repeat,    label: "Berulang"  },
@@ -16,7 +15,7 @@ const ACTIONS = [
 export function QuickActions() {
   return (
     <section>
-      <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
+      <div className="grid grid-cols-5 gap-3">
         {ACTIONS.map(({ href, icon: Icon, label }) => (
           <Link
             key={href}

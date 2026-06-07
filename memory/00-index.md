@@ -13,7 +13,8 @@ ada temuan/keputusan baru.
 
 ## Keputusan yang sudah diambil
 - **Savings goal "Tercapai"**: default filter "Aktif". Selesai.
-- **Menu navigasi**: QuickActions grid di dashboard (6 icon), Profil = akun+tema+logout. Selesai.
+- **Menu navigasi**: QuickActions grid di dashboard (5 icon: Tabungan, Kategori, Berulang, Alokasi, Laporan), Profil = akun+tema+logout. Selesai.
+- **Dompet**: hanya ada di Bottom Navigation, tidak ada di Quick Actions (menghindari duplikasi). Selesai.
 - **Dashboard**: SummaryCards + toggle sembunyikan saldo, QuickActions, tanpa SpendingInsights. Selesai.
 - **Halaman Laporan** (`/reports`): menampilkan ringkasan income/expense/net bulan + tabel pengeluaran per kategori (sorted terbesar). SpendingInsights tetap ada. Selesai.
 - **Quick Actions icons**: light mode = `text-accent` (biru), dark mode = `text-secondary` (muted). Selesai.
