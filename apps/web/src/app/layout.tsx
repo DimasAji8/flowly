@@ -16,7 +16,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Teman Kas",
+  title: "Teman Kas - Sahabat Pengelola Keuanganmu",
   description: "Mobile-first cashflow journal",
   icons: {
     icon: [
