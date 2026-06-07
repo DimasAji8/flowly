@@ -16,7 +16,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Flowly",
+  title: "Teman Kas",
   description: "Mobile-first cashflow journal",
   icons: {
     icon: [

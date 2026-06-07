@@ -26,7 +26,7 @@ export default function AuthLayout({
           <span className="grid size-8 place-items-center rounded-xl bg-accent-soft text-accent">
             <Wallet className="size-4" strokeWidth={2.2} aria-hidden />
           </span>
-          Flowly
+          Teman Kas
         </div>
         {children}
       </div>
