@@ -10,7 +10,7 @@ export const categoriesService = {
     });
   },
 
-  create(payload: { name: string; type: TransactionType; color: string; icon?: string; group?: string }) {
+  create(payload: { name: string; type: TransactionType; color?: string; icon?: string; group?: string }) {
     return apiClient.post<Category>("/categories", payload, {
       auth: true,
       workspaceScoped: true,

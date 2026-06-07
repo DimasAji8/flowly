@@ -17,9 +17,7 @@ import { categoriesService } from "@/services/categories.service";
 import { useCategoryStore } from "@/store/categories.store";
 import type { Category, TransactionType } from "@/types/finance";
 
-const DEFAULT_COLOR = "#2563EB";
 const DEFAULT_ICON = "📦";
-const HEX_PATTERN = /^#([0-9A-Fa-f]{6})$/;
 
 const GROUP_OPTIONS = [
   { value: "needs", label: "Needs", desc: "Kebutuhan pokok" },
@@ -47,11 +45,9 @@ const EMOJI_SUGGESTIONS = {
 
 export default function CategoriesPage() {
   const { categories, loading, fetch: fetchCategories } = useCategoryStore();
-  const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [type, setType] = useState<TransactionType>("expense");
-  const [color, setColor] = useState(DEFAULT_COLOR);
   const [icon, setIcon] = useState(DEFAULT_ICON);
   const [group, setGroup] = useState<"needs" | "wants" | "savings">("needs");
   const [addOpen, setAddOpen] = useState(false);
@@ -71,15 +67,10 @@ export default function CategoriesPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    if (!HEX_PATTERN.test(color)) {
-      setError("Color harus hex 6 digit, contoh #15803D");
-      return;
-    }
     try {
       setCreating(true);
-      await categoriesService.create({ name: name.trim(), type, color: color.toUpperCase(), icon, group: type === "expense" ? group : undefined });
+      await categoriesService.create({ name: name.trim(), type, icon, group: type === "expense" ? group : undefined });
       setName("");
-      setColor(DEFAULT_COLOR);
       setIcon(DEFAULT_ICON);
       setAddOpen(false);
       setAddStep("pick");
@@ -120,12 +111,6 @@ export default function CategoriesPage() {
         </Button>
       </header>
 
-      {error && (
-        <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
-          {error}
-        </div>
-      )}
-
       {/* List */}
       {loading ? (
         <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
@@ -157,7 +142,7 @@ export default function CategoriesPage() {
         title={`Hapus kategori "${confirmDelete?.name}"?`}
       />
 
-      <Modal open={addOpen} onClose={() => { setAddOpen(false); setAddStep("pick"); setName(""); setColor(DEFAULT_COLOR); setIcon(DEFAULT_ICON); setType("expense"); }} title={addStep === "form" ? (type === "expense" ? "Kategori Pengeluaran" : "Kategori Pemasukan") : "Tambah kategori"}>
+      <Modal open={addOpen} onClose={() => { setAddOpen(false); setAddStep("pick"); setName(""); setIcon(DEFAULT_ICON); setType("expense"); }} title={addStep === "form" ? (type === "expense" ? "Kategori Pengeluaran" : "Kategori Pemasukan") : "Tambah kategori"}>
         {addStep === "pick" ? (
           <div className="flex flex-col gap-3 py-2">
             <button type="button" onClick={() => { setType("expense"); setIcon(EMOJI_SUGGESTIONS.expense[0]); setAddStep("form"); }}
@@ -180,14 +165,6 @@ export default function CategoriesPage() {
         ) : (
           <form onSubmit={handleCreate} className="flex flex-col gap-4">
             <Input label="Nama" placeholder="mis. Makanan" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} required />
-
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="cat-color-modal" className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Warna</label>
-              <div className="flex h-11 items-center gap-2 rounded-lg border border-border-subtle bg-card-subtle px-2">
-                <input type="color" id="cat-color-modal" value={color} onChange={(e) => setColor(e.target.value)} className="size-7 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Pick color" />
-                <span className="text-xs tabular-nums text-secondary">{color.toUpperCase()}</span>
-              </div>
-            </div>
 
             {type === "expense" && (
               <div className="flex flex-col gap-1.5">
@@ -239,14 +216,12 @@ function CategorySection({
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
-  const [editColor, setEditColor] = useState("");
   const [editIcon, setEditIcon] = useState("");
   const [saving, setSaving] = useState(false);
 
   const startEdit = (c: Category) => {
     setEditingId(c.id);
     setEditName(c.name);
-    setEditColor(c.color);
     setEditIcon(c.icon);
   };
 
@@ -256,7 +231,7 @@ function CategorySection({
     if (!editName.trim()) return;
     setSaving(true);
     try {
-      await categoriesService.update(id, { name: editName.trim(), color: editColor, icon: editIcon });
+      await categoriesService.update(id, { name: editName.trim(), icon: editIcon });
       toast.success("Kategori diperbarui");
       setEditingId(null);
       onReload();
@@ -286,17 +261,13 @@ function CategorySection({
                 <li key={c.id} className="px-4 py-3">
                   {isEditing ? (
                     <div className="flex flex-col gap-3">
-                      <div className="flex items-center gap-2">
-                        <input
-                          autoFocus
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          className="flex-1 rounded-lg border border-border-subtle bg-card-subtle px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-2 focus:ring-accent-soft"
-                          maxLength={60}
-                        />
-                        <input type="color" value={editColor} onChange={(e) => setEditColor(e.target.value)}
-                          className="size-8 cursor-pointer rounded-lg border-0 bg-transparent p-0" aria-label="Color" />
-                      </div>
+                      <Input
+                        autoFocus
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        placeholder="Nama kategori"
+                        maxLength={60}
+                      />
                       {/* Emoji Picker */}
                       <EmojiPicker value={editIcon} onChange={setEditIcon} />
                       <div className="flex gap-2">
@@ -306,11 +277,10 @@ function CategorySection({
                     </div>
                   ) : (
                     <div className="flex items-center gap-3">
-                      <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-xl text-lg" style={{ background: c.color + "22" }}>
+                      <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-xl bg-card-subtle text-lg">
                         {c.icon}
                       </span>
                       <span className="flex-1 text-sm font-medium text-foreground">{c.name}</span>
-                      <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: c.color }} aria-hidden />
                       <ActionMenu
                         onEdit={() => startEdit(c)}
                         onDelete={() => onDelete(c.id, c.name)}
