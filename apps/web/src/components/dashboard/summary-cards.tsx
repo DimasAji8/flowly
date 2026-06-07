@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { formatCurrency } from "@/utils/format-currency";
 
@@ -10,10 +10,29 @@ interface SummaryCardsProps {
   totalBalance?: number;
 }
 
+const STORAGE_KEY = "teman-kas.balance-hidden";
+
 export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
   const netNum = Number(net);
   const isPositive = netNum >= 0;
   const [hidden, setHidden] = useState(true);
+
+  // Load preference from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored !== null) {
+      setHidden(stored === "true");
+    }
+  }, []);
+
+  // Save preference to localStorage
+  const toggleHidden = () => {
+    setHidden((h) => {
+      const newValue = !h;
+      localStorage.setItem(STORAGE_KEY, String(newValue));
+      return newValue;
+    });
+  };
 
   const mask = "••••••";
 
@@ -41,7 +60,7 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
           </p>
           <button
             type="button"
-            onClick={() => setHidden((h) => !h)}
+            onClick={toggleHidden}
             className="text-white/50 hover:text-white/80 transition-colors"
             aria-label={hidden ? "Tampilkan saldo" : "Sembunyikan saldo"}
           >
