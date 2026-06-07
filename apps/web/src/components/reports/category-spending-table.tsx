@@ -34,8 +34,7 @@ export function CategorySpendingTable({ categorySpends, totalExpense }: Category
           return (
             <div key={cat.categoryId} className="px-5 py-3 flex items-center gap-3">
               <div
-                className="flex size-9 shrink-0 items-center justify-center rounded-lg text-base"
-                style={{ backgroundColor: cat.categoryColor + "20", color: cat.categoryColor }}
+                className="flex size-10 shrink-0 items-center justify-center rounded-xl text-xl bg-card-subtle"
               >
                 {cat.categoryIcon}
               </div>

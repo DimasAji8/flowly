@@ -23,7 +23,6 @@ function TransactionItem({ tx, onItemClick, showDate = false }: {
   const isIncome = tx.type === "income";
   const sign = isIncome ? "+" : "−";
   const amountColor = isIncome ? "var(--color-success)" : "var(--color-danger)";
-  const iconBg = tx.category.color + "22";
 
   const content = (
     <div
@@ -32,8 +31,7 @@ function TransactionItem({ tx, onItemClick, showDate = false }: {
     >
       <span
         aria-hidden
-        className="grid size-8 shrink-0 place-items-center rounded-lg text-base"
-        style={{ background: iconBg }}
+        className="grid size-10 shrink-0 place-items-center rounded-xl text-xl bg-card-subtle"
       >
         {tx.category.icon ?? tx.category.name.slice(0, 2).toUpperCase()}
       </span>

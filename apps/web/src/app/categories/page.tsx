@@ -11,6 +11,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { ActionMenu } from "@/components/ui/action-menu";
 import { Modal } from "@/components/ui/modal";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { EmojiPicker } from "@/components/ui/emoji-picker";
 import { ApiError } from "@/lib/api-client";
 import { categoriesService } from "@/services/categories.service";
 import { useCategoryStore } from "@/store/categories.store";
@@ -209,17 +210,7 @@ export default function CategoriesPage() {
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Ikon</label>
-              <div className="flex items-center gap-2">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-xl">{icon}</span>
-                <div className="flex flex-1 gap-1 overflow-x-auto overflow-y-visible py-1 pb-2">
-                  {EMOJI_SUGGESTIONS[type].map((e) => (
-                    <button key={e} type="button" onClick={() => setIcon(e)}
-                      className={["size-8 shrink-0 rounded-lg text-base transition-colors", icon === e ? "bg-accent-soft ring-2 ring-accent" : "bg-card-subtle hover:bg-surface"].join(" ")}
-                      aria-label={e}
-                    >{e}</button>
-                  ))}
-                </div>
-              </div>
+              <EmojiPicker value={icon} onChange={setIcon} />
             </div>
 
             <div className="flex items-center justify-between pt-1">
@@ -296,10 +287,6 @@ function CategorySection({
                   {isEditing ? (
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center gap-2">
-                        {/* Icon preview + color dot */}
-                        <span className="grid size-9 shrink-0 place-items-center rounded-xl text-lg" style={{ background: editColor + "22" }}>
-                          {editIcon}
-                        </span>
                         <input
                           autoFocus
                           value={editName}
@@ -310,14 +297,8 @@ function CategorySection({
                         <input type="color" value={editColor} onChange={(e) => setEditColor(e.target.value)}
                           className="size-8 cursor-pointer rounded-lg border-0 bg-transparent p-0" aria-label="Color" />
                       </div>
-                      {/* Emoji row */}
-                      <div className="flex gap-1.5 overflow-x-auto pb-1">
-                        {EMOJI_SUGGESTIONS[c.type].map((e) => (
-                          <button key={e} type="button" onClick={() => setEditIcon(e)}
-                            className={["size-8 shrink-0 rounded-lg text-base transition-colors", editIcon === e ? "bg-accent-soft ring-2 ring-accent" : "bg-card-subtle"].join(" ")}
-                          >{e}</button>
-                        ))}
-                      </div>
+                      {/* Emoji Picker */}
+                      <EmojiPicker value={editIcon} onChange={setEditIcon} />
                       <div className="flex gap-2">
                         <Button size="sm" isLoading={saving} onClick={() => saveEdit(c.id)}>Simpan</Button>
                         <Button size="sm" variant="ghost" onClick={cancelEdit}>Batal</Button>

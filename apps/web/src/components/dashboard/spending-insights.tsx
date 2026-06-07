@@ -137,7 +137,7 @@ export function SpendingInsights({ categorySpends, totalIncome, targets, savings
           const pct = Math.round((s.amount / totalIncome) * 100);
           return (
             <div key={s.categoryId} className="flex items-center gap-3 px-4 py-3">
-              <span className="grid size-8 shrink-0 place-items-center rounded-lg text-base" style={{ background: s.categoryColor + "22" }}>
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl text-xl bg-card-subtle">
                 {s.categoryIcon}
               </span>
               <span className="flex-1 text-sm text-foreground">{s.categoryName}</span>

@@ -15,7 +15,7 @@ ada temuan/keputusan baru.
 - **Savings goal "Tercapai"**: default filter "Aktif". Selesai.
 - **Menu navigasi**: QuickActions grid di dashboard (5 icon: Tabungan, Kategori, Berulang, Alokasi, Laporan), Profil = akun+tema+logout. Selesai.
 - **Dompet**: hanya ada di Bottom Navigation, tidak ada di Quick Actions (menghindari duplikasi). Selesai.
-- **Dashboard**: SummaryCards + toggle sembunyikan saldo (default: tertutup), QuickActions, tanpa SpendingInsights. Selesai.
+- **Dashboard**: SummaryCards + toggle sembunyikan saldo (default: tertutup, persistent via localStorage), QuickActions, tanpa SpendingInsights. Selesai.
 - **Branding**: aplikasi bernama "Teman Kas" dengan tagline "Sahabat Pengelola Keuanganmu". Selesai.
 - **Halaman Laporan** (`/reports`): menampilkan ringkasan income/expense/net bulan + tabel pengeluaran per kategori (sorted terbesar). SpendingInsights tetap ada. Selesai.
 - **Quick Actions icons**: light mode = `text-accent` (biru), dark mode = `text-secondary` (muted). Selesai.
@@ -23,6 +23,7 @@ ada temuan/keputusan baru.
 - **Dark mode**: icon QuickActions pakai `bg-card-subtle text-secondary` agar tidak biru di dark mode.
 - **Theme**: tidak pakai `next-themes`, custom `useTheme` hook + script inline di `<head>`.
 - **Hydration fix**: greeting dan date initialization dipindah ke useEffect untuk menghindari SSR/client mismatch. Selesai.
+- **Emoji kategori**: background netral (bg-card-subtle), ukuran lebih besar (size-10, text-xl), emoji picker dengan 300+ emoji terorganisir dalam 10 kategori. Selesai.
 
 ## Keputusan/diskusi yang masih terbuka
 - **Riwayat setoran savings goal**: butuh skema backend baru.
