@@ -161,17 +161,6 @@ export default function DashboardPage() {
         {!loading && savingsGoals.length > 0 && (
           <SavingsGoalsSummary items={savingsGoals} />
         )}
-
-        {!loading && (
-          <Link
-            href={ROUTES.reports}
-            className="flex items-center justify-between rounded-2xl border border-border-subtle bg-card px-4 py-3.5 text-sm transition-colors hover:bg-card-subtle"
-            style={{ boxShadow: "var(--shadow-card)" }}
-          >
-            <span className="font-medium text-foreground">Analisis pengeluaran</span>
-            <span className="text-xs text-muted">Lihat laporan →</span>
-          </Link>
-        )}
       </div>
 
       <TransactionModal

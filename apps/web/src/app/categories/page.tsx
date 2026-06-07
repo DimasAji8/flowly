@@ -147,7 +147,7 @@ export default function CategoriesPage() {
           <div className="flex flex-col gap-3 py-2">
             <button type="button" onClick={() => { setType("expense"); setIcon(EMOJI_SUGGESTIONS.expense[0]); setAddStep("form"); }}
               className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-danger hover:bg-danger-soft">
-              <span className="text-2xl">💸</span>
+              
               <div>
                 <p className="text-sm font-semibold text-foreground">Pengeluaran</p>
                 <p className="text-xs text-muted">Makanan, transportasi, dll.</p>
@@ -155,7 +155,7 @@ export default function CategoriesPage() {
             </button>
             <button type="button" onClick={() => { setType("income"); setIcon(EMOJI_SUGGESTIONS.income[0]); setAddStep("form"); }}
               className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-success hover:bg-success-soft">
-              <span className="text-2xl">💰</span>
+              
               <div>
                 <p className="text-sm font-semibold text-foreground">Pemasukan</p>
                 <p className="text-xs text-muted">Gaji, freelance, dll.</p>

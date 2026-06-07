@@ -15,9 +15,19 @@ export function SavingsGoalsSummary({ items }: SavingsGoalsSummaryProps) {
   if (items.length === 0) return null;
 
   const visible = items
+    .filter((goal) => {
+      // Filter: hanya tampilkan yang tidak di-pause dan belum tercapai
+      if (goal.isPaused) return false;
+      const targetAmount = Number(goal.targetAmount);
+      const currentAmount = Number(goal.currentAmount);
+      const isCompleted = currentAmount >= targetAmount && targetAmount > 0;
+      return !isCompleted;
+    })
     .slice()
     .sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime())
     .slice(0, 3);
+
+  if (visible.length === 0) return null;
 
   return (
     <section className="flex flex-col gap-3">
