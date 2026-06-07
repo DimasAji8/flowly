@@ -30,13 +30,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const [greeting] = useState(() => {
-    const h = new Date().getHours();
-    if (h < 11) return "Selamat pagi";
-    if (h < 15) return "Selamat siang";
-    if (h < 18) return "Selamat sore";
-    return "Selamat malam";
-  });
+  const [greeting, setGreeting] = useState("Selamat datang");
 
   const [addOpen, setAddOpen] = useState(false);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
@@ -47,6 +41,14 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => { void refreshMe(); }, [refreshMe]);
+
+  useEffect(() => {
+    const h = new Date().getHours();
+    if (h < 11) setGreeting("Selamat pagi");
+    else if (h < 15) setGreeting("Selamat siang");
+    else if (h < 18) setGreeting("Selamat sore");
+    else setGreeting("Selamat malam");
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

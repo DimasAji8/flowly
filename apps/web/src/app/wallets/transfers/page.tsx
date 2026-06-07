@@ -19,8 +19,14 @@ const MONTH_NAMES = [
 ];
 
 export default function TransferHistoryPage() {
-  const [year, setYear] = useState(() => new Date().getFullYear());
-  const [month, setMonth] = useState(() => new Date().getMonth() + 1);
+  const [year, setYear] = useState(() => {
+    if (typeof window === 'undefined') return 2026;
+    return new Date().getFullYear();
+  });
+  const [month, setMonth] = useState(() => {
+    if (typeof window === 'undefined') return 1;
+    return new Date().getMonth() + 1;
+  });
 
   const [items, setItems] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
