@@ -93,7 +93,7 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
       </div>
 
       {/* Expense ratio bar */}
-      {!hidden && Number(income) > 0 && (
+      {Number(income) > 0 && (
         <div
           className="rounded-2xl border border-border-subtle bg-card px-4 py-3.5"
           style={{ boxShadow: "var(--shadow-card)" }}
