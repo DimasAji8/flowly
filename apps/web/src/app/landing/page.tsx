@@ -37,11 +37,11 @@ export default function LandingPage() {
         <FeatureRow
           id="overview"
           eyebrow="Pemasukan & Pengeluaran"
-          title="Catat tiap transaksi. Tanpa repot."
-          body="Pilih kategori, tentukan dompet, tambahkan catatan — selesai. Dirancang agar bisa dilakukan dengan satu tangan."
+          title="Catat pengeluaran. Bukan perasaan."
+          body="Gak perlu lagi tebak-tebakan uang habis ke mana. Pilih kategori, pilih dompet, selesai dalam 5 detik — bahkan sambil rebahan."
           bg={T.canvas}
-          image={IMG.coffeeReceipt}
-          imageAlt="Mencatat pengeluaran sehari-hari"
+          image="/img/section-2.webp"
+          imageAlt="Mencatat keuangan dari rumah"
           screen={<ScreenDashboard />}
         />
 
