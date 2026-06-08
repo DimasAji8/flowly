@@ -76,27 +76,35 @@ export function HeroSection() {
         <Reveal className="lp-hero-copy">
           <h1
             style={{
-              fontFamily: T.fontDisplay,
-              fontSize: "clamp(36px, 5vw, 56px)",
-              fontWeight: 700,
-              lineHeight: 1.08,
-              letterSpacing: "-0.02em",
+              fontFamily: `var(--font-urbanist), system-ui, sans-serif`,
+              fontSize: "clamp(38px, 5.2vw, 62px)",
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: "-0.03em",
               color: T.ink,
             }}
           >
             Kas Rapi,{" "}
-            <span style={{ color: T.primary, textDecoration: "underline", textDecorationThickness: "3px", textUnderlineOffset: "6px" }}>
+            <span
+              style={{
+                background: `linear-gradient(135deg, ${T.primary} 0%, #2563eb 100%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
               Hidup Happy.
             </span>
           </h1>
 
           <p
             style={{
-              fontFamily: T.fontText,
-              fontSize: "clamp(16px, 2vw, 19px)",
-              lineHeight: 1.55,
+              fontFamily: `var(--font-urbanist), system-ui, sans-serif`,
+              fontSize: "clamp(15px, 1.8vw, 18px)",
+              fontWeight: 400,
+              lineHeight: 1.65,
               color: T.textMuted,
-              maxWidth: 460,
+              maxWidth: 440,
               margin: "20px 0 0",
             }}
           >

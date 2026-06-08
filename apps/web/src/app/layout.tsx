@@ -15,6 +15,12 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
+const urbanist = Urbanist({
+  subsets: ["latin"],
+  variable: "--font-urbanist",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Teman Kas - Sahabat Pengelola Keuanganmu",
   description: "Mobile-first cashflow journal",
@@ -34,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full", "antialiased", playfair.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="en" className={cn("h-full", "antialiased", playfair.variable, urbanist.variable, "font-sans", geist.variable)} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <Script id="theme-init" strategy="beforeInteractive">{`try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;if(t==='dark'){c.add('dark');}else{c.add('light');}}catch(e){}`}</Script>
         <ThemeProvider>
