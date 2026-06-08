@@ -24,7 +24,7 @@ export function FeatureRow({
   bg: string;
   image: string;
   imageAlt: string;
-  screen: React.ReactNode;
+  screen?: React.ReactNode;
   reverse?: boolean;
 }) {
   return (
@@ -50,6 +50,7 @@ export function FeatureRow({
           {/* Visual side: phone overlapping a rounded image */}
           <div style={{ position: "relative", display: "flex", justifyContent: "center", minHeight: 380 }}>
             <div
+              className="lp-feature-img"
               style={{
                 position: "relative",
                 width: "100%",
@@ -63,7 +64,7 @@ export function FeatureRow({
               <Image src={image} alt={imageAlt} fill sizes="(max-width: 880px) 100vw, 460px" style={{ objectFit: "cover" }} />
             </div>
             <div style={{ position: "absolute", right: "2%", bottom: "-4%" }}>
-              <PhoneFrame scale={0.62}>{screen}</PhoneFrame>
+              {screen && <PhoneFrame scale={0.62}>{screen}</PhoneFrame>}
             </div>
           </div>
         </div>

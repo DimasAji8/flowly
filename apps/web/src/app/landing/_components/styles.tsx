@@ -52,6 +52,7 @@ export function LandingStyles() {
         .lp-feature-grid.lp-reverse { direction: ltr; }
         .lp-feature-grid .lp-feature-copy { align-items: center; }
         .lp-feature-grid .lp-feature-actions { justify-content: center; }
+        .lp-feature-img { aspect-ratio: 3 / 2 !important; max-height: 280px; }
       }
 
       .lp-cap-card {

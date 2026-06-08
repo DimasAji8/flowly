@@ -14,7 +14,7 @@ import { Banner } from "./_components/banner";
 import { CapabilityGrid } from "./_components/capability-grid";
 import { CtaSection } from "./_components/cta";
 import { Footer } from "./_components/footer";
-import { ScreenDashboard, ScreenCalendar, ScreenSavings } from "./_components/screens";
+import { ScreenCalendar, ScreenSavings } from "./_components/screens";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -37,12 +37,11 @@ export default function LandingPage() {
         <FeatureRow
           id="overview"
           eyebrow="Pemasukan & Pengeluaran"
-          title="Catat pengeluaran. Bukan perasaan."
-          body="Gak perlu lagi tebak-tebakan uang habis ke mana. Pilih kategori, pilih dompet, selesai dalam 5 detik — bahkan sambil rebahan."
+          title="Catat pengeluaran jangan Cuma perasaan."
+          body="Gak perlu lagi tebak-tebakan uang habis ke mana. Pilih kategori, pilih dompet, selesai dalam 5 detik bahkan sambil rebahan."
           bg={T.canvas}
           image="/img/section-2.webp"
           imageAlt="Mencatat keuangan dari rumah"
-          screen={<ScreenDashboard />}
         />
 
         <FeatureRow
