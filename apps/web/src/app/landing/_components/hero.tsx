@@ -13,13 +13,28 @@ export function HeroSection() {
         .lp-hero-grid {
           display: grid;
           grid-template-columns: 1.05fr 0.95fr;
-          gap: 56px;
+          column-gap: 56px;
           align-items: center;
         }
 
         .lp-hero-visual {
           display: flex;
           justify-content: center;
+          align-items: center;
+        }
+
+        /* CTA shown next to copy on desktop; mobile copy below mockup */
+        .lp-hero-cta-desktop {
+          display: flex;
+          gap: 14px;
+          margin-top: 28px;
+          flex-wrap: wrap;
+        }
+
+        .lp-hero-cta-mobile {
+          display: none;
+          gap: 14px;
+          flex-wrap: wrap;
         }
 
         @media (max-width: 768px) {
@@ -38,7 +53,13 @@ export function HeroSection() {
             order: 2;
           }
 
-          .lp-hero-cta {
+          .lp-hero-cta-desktop {
+            display: none;
+          }
+
+          .lp-hero-cta-mobile {
+            order: 3;
+            display: flex;
             justify-content: center;
           }
         }
@@ -51,7 +72,7 @@ export function HeroSection() {
         }}
       >
       <div className="lp-hero-grid" style={{ maxWidth: 1100, margin: "0 auto" }}>
-        {/* Left: copy + CTA as one cohesive block */}
+        {/* Copy (+ desktop CTA) */}
         <Reveal className="lp-hero-copy">
           <h1
             style={{
@@ -63,9 +84,9 @@ export function HeroSection() {
               color: T.ink,
             }}
           >
-            Atur duit,{" "}
+            Kas Rapi,{" "}
             <span style={{ color: T.primary, textDecoration: "underline", textDecorationThickness: "3px", textUnderlineOffset: "6px" }}>
-              tanpa drama.
+              Hidup Happy.
             </span>
           </h1>
 
@@ -79,12 +100,10 @@ export function HeroSection() {
               margin: "20px 0 0",
             }}
           >
-            Teman Kas bantu kamu paham ke mana uangmu pergi — catat pemasukan,
-            pengeluaran, dan target nabung dalam hitungan detik. Tenang, rapi,
-            dan beneran kepakai tiap hari.
+            Biar gak cuma kerja cari duit, tapi juga tau duitnya ke mana. Catat, pantau, dan atur cashflow harian dengan cara yang simpel dan gak bikin pusing.
           </p>
 
-          <div className="lp-feature-actions lp-hero-cta" style={{ display: "flex", gap: 14, marginTop: 28, flexWrap: "wrap" }}>
+          <div className="lp-feature-actions lp-hero-cta-desktop">
             <PrimaryButton href={ROUTES.register} big>
               Mulai gratis
             </PrimaryButton>
@@ -92,10 +111,18 @@ export function HeroSection() {
           </div>
         </Reveal>
 
-        {/* Right: mockup image */}
+        {/* Mockup */}
         <Reveal delay={100} className="lp-hero-visual">
           <MockupImage />
         </Reveal>
+
+        {/* CTA — mobile only, after mockup */}
+        <div className="lp-feature-actions lp-hero-cta-mobile">
+          <PrimaryButton href={ROUTES.register} big>
+            Mulai gratis
+          </PrimaryButton>
+          <GhostButton href="#overview">Lihat fiturnya</GhostButton>
+        </div>
       </div>
 
       <StatsStrip />
