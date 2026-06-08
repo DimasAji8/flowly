@@ -76,7 +76,6 @@ export function HeroSection() {
         <Reveal className="lp-hero-copy">
           <h1
             style={{
-              fontFamily: `var(--font-urbanist), system-ui, sans-serif`,
               fontSize: "clamp(38px, 5.2vw, 62px)",
               fontWeight: 800,
               lineHeight: 1.1,
@@ -99,7 +98,6 @@ export function HeroSection() {
 
           <p
             style={{
-              fontFamily: `var(--font-urbanist), system-ui, sans-serif`,
               fontSize: "clamp(15px, 1.8vw, 18px)",
               fontWeight: 400,
               lineHeight: 1.65,
