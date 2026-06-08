@@ -142,11 +142,17 @@ function StatsStrip() {
   const stats = [
     { top: "Catat transaksi", big: "< 5 detik", sub: "Cepat & satu tangan" },
     { top: "Selalu", big: "Gratis", sub: "Untuk memulai" },
-    { top: "Bisa dibagi", big: "Multi-user", sub: "Workspace bersama" },
+    { top: "Bisa dipakai", big: "Sendiri", sub: "Privat & personal" },
     { top: "Tanpa", big: "Iklan", sub: "Tenang & fokus" },
   ];
   return (
     <Reveal delay={150}>
+      <style jsx>{`
+        .lp-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 640px) {
+          .lp-stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+      `}</style>
       <div
         className="lp-stats-grid"
         style={{
