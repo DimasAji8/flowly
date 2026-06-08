@@ -50,9 +50,12 @@ export function LandingStyles() {
       @media (max-width: 880px) {
         .lp-feature-grid { grid-template-columns: 1fr; text-align: center; }
         .lp-feature-grid.lp-reverse { direction: ltr; }
-        .lp-feature-grid .lp-feature-copy { align-items: center; }
+        .lp-feature-grid .lp-feature-copy { align-items: center; order: 1; }
+        .lp-feature-grid .lp-feature-visual { order: 2; min-height: unset !important; }
         .lp-feature-grid .lp-feature-actions { justify-content: center; }
-        .lp-feature-img { aspect-ratio: 3 / 2 !important; max-height: 280px; }
+        .lp-feature-body { display: none; }
+        .lp-feature-cta { display: none !important; }
+        .lp-feature-img { aspect-ratio: 3 / 2 !important; max-height: 260px; }
       }
 
       .lp-cap-card {

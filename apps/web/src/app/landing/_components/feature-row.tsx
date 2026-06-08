@@ -33,22 +33,22 @@ export function FeatureRow({
         <div className={`lp-feature-grid ${reverse ? "lp-reverse" : ""}`} style={{ maxWidth: 1100, margin: "0 auto" }}>
           {/* Copy side */}
           <div className="lp-feature-copy" style={{ display: "flex", flexDirection: "column" }}>
-            <p style={{ fontFamily: T.fontText, fontSize: 13, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: T.primary, marginBottom: 14 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: T.primary, marginBottom: 14 }}>
               {eyebrow}
             </p>
-            <h2 style={{ fontFamily: T.fontDisplay, fontSize: "clamp(28px,3.6vw,42px)", fontWeight: 700, lineHeight: 1.12, letterSpacing: "-0.02em", color: T.ink, marginBottom: 16 }}>
+            <h2 style={{ fontSize: "clamp(28px,3.6vw,42px)", fontWeight: 700, lineHeight: 1.12, letterSpacing: "-0.02em", color: T.ink, marginBottom: 16 }}>
               {title}
             </h2>
-            <p style={{ fontFamily: T.fontText, fontSize: "clamp(15px,1.8vw,18px)", lineHeight: 1.55, color: T.textMuted, maxWidth: 440 }}>
+            <p className="lp-feature-body" style={{ fontSize: "clamp(15px,1.8vw,18px)", lineHeight: 1.55, color: T.textMuted, maxWidth: 440 }}>
               {body}
             </p>
-            <div className="lp-feature-actions" style={{ marginTop: 28, display: "flex" }}>
+            <div className="lp-feature-actions lp-feature-cta" style={{ marginTop: 28, display: "flex" }}>
               <GhostButton href={ROUTES.register}>Coba sekarang</GhostButton>
             </div>
           </div>
 
-          {/* Visual side: phone overlapping a rounded image */}
-          <div style={{ position: "relative", display: "flex", justifyContent: "center", minHeight: 380 }}>
+          {/* Visual side */}
+          <div className="lp-feature-visual" style={{ position: "relative", display: "flex", justifyContent: "center", minHeight: 380 }}>
             <div
               className="lp-feature-img"
               style={{
