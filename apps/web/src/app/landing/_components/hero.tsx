@@ -2,75 +2,89 @@
 
 import { ROUTES } from "@/constants/routes";
 import { T } from "./tokens";
-import { Reveal, PhoneFrame, PrimaryButton, GhostButton } from "./primitives";
-import { ScreenDashboard } from "./screens";
+import { Reveal, PrimaryButton, GhostButton } from "./primitives";
+import { MockupImage } from "./mockup-image";
 
 // ─── Hero (two-column, Bibit-style, soft tinted bg) ───────────────────────────
 export function HeroSection() {
   return (
-    <section
-      style={{
-        // soft gradient wash so the hero isn't plain white
-        background: `linear-gradient(180deg, ${T.tintBlue} 0%, ${T.canvas} 100%)`,
-        padding: "104px 24px 64px",
-      }}
-    >
-      <div className="lp-hero-grid" style={{ maxWidth: 1100, margin: "0 auto" }}>
-        {/* Left: copy + CTA */}
-        <Reveal className="lp-hero-copy">
-          <span
-            style={{
-              display: "inline-flex",
-              alignSelf: "flex-start",
-              alignItems: "center",
-              gap: 8,
-              fontFamily: T.fontText,
-              fontSize: 13,
-              fontWeight: 600,
-              color: T.primary,
-              background: T.canvas,
-              border: `1px solid ${T.hairline}`,
-              borderRadius: 9999,
-              padding: "6px 14px",
-              marginBottom: 22,
-            }}
-          >
-            <span style={{ width: 7, height: 7, borderRadius: 9999, background: T.income }} />
-            Jurnal arus kas pribadi
-          </span>
+    <>
+      <style jsx>{`
+        .lp-hero-grid {
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 56px;
+          align-items: center;
+        }
 
+        .lp-hero-visual {
+          display: flex;
+          justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+          .lp-hero-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            text-align: center;
+          }
+
+          .lp-hero-copy {
+            order: 1;
+          }
+
+          .lp-hero-visual {
+            order: 2;
+          }
+
+          .lp-hero-cta {
+            justify-content: center;
+          }
+        }
+      `}</style>
+      <section
+        style={{
+          // soft gradient wash so the hero isn't plain white
+          background: `linear-gradient(180deg, ${T.tintBlue} 0%, ${T.canvas} 100%)`,
+          padding: "96px 24px 64px",
+        }}
+      >
+      <div className="lp-hero-grid" style={{ maxWidth: 1100, margin: "0 auto" }}>
+        {/* Left: copy + CTA as one cohesive block */}
+        <Reveal className="lp-hero-copy">
           <h1
             style={{
               fontFamily: T.fontDisplay,
-              fontSize: "clamp(36px, 5.4vw, 60px)",
+              fontSize: "clamp(36px, 5vw, 56px)",
               fontWeight: 700,
               lineHeight: 1.08,
               letterSpacing: "-0.02em",
               color: T.ink,
             }}
           >
-            Tahu ke mana{" "}
+            Atur duit,{" "}
             <span style={{ color: T.primary, textDecoration: "underline", textDecorationThickness: "3px", textUnderlineOffset: "6px" }}>
-              uangmu
-            </span>{" "}
-            pergi.
+              tanpa drama.
+            </span>
           </h1>
 
           <p
             style={{
               fontFamily: T.fontText,
               fontSize: "clamp(16px, 2vw, 19px)",
-              lineHeight: 1.5,
+              lineHeight: 1.55,
               color: T.textMuted,
-              maxWidth: 440,
+              maxWidth: 460,
               margin: "20px 0 0",
             }}
           >
-            Teman Kas adalah jurnal arus kas yang tenang dan rapi. Catat pemasukan,
-            pengeluaran, dan tujuan menabung — semuanya di satu tempat.
+            Teman Kas bantu kamu paham ke mana uangmu pergi — catat pemasukan,
+            pengeluaran, dan target nabung dalam hitungan detik. Tenang, rapi,
+            dan beneran kepakai tiap hari.
           </p>
 
-          <div className="lp-feature-actions" style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
+          <div className="lp-feature-actions lp-hero-cta" style={{ display: "flex", gap: 14, marginTop: 28, flexWrap: "wrap" }}>
             <PrimaryButton href={ROUTES.register} big>
               Mulai gratis
             </PrimaryButton>
@@ -78,30 +92,15 @@ export function HeroSection() {
           </div>
         </Reveal>
 
-        {/* Right: phone on soft blob */}
+        {/* Right: mockup image */}
         <Reveal delay={100} className="lp-hero-visual">
-          <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                width: "104%",
-                aspectRatio: "1 / 1",
-                background: `radial-gradient(circle at 50% 42%, rgba(0,102,204,0.16) 0%, rgba(0,102,204,0.05) 46%, rgba(0,102,204,0) 70%)`,
-                borderRadius: "46% 54% 52% 48% / 50% 46% 54% 50%",
-              }}
-            />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <PhoneFrame scale={0.86}>
-                <ScreenDashboard />
-              </PhoneFrame>
-            </div>
-          </div>
+          <MockupImage />
         </Reveal>
       </div>
 
       <StatsStrip />
-    </section>
+      </section>
+    </>
   );
 }
 
