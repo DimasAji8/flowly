@@ -81,8 +81,9 @@ export function Logo({
       height={height}
       width={isWordmark ? height * 4 : height}
       style={{
-        height,
+        height: "auto",
         width: isWordmark ? "auto" : height,
+        maxHeight: height,
         objectFit: "contain",
         display: "block",
       }}

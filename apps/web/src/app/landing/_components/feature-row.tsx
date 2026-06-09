@@ -48,7 +48,7 @@ export function FeatureRow({
           </div>
 
           {/* Visual side */}
-          <div className="lp-feature-visual" style={{ position: "relative", display: "flex", justifyContent: "center", minHeight: 380 }}>
+          <div className="lp-feature-visual" style={{ position: "relative", display: "flex", justifyContent: "center", minHeight: 380, padding: "40px", overflow: "visible" }}>
             <div
               className="lp-feature-img"
               style={{
@@ -56,12 +56,9 @@ export function FeatureRow({
                 width: "100%",
                 maxWidth: 460,
                 aspectRatio: "4 / 5",
-                borderRadius: 24,
-                overflow: "hidden",
-                boxShadow: "rgba(0,0,0,0.10) 0px 18px 48px -18px",
               }}
             >
-              <Image src={image} alt={imageAlt} fill sizes="(max-width: 880px) 100vw, 460px" style={{ objectFit: "cover" }} />
+              <Image src={image} alt={imageAlt} fill sizes="(max-width: 880px) 100vw, 460px" style={{ objectFit: "contain" }} />
             </div>
             <div style={{ position: "absolute", right: "2%", bottom: "-4%" }}>
               {screen && <PhoneFrame scale={0.62}>{screen}</PhoneFrame>}

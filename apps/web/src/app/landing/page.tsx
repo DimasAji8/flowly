@@ -14,7 +14,7 @@ import { Banner } from "./_components/banner";
 import { CapabilityGrid } from "./_components/capability-grid";
 import { CtaSection } from "./_components/cta";
 import { Footer } from "./_components/footer";
-import { ScreenCalendar, ScreenSavings } from "./_components/screens";
+import { ScreenSavings } from "./_components/screens";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -50,9 +50,8 @@ export default function LandingPage() {
           title="Lihat uangmu dalam linimasa."
           body="Tampilan bulanan menunjukkan ke mana uang bergerak. Titik hijau untuk pemasukan, merah untuk pengeluaran. Ketuk tanggal mana pun untuk detail."
           bg={T.tintBlue}
-          image={IMG.planning}
-          imageAlt="Merencanakan anggaran bulanan"
-          screen={<ScreenCalendar />}
+          image="/img/mockup-calendar.webp"
+          imageAlt="Tampilan kalender transaksi bulanan"
           reverse
         />
 
