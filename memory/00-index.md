@@ -13,7 +13,7 @@ ada temuan/keputusan baru.
 
 ## Keputusan yang sudah diambil
 - **Savings goal "Tercapai"**: default filter "Aktif". Selesai.
-- **Menu navigasi**: QuickActions grid di dashboard (5 icon: Tabungan, Kategori, Berulang, Alokasi, Laporan), Profil = akun+tema+logout. Selesai.
+- **Menu navigasi**: QuickActions grid di dashboard (5 icon: Laporan, Tabungan, Kategori, Alokasi, Berulang - diurutkan berdasarkan frekuensi penggunaan), Profil = akun+tema+logout. Selesai.
 - **Dompet**: hanya ada di Bottom Navigation, tidak ada di Quick Actions (menghindari duplikasi). Selesai.
 - **Dashboard**: SummaryCards + toggle sembunyikan saldo (default: tertutup, persistent via localStorage), QuickActions, tanpa SpendingInsights. Button "Analisis pengeluaran" dihapus (duplikasi dengan Laporan di Quick Actions). Target tabungan filter: hanya tampilkan yang tidak di-pause dan belum tercapai. Selesai.
 - **Branding**: aplikasi bernama "Teman Kas" dengan tagline "Sahabat Pengelola Keuanganmu". Selesai.

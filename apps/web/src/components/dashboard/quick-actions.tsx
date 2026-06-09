@@ -5,11 +5,11 @@ import { Target, Tag, Repeat, PieChart, BarChart2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 
 const ACTIONS = [
+  { href: ROUTES.reports,          icon: BarChart2, label: "Laporan"   },
   { href: ROUTES.savingsGoals,     icon: Target,    label: "Tabungan"  },
   { href: ROUTES.categories,       icon: Tag,       label: "Kategori"  },
-  { href: ROUTES.recurring,        icon: Repeat,    label: "Berulang"  },
   { href: ROUTES.profileAllocation,icon: PieChart,  label: "Alokasi"   },
-  { href: ROUTES.reports,          icon: BarChart2, label: "Laporan"  },
+  { href: ROUTES.recurring,        icon: Repeat,    label: "Berulang"  },
 ];
 
 export function QuickActions() {
