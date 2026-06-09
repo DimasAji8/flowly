@@ -51,9 +51,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-dvh w-full bg-background">
       <SideNav />
 
-      {/* Desktop: konten di-center seperti Threads */}
-      <div className="flex min-h-dvh w-full flex-col lg:flex-1 lg:items-center">
-        <div className="flex w-full flex-1 flex-col lg:max-w-2xl lg:rounded-t-2xl lg:border-x lg:border-t lg:border-border-subtle lg:mt-4">
+      {/* Konten selalu center untuk semua ukuran */}
+      <div className="flex min-h-dvh w-full flex-col items-center lg:flex-1">
+        <div className="flex w-full flex-1 flex-col max-w-2xl lg:rounded-t-2xl lg:border-x lg:border-t lg:border-border-subtle lg:mt-4">
           <DesktopHeader />
           <main className="flex-1 px-5 pb-24 pt-6 lg:px-8 lg:pb-12 lg:pt-8">
             {children}
