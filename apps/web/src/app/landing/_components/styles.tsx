@@ -55,7 +55,32 @@ export function LandingStyles() {
         .lp-feature-grid .lp-feature-actions { justify-content: center; }
         .lp-feature-body { display: none; }
         .lp-feature-cta { display: none !important; }
-        .lp-feature-img { aspect-ratio: 3 / 2 !important; max-height: 260px; }
+        .lp-feature-img { aspect-ratio: 3 / 2 !important; max-height: 260px; max-width: 100% !important; min-height: unset !important; }
+        
+        /* Kalender: side-by-side layout with larger image */
+        #calendar .lp-feature-grid { 
+          grid-template-columns: 1fr; 
+          gap: 24px;
+          text-align: left;
+        }
+        #calendar .lp-feature-copy { 
+          align-items: flex-start;
+          order: 1;
+        }
+        #calendar .lp-feature-visual {
+          order: 2;
+        }
+        #calendar .lp-feature-body { 
+          display: block; 
+          font-size: 15px;
+          line-height: 1.5;
+        }
+        #calendar .lp-feature-img { 
+          aspect-ratio: unset !important; 
+          max-height: unset !important; 
+          max-width: 100% !important; 
+          min-height: 350px !important;
+        }
       }
 
       .lp-cap-card {
