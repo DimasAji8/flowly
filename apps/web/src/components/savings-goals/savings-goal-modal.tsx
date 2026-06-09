@@ -41,7 +41,7 @@ function toFormValues(goal?: SavingsGoal) {
   return {
     name: goal?.name ?? "",
     targetAmount: goal ? formatRupiah(String(Number(goal.targetAmount))) : "",
-    currentAmount: goal ? formatRupiah(String(Number(goal.currentAmount))) : "0",
+    currentAmount: goal ? formatRupiah(String(Number(goal.currentAmount))) : "",
     targetDate: goal?.targetDate.slice(0, 10) ?? "",
     linkedWalletId: goal?.linkedWalletId ?? "",
     note: goal?.note ?? "",
