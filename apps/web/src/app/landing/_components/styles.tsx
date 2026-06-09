@@ -55,7 +55,7 @@ export function LandingStyles() {
         .lp-feature-grid .lp-feature-actions { justify-content: center; }
         .lp-feature-body { display: none; }
         .lp-feature-cta { display: none !important; }
-        .lp-feature-img { aspect-ratio: 3 / 2 !important; max-height: 260px; max-width: 100% !important; min-height: unset !important; }
+        .lp-feature-img { aspect-ratio: 4 / 5 !important; max-height: 400px; max-width: 100% !important; min-height: unset !important; }
         
         /* Kalender: side-by-side layout with larger image */
         #calendar .lp-feature-grid { 
