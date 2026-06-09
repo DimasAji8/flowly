@@ -338,3 +338,9 @@ body {
     @apply font-sans;
   }
 }
+
+/* Landing page nav drawer — reset SheetContent bawaan agar inline styles menang */
+[data-slot="sheet-content"][data-side="right"].lp-drawer {
+  gap: 0 !important;
+  padding: 0 !important;
+}
