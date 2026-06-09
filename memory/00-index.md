@@ -25,6 +25,7 @@ ada temuan/keputusan baru.
 - **Hydration fix**: greeting dan date initialization dipindah ke useEffect untuk menghindari SSR/client mismatch. Selesai.
 - **Emoji kategori**: background netral (bg-card-subtle), ukuran lebih besar (size-10, text-xl), emoji picker dengan 300+ emoji terorganisir dalam 10 kategori. Terintegrasi di form tambah dan edit kategori. Selesai.
 - **Warna kategori**: fitur pemilihan warna dihapus dari form kategori (tidak digunakan secara visual, emoji sudah cukup sebagai identifier). Field color di service dijadikan optional. Selesai.
+- **Responsive breakpoint untuk tambah transaksi**: Tablet (< 1024px) menggunakan behaviour mobile dengan BottomNav + FAB tengah. Desktop (≥ 1024px) menggunakan FAB kanan bawah. Breakpoint diubah dari `md` (768px) ke `lg` (1024px) karena tablet lebih cocok dengan pola interaksi touchscreen mobile. Berlaku untuk: SideNav, BottomNav, AppShell, Modal, BackButton, dan halaman Transactions. Selesai.
 
 ## Keputusan/diskusi yang masih terbuka
 - **Riwayat setoran savings goal**: butuh skema backend baru.

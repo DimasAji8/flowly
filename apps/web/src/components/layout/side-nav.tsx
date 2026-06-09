@@ -33,7 +33,7 @@ export function SideNav() {
   return (
     <aside
       aria-label="Primary"
-      className="hidden md:flex md:sticky md:top-0 md:h-dvh md:w-72 md:shrink-0 md:flex-col md:border-r md:border-border-subtle md:px-5 md:py-6"
+      className="hidden lg:flex lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:flex-col lg:border-r lg:border-border-subtle lg:px-5 lg:py-6"
     >
       <Link href={ROUTES.dashboard} className="mb-8 inline-flex items-center px-2">
         <Image src={resolvedTheme === "dark" ? "/img/logo-text-white.webp" : "/img/logo-text-blue.webp"} alt="Teman Kas" width={200} height={50} className="h-12 w-auto" style={{ width: "auto" }} />

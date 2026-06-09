@@ -109,7 +109,7 @@ export default function TransactionsPage() {
   return (
     <div className="flex flex-col gap-5 max-w-3xl flowly-enter">
       {/* Mobile: back button */}
-      <Link href={ROUTES.dashboard} className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors w-fit md:hidden">
+      <Link href={ROUTES.dashboard} className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors w-fit lg:hidden">
         <ArrowLeft className="size-4" />
         Kembali
       </Link>
@@ -121,7 +121,7 @@ export default function TransactionsPage() {
         <button
           type="button"
           onClick={() => setAddOpen(true)}
-          className="hidden md:inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
+          className="hidden lg:inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
         >
           <Plus className="size-4" />
           Tambah

@@ -94,7 +94,7 @@ export function BottomNav() {
     <>
       <nav
         aria-label="Primary"
-        className="sticky bottom-0 z-30 w-full border-t border-border-subtle bg-(--color-bg)/90 backdrop-blur-md md:hidden"
+        className="sticky bottom-0 z-30 w-full border-t border-border-subtle bg-(--color-bg)/90 backdrop-blur-md lg:hidden"
       >
         <div className="flex items-center">
           {/* Left items */}
