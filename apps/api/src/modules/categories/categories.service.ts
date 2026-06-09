@@ -36,7 +36,7 @@ export class CategoriesService {
         workspaceId,
         name: dto.name,
         type: dto.type,
-        color: dto.color.toUpperCase(),
+        color: (dto.color ?? '#6E6E73').toUpperCase(),
         icon: dto.icon ?? '📦',
         group: dto.group ?? null,
       },

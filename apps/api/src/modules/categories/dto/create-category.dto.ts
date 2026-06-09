@@ -17,11 +17,12 @@ export class CreateCategoryDto {
   @IsEnum(TransactionType)
   type!: TransactionType;
 
-  @ApiProperty({ example: '#15803D' })
+  @ApiProperty({ example: '#15803D', required: false })
+  @IsOptional()
   @IsString()
   @Matches(HEX_COLOR_REGEX, { message: 'color must be a hex string like #15803D' })
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
-  color!: string;
+  color?: string;
 
   @ApiProperty({ example: '🍔', required: false })
   @IsOptional()

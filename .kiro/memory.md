@@ -33,3 +33,4 @@
 - `SheetContent` dari shadcn punya `flex flex-col gap-4` hardcoded — tidak bisa di-override Tailwind biasa, harus pakai inline styles + CSS `!important`
 - Logo tersedia di `/public/img/logo-text-blue.webp` dan `/public/img/logo-text-white.webp`
 - Jangan ubah brand color TemanKas (`#0066cc`)
+- `color` di Category DTO sudah dijadikan `@IsOptional()` — default `#6E6E73` di service jika tidak dikirim. Prisma schema masih non-nullable (tidak perlu migration).
