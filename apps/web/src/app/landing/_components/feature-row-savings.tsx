@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { ROUTES } from "@/constants/routes";
 import { T } from "./tokens";
-import { Reveal, PhoneFrame, GhostButton } from "./primitives";
+import { Reveal, GhostButton } from "./primitives";
 
 // Line icons (monokrom, stroke-based) — sesuai aturan no-emoji di landing
 const IconTarget = () => (
@@ -28,9 +29,9 @@ const FEATURES = [
 ];
 
 export function FeatureRowSavings({
-  id, eyebrow, title, body, screen,
+  id, eyebrow, title, body,
 }: {
-  id?: string; eyebrow: string; title: string; body: string; screen?: React.ReactNode;
+  id?: string; eyebrow: string; title: string; body: string;
 }) {
   return (
     <section
@@ -60,10 +61,16 @@ export function FeatureRowSavings({
             padding: "clamp(32px, 5vw, 56px)",
           }}>
             <div className="lp-savings-main">
-              {/* Phone mockup */}
+              {/* Mockup image */}
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <div style={{ maxWidth: 300, width: "100%" }}>
-                  <PhoneFrame>{screen}</PhoneFrame>
+                <div className="lp-phone-wrap" style={{ maxWidth: "100%", width: "100%" }}>
+                  <Image
+                    src="/img/mockup-nabung.webp"
+                    alt="Mockup target tabungan"
+                    width={300}
+                    height={620}
+                    style={{ width: "100%", height: "auto", display: "block" }}
+                  />
                 </div>
               </div>
 

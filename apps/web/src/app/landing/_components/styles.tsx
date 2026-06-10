@@ -115,7 +115,10 @@ export function LandingStyles() {
       @media (max-width: 880px) {
         .lp-savings-main {
           grid-template-columns: 1fr;
-          gap: 48px;
+          gap: 32px;
+        }
+        .lp-phone-wrap {
+          max-width: 200px !important;
         }
       }
 
@@ -126,11 +129,21 @@ export function LandingStyles() {
         gap: 20px;
       }
       @media (max-width: 880px) {
-        .lp-testimonial-grid { grid-template-columns: 1fr; }
+        .lp-testimonial-grid { grid-template-columns: repeat(2, 1fr); }
+        .lp-testimonial-grid > :last-child { grid-column: unset; max-width: unset; }
       }
-      @media (min-width: 481px) and (max-width: 880px) {
-        .lp-testimonial-grid { grid-template-columns: 1fr 1fr; }
-        .lp-testimonial-grid > :last-child { grid-column: 1 / -1; max-width: 400px; margin: 0 auto; width: 100%; }
+      @media (max-width: 480px) {
+        .lp-testimonial-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      }
+
+      /* Capability grid */
+      .lp-cap-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 880px) {
+        .lp-cap-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
       }
 
       .lp-cap-card {

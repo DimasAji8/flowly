@@ -16,7 +16,6 @@ import { CapabilityGrid } from "./_components/capability-grid";
 import { FaqSection } from "./_components/faq";
 import { CtaSection } from "./_components/cta";
 import { Footer } from "./_components/footer";
-import { ScreenSavings } from "./_components/screens";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -70,7 +69,6 @@ export default function LandingPage() {
           eyebrow="Target Tabungan"
           title="Wujudkan Impian Finansial dengan Rencana yang Terukur"
           body="Kelola target keuangan jangka pendek dan panjang dengan tracking real-time. Sistem fleksibel yang menyesuaikan dengan kemampuan dan prioritas Anda."
-          screen={<ScreenSavings />}
         />
 
         <CapabilityGrid />
