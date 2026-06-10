@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
-type Size = "md" | "sm" | "lg";
+type Size = "md" | "sm" | "lg" | "icon-sm";
 
 const base = [
   "inline-flex items-center justify-center gap-2",
@@ -29,6 +29,7 @@ const sizes: Record<Size, string> = {
   sm: "h-9 px-3 text-sm rounded-lg",
   md: "h-11 px-4 text-sm rounded-xl",
   lg: "h-12 px-5 text-base rounded-xl",
+  "icon-sm": "h-8 w-8 rounded-lg p-0",
 };
 
 interface CommonProps {

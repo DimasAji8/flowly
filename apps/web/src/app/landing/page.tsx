@@ -10,8 +10,10 @@ import { LandingStyles } from "./_components/styles";
 import { GlobalNav } from "./_components/nav";
 import { HeroSection } from "./_components/hero";
 import { FeatureRow } from "./_components/feature-row";
+import { FeatureRowSavings } from "./_components/feature-row-savings";
 import { Banner } from "./_components/banner";
 import { CapabilityGrid } from "./_components/capability-grid";
+import { FaqSection } from "./_components/faq";
 import { CtaSection } from "./_components/cta";
 import { Footer } from "./_components/footer";
 import { ScreenSavings } from "./_components/screens";
@@ -63,18 +65,17 @@ export default function LandingPage() {
           href={ROUTES.register}
         />
 
-        <FeatureRow
+        <FeatureRowSavings
           id="savings"
-          eyebrow="Savings Goals"
-          title="Impikan. Rencanakan. Wujudkan."
-          body="Tetapkan target finansial dan saksikan progresnya bertumbuh. Setiap tabungan membawamu lebih dekat ke tujuan."
-          bg={T.tintLilac}
-          image={IMG.savingJar}
-          imageAlt="Menabung untuk tujuan"
+          eyebrow="Target Tabungan"
+          title="Wujudkan Impian Finansial dengan Rencana yang Terukur"
+          body="Kelola target keuangan jangka pendek dan panjang dengan tracking real-time. Sistem fleksibel yang menyesuaikan dengan kemampuan dan prioritas Anda."
           screen={<ScreenSavings />}
         />
 
         <CapabilityGrid />
+
+        <FaqSection />
 
         <CtaSection />
       </main>

@@ -81,6 +81,56 @@ export function LandingStyles() {
           max-width: 100% !important; 
           min-height: 350px !important;
         }
+        
+        /* Savings: stack layout with smaller masonry */
+        #savings .lp-feature-grid {
+          grid-template-columns: 1fr;
+          gap: 32px;
+          text-align: left;
+        }
+        #savings .lp-feature-copy {
+          align-items: flex-start;
+          order: 1;
+        }
+        #savings .lp-feature-visual {
+          order: 2;
+        }
+        #savings .lp-feature-body {
+          display: block;
+        }
+        #savings .lp-feature-img {
+          aspect-ratio: unset !important;
+          max-height: unset !important;
+          padding: 0 !important;
+        }
+      }
+
+      /* Savings visual grid responsive */
+      .lp-savings-main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 6vw, 80px);
+        align-items: center;
+      }
+      @media (max-width: 880px) {
+        .lp-savings-main {
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+      }
+
+      /* Social proof grids */
+      .lp-testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      @media (max-width: 880px) {
+        .lp-testimonial-grid { grid-template-columns: 1fr; }
+      }
+      @media (min-width: 481px) and (max-width: 880px) {
+        .lp-testimonial-grid { grid-template-columns: 1fr 1fr; }
+        .lp-testimonial-grid > :last-child { grid-column: 1 / -1; max-width: 400px; margin: 0 auto; width: 100%; }
       }
 
       .lp-cap-card {
