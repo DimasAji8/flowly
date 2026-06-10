@@ -1,16 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { FormError } from "@/components/ui/form-error";
+import { AuthComponent } from "@/components/ui/sign-up";
 import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
-import { loginSchema, type LoginFormValues } from "@/lib/auth-schemas";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useRedirectIfAuthed } from "@/hooks/use-auth";
@@ -20,90 +13,30 @@ export default function LoginPage() {
   const { isReady, isAuthed } = useRedirectIfAuthed();
   const setSession = useAuthStore((s) => s.setSession);
 
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
-  });
-
   if (!isReady || isAuthed) {
     return null;
   }
 
-  const onSubmit = async (values: LoginFormValues) => {
-    setSubmitError(null);
+  const handleLogin = async ({ email, password }: { email: string; password: string }) => {
     try {
-      const session = await authService.login(values);
+      const session = await authService.login({ email, password });
       setSession(session);
       router.replace(ROUTES.dashboard);
     } catch (e) {
-      if (e instanceof ApiError) {
-        setSubmitError(e.message);
-      } else {
-        setSubmitError("Something went wrong. Please try again.");
-      }
+      if (e instanceof ApiError) throw new Error(e.message);
+      throw new Error("Terjadi kesalahan. Coba lagi.");
     }
   };
 
   return (
-    <section className="flex flex-col gap-6">
-      <Link
-        href={ROUTES.home}
-        className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
-      >
-        <span>←</span>
-        <span>Kembali</span>
-      </Link>
-      
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Selamat datang kembali
-        </h1>
-        <p className="text-sm text-secondary">
-          Masuk untuk melanjutkan catatan keuanganmu.
-        </p>
-      </header>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <FormError message={submitError} />
-
-        <Input
-          label="Email"
-          type="email"
-          autoComplete="email"
-          placeholder="kamu@contoh.com"
-          {...register("email")}
-          error={errors.email?.message}
-        />
-
-        <Input
-          label="Kata sandi"
-          type="password"
-          autoComplete="current-password"
-          placeholder="••••••••"
-          {...register("password")}
-          error={errors.password?.message}
-        />
-
-        <Button type="submit" isLoading={isSubmitting} className="mt-2">
-          Masuk
-        </Button>
-      </form>
-
-      <p className="text-sm text-secondary text-center">
-        Belum punya akun?{" "}
-        <Link
-          href={ROUTES.register}
-          className="text-accent hover:underline"
-        >
-          Daftar
-        </Link>
-      </p>
-    </section>
+    <AuthComponent
+      mode="login"
+      loginLink={ROUTES.login}
+      registerLink={ROUTES.register}
+      homeLink={ROUTES.home}
+      onLoginSubmit={handleLogin}
+      onRegisterSubmit={async () => {}}
+    />
   );
 }
+
