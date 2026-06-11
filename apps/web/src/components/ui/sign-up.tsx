@@ -6,7 +6,6 @@ import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, us
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, ArrowRight, ArrowLeft, Loader, PartyPopper, X, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import type { GlobalOptions as ConfettiGlobalOptions, CreateTypes as ConfettiInstance, Options as ConfettiOptions } from "canvas-confetti";
 import confetti from "canvas-confetti";
@@ -239,6 +238,31 @@ export interface AuthComponentProps {
   onRegisterComplete?: () => void;
 }
 
+// ─── Auth Button ─────────────────────────────────────────────────────────────
+function AuthButton({ children, disabled, rightIcon, type = "submit", onClick }: {
+  children: React.ReactNode; disabled?: boolean; rightIcon?: React.ReactNode;
+  type?: "submit" | "button"; onClick?: () => void;
+}) {
+  return (
+    <button type={type} onClick={onClick} disabled={disabled}
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        width: "100%", height: 48, borderRadius: 12, border: "none",
+        cursor: disabled ? "not-allowed" : "pointer",
+        background: disabled ? "var(--color-border)" : "var(--color-accent)",
+        color: disabled ? "var(--color-text-muted)" : "#fff",
+        fontSize: 15, fontWeight: 600, fontFamily: "var(--font-sans)",
+        transition: "opacity 0.15s",
+        opacity: disabled ? 0.6 : 1,
+      }}
+      onMouseEnter={e => { if (!disabled) (e.currentTarget as HTMLElement).style.opacity = "0.88"; }}
+      onMouseLeave={e => { if (!disabled) (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+    >
+      {children}{rightIcon}
+    </button>
+  );
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 export const AuthComponent = ({
   mode, brandName = "Teman Kas", loginLink = "/auth/login", registerLink = "/auth/register", homeLink = "/",
@@ -305,7 +329,7 @@ export const AuthComponent = ({
   const activeTyping = isLogin ? loginTyping : regTyping;
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="grid lg:grid-cols-2" style={{ minHeight: "100vh" }}>
       <Confetti ref={confettiRef} manualstart className="fixed inset-0 w-full h-full pointer-events-none z-[999]" />
 
       {/* Status modal */}
@@ -364,132 +388,166 @@ export const AuthComponent = ({
       </div>
 
       {/* Right panel — form */}
-      <div className="flex items-center justify-center min-h-screen px-12 py-16 bg-background">
-        <div className="w-full" style={{ maxWidth: 520 }}>
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center mb-10">
+      <div className="relative flex flex-col bg-background" style={{ minHeight: "100vh" }}>
+        {/* Mobile hero header — gradient + logo (only mobile) */}
+        <div className="lg:hidden relative overflow-hidden" style={{ background: "linear-gradient(135deg, var(--color-accent) 0%, #1e40af 100%)", paddingTop: 28, paddingBottom: 40, paddingInline: 24, flexShrink: 0 }}>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:18px_18px]" />
+          <div style={{ position: "absolute", width: 180, height: 180, borderRadius: "50%", background: "rgba(255,255,255,0.1)", top: -60, right: -40, filter: "blur(30px)" }} />
+          <div className="relative z-10 flex items-center justify-between">
             <Link href={homeLink}>
-              <Image src="/img/logo-text-blue.webp" alt="Teman Kas" height={48} width={192} style={{ height: 48, width: "auto" }} />
+              <Image src="/img/logo-text-white.webp" alt="Teman Kas" height={32} width={128} style={{ height: 32, width: "auto" }} />
+            </Link>
+            <Link href={homeLink} className="flex items-center gap-1 text-sm font-medium" style={{ color: "rgba(255,255,255,0.85)" }}>
+              <ArrowLeft className="size-4" /> Beranda
             </Link>
           </div>
+          <p className="relative z-10 mt-5 text-sm" style={{ color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>
+            Catat keuangan, kelola dompet, dan capai target tabungan — semua dalam satu app.
+          </p>
+        </div>
 
-          <AnimatePresence mode="wait">
-            {isLogin ? (
-              /* ── LOGIN ── */
-              <motion.div key="login" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                <div className="text-center mb-10">
-                  <h1 className="text-4xl font-bold tracking-tight mb-2">Selamat datang!</h1>
-                  <p className="text-muted-foreground">Masuk untuk melanjutkan catatan keuanganmu.</p>
-                </div>
+        {/* Desktop back to home — top left */}
+        <div className="hidden lg:flex items-center px-8 py-5" style={{ flexShrink: 0 }}>
+          <Link href={homeLink} className="flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-foreground transition-colors">
+            <ArrowLeft className="size-4" /> Kembali ke beranda
+          </Link>
+        </div>
 
-                <form onSubmit={handleLogin} className="space-y-5">
-                  <Input id="email" label="Email" type="email" placeholder="kamu@contoh.com" value={loginEmail}
-                    onChange={e => setLoginEmail(e.target.value)}
-                    onFocus={() => setLoginTyping(true)} onBlur={() => setLoginTyping(false)}
-                    autoComplete="email" required />
-                  <Input id="password" label="Kata sandi" type={showLoginPassword ? "text" : "password"} placeholder="••••••••"
-                    value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
-                    autoComplete="current-password" required
-                    rightAdornment={
-                      <button type="button" onClick={() => setShowLoginPassword(v => !v)} className="text-muted hover:text-foreground transition-colors">
-                        {showLoginPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                      </button>
-                    } />
-
-                  <Button type="submit" className="w-full" size="lg" disabled={!isLoginValid || status === "loading"}>
-                    Masuk
-                  </Button>
-                </form>
-
-                <p className="text-center text-sm text-muted-foreground mt-8">
-                  Belum punya akun?{" "}
-                  <Link href={registerLink} className="text-primary font-medium hover:underline">Daftar</Link>
-                </p>
-              </motion.div>
-            ) : step === "info" ? (
-              /* ── REGISTER step 1 ── */
-              <motion.div key="reg-info" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                <div className="text-center mb-10">
-                  <h1 className="text-4xl font-bold tracking-tight mb-2">Buat akun baru</h1>
-                  <p className="text-muted-foreground">Gratis selamanya. Tanpa kartu kredit.</p>
-                </div>
-
-                <form onSubmit={e => { e.preventDefault(); if (isRegInfoValid) setStep("password"); }} className="space-y-5">
-                  <Input id="name" label="Nama" type="text" placeholder="Nama kamu" value={regName}
-                    onChange={e => setRegName(e.target.value)}
-                    onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                    autoComplete="name" required />
-                  <Input id="reg-email" label="Email" type="email" placeholder="kamu@contoh.com" value={regEmail}
-                    onChange={e => setRegEmail(e.target.value)}
-                    onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                    autoComplete="email" required />
-
-                  {/* Avatar */}
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Avatar <span className="normal-case font-normal">(opsional)</span></span>
-                    <div className="flex gap-3">
-                      {(["m", "f"] as const).map(g => (
-                        <button key={g} type="button" onClick={() => setRegGender(regGender === g ? undefined : g)}
-                          className={cn("flex flex-col items-center gap-1 rounded-2xl border-2 p-2 transition-all duration-200",
-                            regGender === g ? "border-primary bg-primary/5" : "border-border hover:border-primary/50")}>
-                          <Image src={`/svg/${g}.svg`} alt={g === "m" ? "Laki-laki" : "Perempuan"} width={48} height={48} className="size-12 rounded-xl object-cover" />
-                          <span className="text-xs text-muted-foreground">{g === "m" ? "Laki-laki" : "Perempuan"}</span>
-                        </button>
-                      ))}
-                    </div>
+        {/* Form — centered on desktop, top-aligned on mobile */}
+        <div className="flex justify-center items-start lg:items-center px-8 pt-8 pb-12 lg:py-8" style={{ flex: 1 }}>
+          <div style={{ width: "100%", maxWidth: 420 }}>
+            <AnimatePresence mode="wait">
+              {isLogin ? (
+                /* ── LOGIN ── */
+                <motion.div key="login" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+                  <div className="mb-8">
+                    <h1 style={{ fontSize: "clamp(28px,4vw,36px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--color-text-primary)", marginBottom: 6 }}>Selamat datang</h1>
+                    <p style={{ fontSize: 15, color: "var(--color-text-secondary)" }}>Masuk untuk melanjutkan catatan keuanganmu.</p>
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg" disabled={!isRegInfoValid} rightIcon={<ArrowRight className="size-4" />}>
-                    Lanjut
-                  </Button>
-                </form>
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <Input id="email" label="Email" type="email" placeholder="kamu@contoh.com" value={loginEmail}
+                      onChange={e => setLoginEmail(e.target.value)}
+                      onFocus={() => setLoginTyping(true)} onBlur={() => setLoginTyping(false)}
+                      autoComplete="email" required />
+                    <Input id="password" label="Kata sandi" type={showLoginPassword ? "text" : "password"} placeholder="••••••••"
+                      value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
+                      autoComplete="current-password" required
+                      rightAdornment={
+                        <button type="button" onClick={() => setShowLoginPassword(v => !v)} style={{ color: "var(--color-text-muted)" }}>
+                          {showLoginPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                      } />
 
-                <p className="text-center text-sm text-muted-foreground mt-8">
-                  Sudah punya akun?{" "}
-                  <Link href={loginLink} className="text-primary font-medium hover:underline">Masuk</Link>
-                </p>
-              </motion.div>
-            ) : (
-              /* ── REGISTER step 2 ── */
-              <motion.div key="reg-pass" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                <div className="text-center mb-10">
-                  <h1 className="text-4xl font-bold tracking-tight mb-2">Buat kata sandi</h1>
-                  <p className="text-muted-foreground">Minimal 8 karakter.</p>
-                </div>
+                    <div style={{ paddingTop: 8 }}>
+                      <AuthButton disabled={!isLoginValid || status === "loading"}>Masuk</AuthButton>
+                    </div>
+                  </form>
 
-                <form onSubmit={handleRegister} className="space-y-5">
-                  <Input id="reg-pass" label="Kata sandi" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
-                    value={regPassword} onChange={e => setRegPassword(e.target.value)}
-                    onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                    autoComplete="new-password" required
-                    rightAdornment={
-                      <button type="button" onClick={() => setShowRegPassword(v => !v)} className="text-muted hover:text-foreground transition-colors">
-                        {showRegPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                      </button>
-                    } />
-                  <Input id="reg-confirm" label="Konfirmasi kata sandi" type={showRegConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
-                    value={regConfirm} onChange={e => setRegConfirm(e.target.value)}
-                    autoComplete="new-password" required
-                    rightAdornment={
-                      <button type="button" onClick={() => setShowRegConfirm(v => !v)} className="text-muted hover:text-foreground transition-colors">
-                        {showRegConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                      </button>
-                    } />
+                  <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-text-secondary)", marginTop: 24 }}>
+                    Belum punya akun?{" "}
+                    <Link href={registerLink} style={{ color: "var(--color-accent)", fontWeight: 600 }}>Daftar</Link>
+                  </p>
+                </motion.div>
+              ) : step === "info" ? (
+                /* ── REGISTER step 1 ── */
+                <motion.div key="reg-info" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+                  <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-5">
+                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-accent)" }} />
+                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-border)" }} />
+                      <span style={{ fontSize: 12, color: "var(--color-text-muted)", marginLeft: 4 }}>Langkah 1 dari 2</span>
+                    </div>
+                    <h1 style={{ fontSize: "clamp(28px,4vw,36px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--color-text-primary)", marginBottom: 6 }}>Buat akun baru</h1>
+                    <p style={{ fontSize: 15, color: "var(--color-text-secondary)" }}>Gratis selamanya. Tanpa kartu kredit.</p>
+                  </div>
 
-                  <Button type="submit" className="w-full" size="lg" disabled={!isRegPassValid || status === "loading"} rightIcon={<ArrowRight className="size-4" />}>
-                    Buat Akun
-                  </Button>
-                </form>
+                  <form onSubmit={e => { e.preventDefault(); if (isRegInfoValid) setStep("password"); }} className="space-y-4">
+                    <Input id="name" label="Nama" type="text" placeholder="Nama kamu" value={regName}
+                      onChange={e => setRegName(e.target.value)}
+                      onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
+                      autoComplete="name" required />
+                    <Input id="reg-email" label="Email" type="email" placeholder="kamu@contoh.com" value={regEmail}
+                      onChange={e => setRegEmail(e.target.value)}
+                      onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
+                      autoComplete="email" required />
 
-                <div className="text-center mt-6">
-                  <button type="button" onClick={() => setStep("info")}
-                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mx-auto">
-                    <ArrowLeft className="size-4" /> Kembali
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    {/* Avatar */}
+                    <div className="flex flex-col gap-2 pt-1">
+                      <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--color-text-secondary)" }}>Avatar <span style={{ textTransform: "none", fontWeight: 400 }}>(opsional)</span></span>
+                      <div className="flex gap-3">
+                        {(["m", "f"] as const).map(g => (
+                          <button key={g} type="button" onClick={() => setRegGender(regGender === g ? undefined : g)}
+                            style={{
+                              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                              borderRadius: 16, border: `2px solid ${regGender === g ? "var(--color-accent)" : "var(--color-border)"}`,
+                              padding: "8px 12px", background: regGender === g ? "var(--color-accent-soft)" : "transparent",
+                              transition: "all 0.15s", cursor: "pointer",
+                            }}>
+                            <Image src={`/svg/${g}.svg`} alt={g === "m" ? "Laki-laki" : "Perempuan"} width={44} height={44} className="rounded-xl object-cover" style={{ width: 44, height: 44 }} />
+                            <span style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>{g === "m" ? "Laki-laki" : "Perempuan"}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ paddingTop: 8 }}>
+                      <AuthButton disabled={!isRegInfoValid} rightIcon={<ArrowRight className="size-4" />}>Lanjut</AuthButton>
+                    </div>
+                  </form>
+
+                  <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-text-secondary)", marginTop: 24 }}>
+                    Sudah punya akun?{" "}
+                    <Link href={loginLink} style={{ color: "var(--color-accent)", fontWeight: 600 }}>Masuk</Link>
+                  </p>
+                </motion.div>
+              ) : (
+                /* ── REGISTER step 2 ── */
+                <motion.div key="reg-pass" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+                  <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-5">
+                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-accent)" }} />
+                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-accent)" }} />
+                      <span style={{ fontSize: 12, color: "var(--color-text-muted)", marginLeft: 4 }}>Langkah 2 dari 2</span>
+                    </div>
+                    <h1 style={{ fontSize: "clamp(28px,4vw,36px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--color-text-primary)", marginBottom: 6 }}>Buat kata sandi</h1>
+                    <p style={{ fontSize: 15, color: "var(--color-text-secondary)" }}>Minimal 8 karakter.</p>
+                  </div>
+
+                  <form onSubmit={handleRegister} className="space-y-4">
+                    <Input id="reg-pass" label="Kata sandi" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
+                      value={regPassword} onChange={e => setRegPassword(e.target.value)}
+                      onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
+                      autoComplete="new-password" required
+                      rightAdornment={
+                        <button type="button" onClick={() => setShowRegPassword(v => !v)} style={{ color: "var(--color-text-muted)" }}>
+                          {showRegPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                      } />
+                    <Input id="reg-confirm" label="Konfirmasi kata sandi" type={showRegConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
+                      value={regConfirm} onChange={e => setRegConfirm(e.target.value)}
+                      autoComplete="new-password" required
+                      rightAdornment={
+                        <button type="button" onClick={() => setShowRegConfirm(v => !v)} style={{ color: "var(--color-text-muted)" }}>
+                          {showRegConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                      } />
+
+                    <div style={{ paddingTop: 8 }}>
+                      <AuthButton disabled={!isRegPassValid || status === "loading"} rightIcon={<ArrowRight className="size-4" />}>Buat Akun</AuthButton>
+                    </div>
+                  </form>
+
+                  <div style={{ textAlign: "center", marginTop: 24 }}>
+                    <button type="button" onClick={() => setStep("info")}
+                      style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--color-text-secondary)", cursor: "pointer", background: "none", border: "none" }}>
+                      <ArrowLeft className="size-4" /> Kembali
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>
