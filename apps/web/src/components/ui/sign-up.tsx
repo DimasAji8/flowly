@@ -397,7 +397,7 @@ export const AuthComponent = ({
             </Link>
           </div>
           <p className="relative z-10 mt-5 text-sm" style={{ color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>
-            Catat keuangan, kelola dompet, dan capai target tabungan — semua dalam satu app.
+            Catat keuangan, kelola dompet, dan capai target tabungan dalam satu app.
           </p>
         </div>
 
