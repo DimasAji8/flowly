@@ -5,7 +5,7 @@ import Link from "next/link";
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useCallback, createContext, Children } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Loader, PartyPopper, X, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, Loader, PartyPopper, X, AlertCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { GlobalOptions as ConfettiGlobalOptions, CreateTypes as ConfettiInstance, Options as ConfettiOptions } from "canvas-confetti";
 import confetti from "canvas-confetti";
@@ -223,7 +223,6 @@ function TextLoop({ children, interval = 2 }: { children: React.ReactNode[]; int
   );
 }
 
-type RegisterStep = "info" | "password";
 export interface LoginData { email: string; password: string; }
 export interface RegisterData { name: string; email: string; password: string; gender?: "m" | "f"; }
 export interface AuthComponentProps {
@@ -279,11 +278,8 @@ export const AuthComponent = ({
   const [regEmail, setRegEmail] = useState("");
   const [regGender, setRegGender] = useState<"m" | "f" | undefined>();
   const [regPassword, setRegPassword] = useState("");
-  const [regConfirm, setRegConfirm] = useState("");
   const [showRegPassword, setShowRegPassword] = useState(false);
-  const [showRegConfirm, setShowRegConfirm] = useState(false);
   const [regTyping, setRegTyping] = useState(false);
-  const [step, setStep] = useState<RegisterStep>("info");
 
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -291,7 +287,7 @@ export const AuthComponent = ({
 
   const isLoginValid = /\S+@\S+\.\S+/.test(loginEmail) && loginPassword.length > 0;
   const isRegInfoValid = /\S+@\S+\.\S+/.test(regEmail) && regName.trim().length >= 2;
-  const isRegPassValid = regPassword.length >= 8 && regConfirm.length >= 8;
+  const isRegPassValid = regPassword.length >= 8;
 
   const fireCannon = () => {
     const fire = confettiRef.current?.fire;
@@ -312,7 +308,6 @@ export const AuthComponent = ({
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (status !== "idle") return;
-    if (regPassword !== regConfirm) { setErrorMsg("Kata sandi tidak cocok!"); setStatus("error"); return; }
     setStatus("loading");
     try {
       await onRegisterSubmit({ name: regName, email: regEmail, password: regPassword, gender: regGender });
@@ -449,20 +444,15 @@ export const AuthComponent = ({
                     <Link href={registerLink} style={{ color: "var(--color-accent)", fontWeight: 600 }}>Daftar</Link>
                   </p>
                 </motion.div>
-              ) : step === "info" ? (
-                /* ── REGISTER step 1 ── */
-                <motion.div key="reg-info" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                  <div className="mb-8">
-                    <div className="flex items-center gap-2 mb-5">
-                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-accent)" }} />
-                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-border)" }} />
-                      <span style={{ fontSize: 12, color: "var(--color-text-muted)", marginLeft: 4 }}>Langkah 1 dari 2</span>
-                    </div>
+              ) : (
+                /* ── REGISTER (single step) ── */
+                <motion.div key="reg" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+                  <div className="mb-6">
                     <h1 style={{ fontSize: "clamp(28px,4vw,36px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--color-text-primary)", marginBottom: 6 }}>Buat akun baru</h1>
                     <p style={{ fontSize: 15, color: "var(--color-text-secondary)" }}>Gratis selamanya. Tanpa kartu kredit.</p>
                   </div>
 
-                  <form onSubmit={e => { e.preventDefault(); if (isRegInfoValid) setStep("password"); }} className="space-y-4">
+                  <form onSubmit={handleRegister} className="space-y-4">
                     <Input id="name" label="Nama" type="text" placeholder="Nama kamu" value={regName}
                       onChange={e => setRegName(e.target.value)}
                       onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
@@ -471,6 +461,15 @@ export const AuthComponent = ({
                       onChange={e => setRegEmail(e.target.value)}
                       onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
                       autoComplete="email" required />
+                    <Input id="reg-pass" label="Kata sandi" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
+                      value={regPassword} onChange={e => setRegPassword(e.target.value)}
+                      onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
+                      autoComplete="new-password" required
+                      rightAdornment={
+                        <button type="button" onClick={() => setShowRegPassword(v => !v)} style={{ color: "var(--color-text-muted)" }}>
+                          {showRegPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                      } />
 
                     {/* Avatar */}
                     <div className="flex flex-col gap-2 pt-1">
@@ -492,7 +491,7 @@ export const AuthComponent = ({
                     </div>
 
                     <div style={{ paddingTop: 8 }}>
-                      <AuthButton disabled={!isRegInfoValid} rightIcon={<ArrowRight className="size-4" />}>Lanjut</AuthButton>
+                      <AuthButton disabled={!isRegInfoValid || !isRegPassValid || status === "loading"}>Buat Akun</AuthButton>
                     </div>
                   </form>
 
@@ -500,50 +499,6 @@ export const AuthComponent = ({
                     Sudah punya akun?{" "}
                     <Link href={loginLink} style={{ color: "var(--color-accent)", fontWeight: 600 }}>Masuk</Link>
                   </p>
-                </motion.div>
-              ) : (
-                /* ── REGISTER step 2 ── */
-                <motion.div key="reg-pass" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                  <div className="mb-8">
-                    <div className="flex items-center gap-2 mb-5">
-                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-accent)" }} />
-                      <span style={{ width: 28, height: 5, borderRadius: 9999, background: "var(--color-accent)" }} />
-                      <span style={{ fontSize: 12, color: "var(--color-text-muted)", marginLeft: 4 }}>Langkah 2 dari 2</span>
-                    </div>
-                    <h1 style={{ fontSize: "clamp(28px,4vw,36px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--color-text-primary)", marginBottom: 6 }}>Buat kata sandi</h1>
-                    <p style={{ fontSize: 15, color: "var(--color-text-secondary)" }}>Minimal 8 karakter.</p>
-                  </div>
-
-                  <form onSubmit={handleRegister} className="space-y-4">
-                    <Input id="reg-pass" label="Kata sandi" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
-                      value={regPassword} onChange={e => setRegPassword(e.target.value)}
-                      onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                      autoComplete="new-password" required
-                      rightAdornment={
-                        <button type="button" onClick={() => setShowRegPassword(v => !v)} style={{ color: "var(--color-text-muted)" }}>
-                          {showRegPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                        </button>
-                      } />
-                    <Input id="reg-confirm" label="Konfirmasi kata sandi" type={showRegConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
-                      value={regConfirm} onChange={e => setRegConfirm(e.target.value)}
-                      autoComplete="new-password" required
-                      rightAdornment={
-                        <button type="button" onClick={() => setShowRegConfirm(v => !v)} style={{ color: "var(--color-text-muted)" }}>
-                          {showRegConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                        </button>
-                      } />
-
-                    <div style={{ paddingTop: 8 }}>
-                      <AuthButton disabled={!isRegPassValid || status === "loading"} rightIcon={<ArrowRight className="size-4" />}>Buat Akun</AuthButton>
-                    </div>
-                  </form>
-
-                  <div style={{ textAlign: "center", marginTop: 24 }}>
-                    <button type="button" onClick={() => setStep("info")}
-                      style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--color-text-secondary)", cursor: "pointer", background: "none", border: "none" }}>
-                      <ArrowLeft className="size-4" /> Kembali
-                    </button>
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
