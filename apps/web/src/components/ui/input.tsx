@@ -1,25 +1,98 @@
-import * as React from "react"
+import { forwardRef } from "react";
 
-import { cn } from "@/lib/utils"
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  hint?: string;
+  /** Adornment di kiri input (mis. "Rp", icon) */
+  leftAdornment?: React.ReactNode;
+  /** Adornment di kanan input */
+  rightAdornment?: React.ReactNode;
+}
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    label,
+    error,
+    hint,
+    leftAdornment,
+    rightAdornment,
+    className = "",
+    id,
+    ...rest
+  },
+  ref,
+) {
+  const inputId = id ?? rest.name;
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
-    return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          className
+  return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <label
+          htmlFor={inputId}
+          className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary"
+        >
+          {label}
+        </label>
+      )}
+
+      <div
+        className={[
+          "flex items-center gap-2 px-3",
+          "bg-card-subtle rounded-lg",
+          "border outline-none transition-colors",
+          "focus-within:bg-card",
+          error
+            ? "border-danger focus-within:border-danger"
+            : "border-border-subtle focus-within:border-accent focus-within:ring-2 focus-within:ring-[var(--color-accent-soft)]",
+        ].join(" ")}
+      >
+        {leftAdornment && (
+          <span className="shrink-0 text-sm text-muted">
+            {leftAdornment}
+          </span>
         )}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Input.displayName = "Input"
+        <input
+          id={inputId}
+          ref={ref}
+          aria-invalid={Boolean(error) || undefined}
+          aria-describedby={
+            error
+              ? `${inputId}-error`
+              : hint
+                ? `${inputId}-hint`
+                : undefined
+          }
+          className={[
+            "h-11 flex-1 bg-transparent text-sm",
+            "text-foreground placeholder:text-muted",
+            "outline-none",
+            className,
+          ].join(" ")}
+          {...rest}
+        />
+        {rightAdornment && (
+          <span className="shrink-0 text-sm text-muted">
+            {rightAdornment}
+          </span>
+        )}
+      </div>
 
-export { Input }
+      {error ? (
+        <p
+          id={`${inputId}-error`}
+          className="text-xs text-danger"
+        >
+          {error}
+        </p>
+      ) : hint ? (
+        <p
+          id={`${inputId}-hint`}
+          className="text-xs text-muted"
+        >
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+});

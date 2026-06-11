@@ -2,11 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useCallback, createContext, Children } from "react";
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useCallback, createContext, Children } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Wallet, ArrowRight, ArrowLeft, Loader, PartyPopper, X, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Loader, PartyPopper, X, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import type { GlobalOptions as ConfettiGlobalOptions, CreateTypes as ConfettiInstance, Options as ConfettiOptions } from "canvas-confetti";
@@ -42,57 +40,19 @@ Confetti.displayName = "Confetti";
 interface EyeBallProps {
   size?: number; pupilSize?: number; maxDistance?: number;
   eyeColor?: string; pupilColor?: string; isBlinking?: boolean;
-  forceLookX?: number; forceLookY?: number;
+  lookX?: number; lookY?: number;
 }
-const EyeBall = ({ size = 48, pupilSize = 16, maxDistance = 10, eyeColor = "white", pupilColor = "black", isBlinking = false, forceLookX, forceLookY }: EyeBallProps) => {
-  const [mouseX, setMouseX] = useState(0);
-  const [mouseY, setMouseY] = useState(0);
-  const eyeRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const h = (e: MouseEvent) => { setMouseX(e.clientX); setMouseY(e.clientY); };
-    window.addEventListener("mousemove", h);
-    return () => window.removeEventListener("mousemove", h);
-  }, []);
-  const pos = () => {
-    if (!eyeRef.current) return { x: 0, y: 0 };
-    if (forceLookX !== undefined && forceLookY !== undefined) return { x: forceLookX, y: forceLookY };
-    const r = eyeRef.current.getBoundingClientRect();
-    const dx = mouseX - (r.left + r.width / 2), dy = mouseY - (r.top + r.height / 2);
-    const dist = Math.min(Math.sqrt(dx ** 2 + dy ** 2), maxDistance);
-    const angle = Math.atan2(dy, dx);
-    return { x: Math.cos(angle) * dist, y: Math.sin(angle) * dist };
-  };
-  const { x, y } = pos();
-  return (
-    <div ref={eyeRef} className="rounded-full flex items-center justify-center transition-all duration-150"
-      style={{ width: size, height: isBlinking ? 2 : size, backgroundColor: eyeColor, overflow: "hidden" }}>
-      {!isBlinking && <div className="rounded-full" style={{ width: pupilSize, height: pupilSize, backgroundColor: pupilColor, transform: `translate(${x}px,${y}px)`, transition: "transform 0.1s ease-out" }} />}
-    </div>
-  );
-};
+const EyeBall = ({ size = 48, pupilSize = 16, eyeColor = "white", pupilColor = "black", isBlinking = false, lookX = 0, lookY = 0 }: EyeBallProps) => (
+  <div className="rounded-full flex items-center justify-center transition-all duration-150"
+    style={{ width: size, height: isBlinking ? 2 : size, backgroundColor: eyeColor, overflow: "hidden" }}>
+    {!isBlinking && <div className="rounded-full" style={{ width: pupilSize, height: pupilSize, backgroundColor: pupilColor, transform: `translate(${lookX}px,${lookY}px)`, transition: "transform 0.1s ease-out" }} />}
+  </div>
+);
 
-interface PupilProps { size?: number; maxDistance?: number; pupilColor?: string; forceLookX?: number; forceLookY?: number; }
-const Pupil = ({ size = 12, maxDistance = 5, pupilColor = "black", forceLookX, forceLookY }: PupilProps) => {
-  const [mouseX, setMouseX] = useState(0);
-  const [mouseY, setMouseY] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const h = (e: MouseEvent) => { setMouseX(e.clientX); setMouseY(e.clientY); };
-    window.addEventListener("mousemove", h);
-    return () => window.removeEventListener("mousemove", h);
-  }, []);
-  const pos = () => {
-    if (!ref.current) return { x: 0, y: 0 };
-    if (forceLookX !== undefined && forceLookY !== undefined) return { x: forceLookX, y: forceLookY };
-    const r = ref.current.getBoundingClientRect();
-    const dx = mouseX - (r.left + r.width / 2), dy = mouseY - (r.top + r.height / 2);
-    const dist = Math.min(Math.sqrt(dx ** 2 + dy ** 2), maxDistance);
-    const angle = Math.atan2(dy, dx);
-    return { x: Math.cos(angle) * dist, y: Math.sin(angle) * dist };
-  };
-  const { x, y } = pos();
-  return <div ref={ref} className="rounded-full" style={{ width: size, height: size, backgroundColor: pupilColor, transform: `translate(${x}px,${y}px)`, transition: "transform 0.1s ease-out" }} />;
-};
+interface PupilProps { size?: number; pupilColor?: string; lookX?: number; lookY?: number; }
+const Pupil = ({ size = 12, pupilColor = "black", lookX = 0, lookY = 0 }: PupilProps) => (
+  <div className="rounded-full" style={{ width: size, height: size, backgroundColor: pupilColor, transform: `translate(${lookX}px,${lookY}px)`, transition: "transform 0.1s ease-out" }} />
+);
 
 function Characters({ isTyping, showPassword, password }: { isTyping: boolean; showPassword: boolean; password: string }) {
   const [mouseX, setMouseX] = useState(0);
@@ -101,15 +61,26 @@ function Characters({ isTyping, showPassword, password }: { isTyping: boolean; s
   const [isBlackBlinking, setIsBlackBlinking] = useState(false);
   const [isLookingAtEachOther, setIsLookingAtEachOther] = useState(false);
   const [isPurplePeeking, setIsPurplePeeking] = useState(false);
-  const purpleRef = useRef<HTMLDivElement>(null);
-  const blackRef = useRef<HTMLDivElement>(null);
-  const yellowRef = useRef<HTMLDivElement>(null);
-  const orangeRef = useRef<HTMLDivElement>(null);
+  const [containerRect, setContainerRect] = useState<{ left: number; top: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const h = (e: MouseEvent) => { setMouseX(e.clientX); setMouseY(e.clientY); };
     window.addEventListener("mousemove", h);
     return () => window.removeEventListener("mousemove", h);
+  }, []);
+
+  // Track container position without accessing ref during render
+  useEffect(() => {
+    const update = () => {
+      if (containerRef.current) {
+        const r = containerRef.current.getBoundingClientRect();
+        setContainerRect({ left: r.left, top: r.top });
+      }
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   useEffect(() => {
@@ -123,24 +94,37 @@ function Characters({ isTyping, showPassword, password }: { isTyping: boolean; s
   }, []);
 
   useEffect(() => {
+    const t = setTimeout(() => setIsLookingAtEachOther(isTyping), 0);
     if (isTyping) {
-      setIsLookingAtEachOther(true);
-      const t = setTimeout(() => setIsLookingAtEachOther(false), 800);
-      return () => clearTimeout(t);
-    } else setIsLookingAtEachOther(false);
+      const t2 = setTimeout(() => setIsLookingAtEachOther(false), 800);
+      return () => { clearTimeout(t); clearTimeout(t2); };
+    }
+    return () => clearTimeout(t);
   }, [isTyping]);
 
   useEffect(() => {
-    if (password.length > 0 && showPassword) {
-      const t = setTimeout(() => { setIsPurplePeeking(true); setTimeout(() => setIsPurplePeeking(false), 800); }, Math.random() * 3000 + 2000);
-      return () => clearTimeout(t);
-    } else setIsPurplePeeking(false);
-  }, [password, showPassword, isPurplePeeking]);
+    const shouldPeek = password.length > 0 && showPassword;
+    const t0 = setTimeout(() => setIsPurplePeeking(!shouldPeek ? false : isPurplePeeking), 0);
+    if (!shouldPeek) return () => clearTimeout(t0);
+    const t = setTimeout(() => {
+      setIsPurplePeeking(true);
+      setTimeout(() => setIsPurplePeeking(false), 800);
+    }, Math.random() * 3000 + 2000);
+    return () => { clearTimeout(t0); clearTimeout(t); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [password, showPassword]);
 
-  const calcPos = (ref: React.RefObject<HTMLDivElement | null>) => {
-    if (!ref.current) return { faceX: 0, faceY: 0, bodySkew: 0 };
-    const r = ref.current.getBoundingClientRect();
-    const dx = mouseX - (r.left + r.width / 2), dy = mouseY - (r.top + r.height / 3);
+  const CHAR_CENTERS = {
+    purple: { x: 160, y: 200 },
+    black:  { x: 300, y: 155 },
+    orange: { x: 120, y: 100 },
+    yellow: { x: 380, y: 115 },
+  };
+
+  const calcPos = (center: { x: number; y: number }) => {
+    if (!containerRect) return { faceX: 0, faceY: 0, bodySkew: 0 };
+    const dx = mouseX - (containerRect.left + center.x);
+    const dy = mouseY - (containerRect.top + center.y);
     return {
       faceX: Math.max(-15, Math.min(15, dx / 20)),
       faceY: Math.max(-10, Math.min(10, dy / 30)),
@@ -148,52 +132,72 @@ function Characters({ isTyping, showPassword, password }: { isTyping: boolean; s
     };
   };
 
-  const pp = calcPos(purpleRef), bp = calcPos(blackRef), yp = calcPos(yellowRef), op = calcPos(orangeRef);
+  const calcLook = (center: { x: number; y: number }, max = 5) => {
+    if (!containerRect) return { lx: 0, ly: 0 };
+    const dx = mouseX - (containerRect.left + center.x);
+    const dy = mouseY - (containerRect.top + center.y);
+    const dist = Math.min(Math.sqrt(dx ** 2 + dy ** 2), max);
+    const angle = Math.atan2(dy, dx);
+    return { lx: Math.cos(angle) * dist, ly: Math.sin(angle) * dist };
+  };
+
+  const pp = calcPos(CHAR_CENTERS.purple);
+  const bp = calcPos(CHAR_CENTERS.black);
+  const yp = calcPos(CHAR_CENTERS.yellow);
+  const op = calcPos(CHAR_CENTERS.orange);
   const hiding = isTyping || (password.length > 0 && !showPassword);
   const peekingOut = password.length > 0 && showPassword;
 
+  const purpleLook = peekingOut
+    ? { lx: isPurplePeeking ? 4 : -4, ly: isPurplePeeking ? 5 : -4 }
+    : isLookingAtEachOther ? { lx: 3, ly: 4 }
+    : calcLook(CHAR_CENTERS.purple);
+
+  const blackLook = peekingOut ? { lx: -4, ly: -4 }
+    : isLookingAtEachOther ? { lx: 0, ly: -4 }
+    : calcLook(CHAR_CENTERS.black, 4);
+
+  const orangeLook = peekingOut ? { lx: -5, ly: -4 } : calcLook(CHAR_CENTERS.orange);
+  const yellowLook = peekingOut ? { lx: -5, ly: -4 } : calcLook(CHAR_CENTERS.yellow);
+
   return (
-    <div style={{ position: "relative", width: 550, height: 400 }}>
+    <div ref={containerRef} style={{ position: "relative", width: 550, height: 400 }}>
       {/* Purple */}
-      <div ref={purpleRef} className="absolute bottom-0 transition-all duration-700 ease-in-out"
+      <div className="absolute bottom-0 transition-all duration-700 ease-in-out"
         style={{ left: 70, width: 180, height: hiding ? 440 : 400, backgroundColor: "#6C3FF5", borderRadius: "10px 10px 0 0", zIndex: 1,
           transform: peekingOut ? "skewX(0deg)" : hiding ? `skewX(${(pp.bodySkew||0)-12}deg) translateX(40px)` : `skewX(${pp.bodySkew||0}deg)`,
           transformOrigin: "bottom center" }}>
         <div className="absolute flex gap-8 transition-all duration-700 ease-in-out"
           style={{ left: peekingOut ? 20 : isLookingAtEachOther ? 55 : 45 + pp.faceX, top: peekingOut ? 35 : isLookingAtEachOther ? 65 : 40 + pp.faceY }}>
-          {[0,1].map(i => <EyeBall key={i} size={18} pupilSize={7} maxDistance={5} eyeColor="white" pupilColor="#2D2D2D" isBlinking={isPurpleBlinking}
-            forceLookX={peekingOut ? (isPurplePeeking?4:-4) : isLookingAtEachOther?3:undefined}
-            forceLookY={peekingOut ? (isPurplePeeking?5:-4) : isLookingAtEachOther?4:undefined} />)}
+          {[0,1].map(i => <EyeBall key={i} size={18} pupilSize={7} eyeColor="white" pupilColor="#2D2D2D" isBlinking={isPurpleBlinking} lookX={purpleLook.lx} lookY={purpleLook.ly} />)}
         </div>
       </div>
       {/* Black */}
-      <div ref={blackRef} className="absolute bottom-0 transition-all duration-700 ease-in-out"
+      <div className="absolute bottom-0 transition-all duration-700 ease-in-out"
         style={{ left: 240, width: 120, height: 310, backgroundColor: "#2D2D2D", borderRadius: "8px 8px 0 0", zIndex: 2,
           transform: peekingOut ? "skewX(0deg)" : isLookingAtEachOther ? `skewX(${(bp.bodySkew||0)*1.5+10}deg) translateX(20px)` : hiding ? `skewX(${(bp.bodySkew||0)*1.5}deg)` : `skewX(${bp.bodySkew||0}deg)`,
           transformOrigin: "bottom center" }}>
         <div className="absolute flex gap-6 transition-all duration-700 ease-in-out"
           style={{ left: peekingOut ? 10 : isLookingAtEachOther ? 32 : 26 + bp.faceX, top: peekingOut ? 28 : isLookingAtEachOther ? 12 : 32 + bp.faceY }}>
-          {[0,1].map(i => <EyeBall key={i} size={16} pupilSize={6} maxDistance={4} eyeColor="white" pupilColor="#2D2D2D" isBlinking={isBlackBlinking}
-            forceLookX={peekingOut ? -4 : isLookingAtEachOther?0:undefined}
-            forceLookY={peekingOut ? -4 : isLookingAtEachOther?-4:undefined} />)}
+          {[0,1].map(i => <EyeBall key={i} size={16} pupilSize={6} eyeColor="white" pupilColor="#2D2D2D" isBlinking={isBlackBlinking} lookX={blackLook.lx} lookY={blackLook.ly} />)}
         </div>
       </div>
       {/* Orange */}
-      <div ref={orangeRef} className="absolute bottom-0 transition-all duration-700 ease-in-out"
+      <div className="absolute bottom-0 transition-all duration-700 ease-in-out"
         style={{ left: 0, width: 240, height: 200, backgroundColor: "#FF9B6B", borderRadius: "120px 120px 0 0", zIndex: 3,
           transform: peekingOut ? "skewX(0deg)" : `skewX(${op.bodySkew||0}deg)`, transformOrigin: "bottom center" }}>
         <div className="absolute flex gap-8 transition-all duration-200 ease-out"
           style={{ left: peekingOut ? 50 : 82 + (op.faceX||0), top: peekingOut ? 85 : 90 + (op.faceY||0) }}>
-          {[0,1].map(i => <Pupil key={i} size={12} maxDistance={5} pupilColor="#2D2D2D" forceLookX={peekingOut?-5:undefined} forceLookY={peekingOut?-4:undefined} />)}
+          {[0,1].map(i => <Pupil key={i} size={12} pupilColor="#2D2D2D" lookX={orangeLook.lx} lookY={orangeLook.ly} />)}
         </div>
       </div>
       {/* Yellow */}
-      <div ref={yellowRef} className="absolute bottom-0 transition-all duration-700 ease-in-out"
+      <div className="absolute bottom-0 transition-all duration-700 ease-in-out"
         style={{ left: 310, width: 140, height: 230, backgroundColor: "#E8D754", borderRadius: "70px 70px 0 0", zIndex: 4,
           transform: peekingOut ? "skewX(0deg)" : `skewX(${yp.bodySkew||0}deg)`, transformOrigin: "bottom center" }}>
         <div className="absolute flex gap-6 transition-all duration-200 ease-out"
           style={{ left: peekingOut ? 20 : 52 + (yp.faceX||0), top: peekingOut ? 35 : 40 + (yp.faceY||0) }}>
-          {[0,1].map(i => <Pupil key={i} size={12} maxDistance={5} pupilColor="#2D2D2D" forceLookX={peekingOut?-5:undefined} forceLookY={peekingOut?-4:undefined} />)}
+          {[0,1].map(i => <Pupil key={i} size={12} pupilColor="#2D2D2D" lookX={yellowLook.lx} lookY={yellowLook.ly} />)}
         </div>
         <div className="absolute w-20 h-1 bg-[#2D2D2D] rounded-full transition-all duration-200 ease-out"
           style={{ left: peekingOut ? 10 : 40 + (yp.faceX||0), top: peekingOut ? 88 : 88 + (yp.faceY||0) }} />
@@ -219,7 +223,15 @@ function TextLoop({ children, interval = 2 }: { children: React.ReactNode[]; int
   );
 }
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+const FieldLabel = ({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) => (
+  <label htmlFor={htmlFor} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">{children}</label>
+);
+const FieldInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
+  ({ className, ...props }, ref) => (
+    <input ref={ref} className={cn("h-11 w-full flex-1 bg-card-subtle rounded-lg border border-border-subtle px-3 text-sm text-foreground placeholder:text-muted outline-none transition-colors focus:bg-card focus:border-accent focus:ring-2 focus:ring-[var(--color-accent-soft)]", className)} {...props} />
+  )
+);
+FieldInput.displayName = "FieldInput";
 type RegisterStep = "info" | "password";
 export interface LoginData { email: string; password: string; }
 export interface RegisterData { name: string; email: string; password: string; gender?: "m" | "f"; }
@@ -329,13 +341,13 @@ export const AuthComponent = ({
               {status === "error" && <>
                 <AlertCircle className="w-10 h-10 text-destructive" />
                 <p className="text-base font-medium text-center">{errorMsg}</p>
-                <Button onClick={closeModal} size="sm">Coba Lagi</Button>
+                <Button onClick={closeModal} variant="secondary" size="sm">Coba Lagi</Button>
               </>}
               {status === "success" && <>
                 <PartyPopper className="w-10 h-10 text-green-500" />
                 <p className="text-base font-bold">Selamat datang!</p>
                 <p className="text-sm text-muted-foreground text-center">Akun kamu siap. Yuk mulai catat keuanganmu!</p>
-                <Button onClick={() => { closeModal(); onRegisterComplete?.(); }} size="sm">Mulai Sekarang</Button>
+                <Button onClick={() => { closeModal(); onRegisterComplete?.(); }} variant="primary" size="sm">Mulai Sekarang</Button>
               </>}
             </motion.div>
           </motion.div>
@@ -344,11 +356,8 @@ export const AuthComponent = ({
 
       {/* Left panel — characters */}
       <div className="relative hidden lg:flex flex-col justify-between bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 text-primary-foreground overflow-hidden">
-        <Link href={homeLink} className="relative z-20 flex items-center gap-2 text-lg font-semibold">
-          <div className="size-8 rounded-lg bg-primary-foreground/10 backdrop-blur-sm flex items-center justify-center">
-            <Wallet className="size-4" />
-          </div>
-          <span>{brandName}</span>
+        <Link href={homeLink} className="relative z-20">
+          <Image src="/img/logo-text-white.webp" alt="Teman Kas" height={48} width={192} style={{ height: 48, width: "auto" }} />
         </Link>
 
         <div className="relative z-20 flex items-end justify-center h-[500px]">
@@ -363,15 +372,12 @@ export const AuthComponent = ({
       </div>
 
       {/* Right panel — form */}
-      <div className="flex items-center justify-center p-8 bg-background">
-        <div className="w-full max-w-[420px]">
+      <div className="flex items-center justify-center min-h-screen px-12 py-16 bg-background">
+        <div className="w-full" style={{ maxWidth: 520 }}>
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center gap-2 text-lg font-semibold mb-10">
-            <Link href={homeLink} className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Wallet className="size-4 text-primary" />
-              </div>
-              <span>{brandName}</span>
+          <div className="lg:hidden flex items-center justify-center mb-10">
+            <Link href={homeLink}>
+              <Image src="/img/logo-text-blue.webp" alt="Teman Kas" height={48} width={192} style={{ height: 48, width: "auto" }} />
             </Link>
           </div>
 
@@ -379,26 +385,26 @@ export const AuthComponent = ({
             {isLogin ? (
               /* ── LOGIN ── */
               <motion.div key="login" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold tracking-tight mb-1">Selamat datang!</h1>
-                  <p className="text-muted-foreground text-sm">Masuk untuk melanjutkan catatan keuanganmu.</p>
+                <div className="text-center mb-10">
+                  <h1 className="text-4xl font-bold tracking-tight mb-2">Selamat datang!</h1>
+                  <p className="text-muted-foreground">Masuk untuk melanjutkan catatan keuanganmu.</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-5">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="kamu@contoh.com" value={loginEmail}
+                <form onSubmit={handleLogin} className="space-y-6">
+                  <div className="flex flex-col gap-1.5">
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                    <FieldInput id="email" type="email" placeholder="kamu@contoh.com" value={loginEmail}
                       onChange={e => setLoginEmail(e.target.value)}
                       onFocus={() => setLoginTyping(true)} onBlur={() => setLoginTyping(false)}
-                      className="h-12" autoComplete="email" required />
+                      autoComplete="email" required />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="password">Kata sandi</Label>
+                  <div className="flex flex-col gap-1.5">
+                    <FieldLabel htmlFor="password">Kata sandi</FieldLabel>
                     <div className="relative">
-                      <Input id="password" type={showLoginPassword ? "text" : "password"} placeholder="••••••••"
+                      <FieldInput id="password" type={showLoginPassword ? "text" : "password"} placeholder="••••••••"
                         value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
-                        className="h-12 pr-10" autoComplete="current-password" required />
+                        className="pr-10" autoComplete="current-password" required />
                       <button type="button" onClick={() => setShowLoginPassword(v => !v)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                         {showLoginPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -406,7 +412,7 @@ export const AuthComponent = ({
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full h-12 text-base" disabled={!isLoginValid || status === "loading"}>
+                  <Button type="submit" className="w-full" size="lg" disabled={!isLoginValid || status === "loading"}>
                     Masuk
                   </Button>
                 </form>
@@ -419,30 +425,30 @@ export const AuthComponent = ({
             ) : step === "info" ? (
               /* ── REGISTER step 1 ── */
               <motion.div key="reg-info" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold tracking-tight mb-1">Buat akun baru</h1>
-                  <p className="text-muted-foreground text-sm">Gratis selamanya. Tanpa kartu kredit.</p>
+                <div className="text-center mb-10">
+                  <h1 className="text-4xl font-bold tracking-tight mb-2">Buat akun baru</h1>
+                  <p className="text-muted-foreground">Gratis selamanya. Tanpa kartu kredit.</p>
                 </div>
 
-                <form onSubmit={e => { e.preventDefault(); if (isRegInfoValid) setStep("password"); }} className="space-y-5">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="name">Nama</Label>
-                    <Input id="name" type="text" placeholder="Nama kamu" value={regName}
+                <form onSubmit={e => { e.preventDefault(); if (isRegInfoValid) setStep("password"); }} className="space-y-6">
+                  <div className="flex flex-col gap-1.5">
+                    <FieldLabel htmlFor="name">Nama</FieldLabel>
+                    <FieldInput id="name" type="text" placeholder="Nama kamu" value={regName}
                       onChange={e => setRegName(e.target.value)}
                       onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                      className="h-12" autoComplete="name" required />
+                      autoComplete="name" required />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="reg-email">Email</Label>
-                    <Input id="reg-email" type="email" placeholder="kamu@contoh.com" value={regEmail}
+                  <div className="flex flex-col gap-1.5">
+                    <FieldLabel htmlFor="reg-email">Email</FieldLabel>
+                    <FieldInput id="reg-email" type="email" placeholder="kamu@contoh.com" value={regEmail}
                       onChange={e => setRegEmail(e.target.value)}
                       onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                      className="h-12" autoComplete="email" required />
+                      autoComplete="email" required />
                   </div>
 
                   {/* Avatar */}
-                  <div className="space-y-2">
-                    <Label>Avatar <span className="text-muted-foreground font-normal">(opsional)</span></Label>
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Avatar <span className="normal-case font-normal">(opsional)</span></span>
                     <div className="flex gap-3">
                       {(["m", "f"] as const).map(g => (
                         <button key={g} type="button" onClick={() => setRegGender(regGender === g ? undefined : g)}
@@ -455,8 +461,8 @@ export const AuthComponent = ({
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full h-12 text-base" disabled={!isRegInfoValid}>
-                    Lanjut <ArrowRight className="ml-2 size-4" />
+                  <Button type="submit" className="w-full" size="lg" disabled={!isRegInfoValid} rightIcon={<ArrowRight className="size-4" />}>
+                    Lanjut
                   </Button>
                 </form>
 
@@ -468,31 +474,31 @@ export const AuthComponent = ({
             ) : (
               /* ── REGISTER step 2 ── */
               <motion.div key="reg-pass" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-                <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold tracking-tight mb-1">Buat kata sandi</h1>
-                  <p className="text-muted-foreground text-sm">Minimal 8 karakter.</p>
+                <div className="text-center mb-10">
+                  <h1 className="text-4xl font-bold tracking-tight mb-2">Buat kata sandi</h1>
+                  <p className="text-muted-foreground">Minimal 8 karakter.</p>
                 </div>
 
-                <form onSubmit={handleRegister} className="space-y-5">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="reg-pass">Kata sandi</Label>
+                <form onSubmit={handleRegister} className="space-y-6">
+                  <div className="flex flex-col gap-1.5">
+                    <FieldLabel htmlFor="reg-pass">Kata sandi</FieldLabel>
                     <div className="relative">
-                      <Input id="reg-pass" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
+                      <FieldInput id="reg-pass" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
                         value={regPassword} onChange={e => setRegPassword(e.target.value)}
                         onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                        className="h-12 pr-10" autoComplete="new-password" required />
+                        className="pr-10" autoComplete="new-password" required />
                       <button type="button" onClick={() => setShowRegPassword(v => !v)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                         {showRegPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="reg-confirm">Konfirmasi kata sandi</Label>
+                  <div className="flex flex-col gap-1.5">
+                    <FieldLabel htmlFor="reg-confirm">Konfirmasi kata sandi</FieldLabel>
                     <div className="relative">
-                      <Input id="reg-confirm" type={showRegConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
+                      <FieldInput id="reg-confirm" type={showRegConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
                         value={regConfirm} onChange={e => setRegConfirm(e.target.value)}
-                        className="h-12 pr-10" autoComplete="new-password" required />
+                        className="pr-10" autoComplete="new-password" required />
                       <button type="button" onClick={() => setShowRegConfirm(v => !v)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                         {showRegConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -500,8 +506,8 @@ export const AuthComponent = ({
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full h-12 text-base" disabled={!isRegPassValid || status === "loading"}>
-                    Buat Akun <ArrowRight className="ml-2 size-4" />
+                  <Button type="submit" className="w-full" size="lg" disabled={!isRegPassValid || status === "loading"} rightIcon={<ArrowRight className="size-4" />}>
+                    Buat Akun
                   </Button>
                 </form>
 
