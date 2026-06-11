@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useCallback, createContext, Children } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, ArrowRight, ArrowLeft, Loader, PartyPopper, X, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -223,15 +224,6 @@ function TextLoop({ children, interval = 2 }: { children: React.ReactNode[]; int
   );
 }
 
-const FieldLabel = ({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) => (
-  <label htmlFor={htmlFor} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">{children}</label>
-);
-const FieldInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  ({ className, ...props }, ref) => (
-    <input ref={ref} className={cn("h-11 w-full flex-1 bg-card-subtle rounded-lg border border-border-subtle px-3 text-sm text-foreground placeholder:text-muted outline-none transition-colors focus:bg-card focus:border-accent focus:ring-2 focus:ring-[var(--color-accent-soft)]", className)} {...props} />
-  )
-);
-FieldInput.displayName = "FieldInput";
 type RegisterStep = "info" | "password";
 export interface LoginData { email: string; password: string; }
 export interface RegisterData { name: string; email: string; password: string; gender?: "m" | "f"; }
@@ -390,27 +382,19 @@ export const AuthComponent = ({
                   <p className="text-muted-foreground">Masuk untuk melanjutkan catatan keuanganmu.</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-6">
-                  <div className="flex flex-col gap-1.5">
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
-                    <FieldInput id="email" type="email" placeholder="kamu@contoh.com" value={loginEmail}
-                      onChange={e => setLoginEmail(e.target.value)}
-                      onFocus={() => setLoginTyping(true)} onBlur={() => setLoginTyping(false)}
-                      autoComplete="email" required />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <FieldLabel htmlFor="password">Kata sandi</FieldLabel>
-                    <div className="relative">
-                      <FieldInput id="password" type={showLoginPassword ? "text" : "password"} placeholder="••••••••"
-                        value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
-                        className="pr-10" autoComplete="current-password" required />
-                      <button type="button" onClick={() => setShowLoginPassword(v => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                <form onSubmit={handleLogin} className="space-y-5">
+                  <Input id="email" label="Email" type="email" placeholder="kamu@contoh.com" value={loginEmail}
+                    onChange={e => setLoginEmail(e.target.value)}
+                    onFocus={() => setLoginTyping(true)} onBlur={() => setLoginTyping(false)}
+                    autoComplete="email" required />
+                  <Input id="password" label="Kata sandi" type={showLoginPassword ? "text" : "password"} placeholder="••••••••"
+                    value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
+                    autoComplete="current-password" required
+                    rightAdornment={
+                      <button type="button" onClick={() => setShowLoginPassword(v => !v)} className="text-muted hover:text-foreground transition-colors">
                         {showLoginPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
-                    </div>
-                  </div>
+                    } />
 
                   <Button type="submit" className="w-full" size="lg" disabled={!isLoginValid || status === "loading"}>
                     Masuk
@@ -430,21 +414,15 @@ export const AuthComponent = ({
                   <p className="text-muted-foreground">Gratis selamanya. Tanpa kartu kredit.</p>
                 </div>
 
-                <form onSubmit={e => { e.preventDefault(); if (isRegInfoValid) setStep("password"); }} className="space-y-6">
-                  <div className="flex flex-col gap-1.5">
-                    <FieldLabel htmlFor="name">Nama</FieldLabel>
-                    <FieldInput id="name" type="text" placeholder="Nama kamu" value={regName}
-                      onChange={e => setRegName(e.target.value)}
-                      onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                      autoComplete="name" required />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <FieldLabel htmlFor="reg-email">Email</FieldLabel>
-                    <FieldInput id="reg-email" type="email" placeholder="kamu@contoh.com" value={regEmail}
-                      onChange={e => setRegEmail(e.target.value)}
-                      onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                      autoComplete="email" required />
-                  </div>
+                <form onSubmit={e => { e.preventDefault(); if (isRegInfoValid) setStep("password"); }} className="space-y-5">
+                  <Input id="name" label="Nama" type="text" placeholder="Nama kamu" value={regName}
+                    onChange={e => setRegName(e.target.value)}
+                    onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
+                    autoComplete="name" required />
+                  <Input id="reg-email" label="Email" type="email" placeholder="kamu@contoh.com" value={regEmail}
+                    onChange={e => setRegEmail(e.target.value)}
+                    onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
+                    autoComplete="email" required />
 
                   {/* Avatar */}
                   <div className="flex flex-col gap-2">
@@ -479,32 +457,24 @@ export const AuthComponent = ({
                   <p className="text-muted-foreground">Minimal 8 karakter.</p>
                 </div>
 
-                <form onSubmit={handleRegister} className="space-y-6">
-                  <div className="flex flex-col gap-1.5">
-                    <FieldLabel htmlFor="reg-pass">Kata sandi</FieldLabel>
-                    <div className="relative">
-                      <FieldInput id="reg-pass" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
-                        value={regPassword} onChange={e => setRegPassword(e.target.value)}
-                        onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                        className="pr-10" autoComplete="new-password" required />
-                      <button type="button" onClick={() => setShowRegPassword(v => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                <form onSubmit={handleRegister} className="space-y-5">
+                  <Input id="reg-pass" label="Kata sandi" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
+                    value={regPassword} onChange={e => setRegPassword(e.target.value)}
+                    onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
+                    autoComplete="new-password" required
+                    rightAdornment={
+                      <button type="button" onClick={() => setShowRegPassword(v => !v)} className="text-muted hover:text-foreground transition-colors">
                         {showRegPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <FieldLabel htmlFor="reg-confirm">Konfirmasi kata sandi</FieldLabel>
-                    <div className="relative">
-                      <FieldInput id="reg-confirm" type={showRegConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
-                        value={regConfirm} onChange={e => setRegConfirm(e.target.value)}
-                        className="pr-10" autoComplete="new-password" required />
-                      <button type="button" onClick={() => setShowRegConfirm(v => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                    } />
+                  <Input id="reg-confirm" label="Konfirmasi kata sandi" type={showRegConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
+                    value={regConfirm} onChange={e => setRegConfirm(e.target.value)}
+                    autoComplete="new-password" required
+                    rightAdornment={
+                      <button type="button" onClick={() => setShowRegConfirm(v => !v)} className="text-muted hover:text-foreground transition-colors">
                         {showRegConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
-                    </div>
-                  </div>
+                    } />
 
                   <Button type="submit" className="w-full" size="lg" disabled={!isRegPassValid || status === "loading"} rightIcon={<ArrowRight className="size-4" />}>
                     Buat Akun
