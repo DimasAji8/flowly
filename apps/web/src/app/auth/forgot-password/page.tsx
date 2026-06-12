@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const response = await authService.forgotPassword(data);
-      setSuccessMessage(response.message);
+      setSuccessMessage("Email reset password telah dikirim. Silakan cek kotak masuk (atau folder spam) di email yang Anda gunakan untuk mendaftar.");
       if (response.token) {
         setDevToken(response.token);
       }

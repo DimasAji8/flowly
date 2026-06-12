@@ -12,110 +12,115 @@ export class EmailService {
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('RESEND_API_KEY');
-    
     if (!apiKey) {
-      this.logger.warn('RESEND_API_KEY not configured. Email sending will be disabled.');
+      this.logger.warn(
+        'RESEND_API_KEY not configured. Email sending will be disabled.',
+      );
     }
-
     this.resend = new Resend(apiKey);
-    this.fromEmail = this.configService.get<string>('EMAIL_FROM', 'noreply@temankas.com');
+    this.fromEmail = this.configService.get<string>(
+      'EMAIL_FROM',
+      'noreply@temankas.com',
+    );
     this.appName = this.configService.get<string>('APP_NAME', 'Teman Kas');
-    this.appUrl = this.configService.get<string>('APP_URL', 'http://localhost:4000');
+    this.appUrl = this.configService.get<string>(
+      'APP_URL',
+      'http://localhost:4000',
+    );
   }
 
-  async sendResetPasswordEmail(to: string, token: string, userName: string): Promise<void> {
+  async sendResetPasswordEmail(
+    to: string,
+    token: string,
+    userName: string,
+  ): Promise<void> {
     const resetLink = `${this.appUrl}/auth/reset-password?token=${token}`;
+    const firstName = userName.split(' ')[0];
 
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Reset Password - ${this.appName}</title>
-        </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
-            <tr>
-              <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                  
-                  <!-- Header -->
-                  <tr>
-                    <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
-                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">${this.appName}</h1>
-                    </td>
-                  </tr>
+    const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f7;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
 
-                  <!-- Content -->
-                  <tr>
-                    <td style="padding: 40px 30px;">
-                      <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">Reset Password</h2>
-                      
-                      <p style="margin: 0 0 16px 0; color: #555555; font-size: 16px; line-height: 1.6;">
-                        Halo <strong>${userName}</strong>,
-                      </p>
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding:0 0 24px 0;">
+              <span style="font-size:22px;font-weight:700;color:#0066cc;letter-spacing:-0.5px;">${this.appName}</span>
+            </td>
+          </tr>
 
-                      <p style="margin: 0 0 16px 0; color: #555555; font-size: 16px; line-height: 1.6;">
-                        Kami menerima permintaan untuk reset password akun Anda. Klik tombol di bawah ini untuk membuat password baru:
-                      </p>
+          <!-- Card -->
+          <tr>
+            <td style="background:#ffffff;border-radius:12px;border:1px solid #e3e3e8;padding:40px 36px;">
 
-                      <!-- Button -->
-                      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
-                        <tr>
-                          <td align="center">
-                            <a href="${resetLink}" style="display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Reset Password</a>
-                          </td>
-                        </tr>
-                      </table>
+              <!-- Icon -->
+              <div style="text-align:center;margin-bottom:24px;">
+                <div style="display:inline-block;width:48px;height:48px;background:#eef4fc;border-radius:12px;text-align:center;line-height:48px;font-size:24px;">🔐</div>
+              </div>
 
-                      <p style="margin: 24px 0 16px 0; color: #555555; font-size: 14px; line-height: 1.6;">
-                        Atau copy link berikut ke browser Anda:
-                      </p>
+              <h1 style="margin:0 0 8px 0;font-size:20px;font-weight:700;color:#1d1d1f;text-align:center;">Reset Password</h1>
+              <p style="margin:0 0 28px 0;font-size:14px;color:#6e6e73;text-align:center;">Permintaan reset password untuk akun Anda</p>
 
-                      <p style="margin: 0 0 24px 0; padding: 12px; background-color: #f5f5f5; border-radius: 4px; word-break: break-all; font-size: 13px; color: #667eea;">
-                        ${resetLink}
-                      </p>
+              <p style="margin:0 0 20px 0;font-size:15px;color:#1d1d1f;line-height:1.6;">
+                Halo <strong>${firstName}</strong>,
+              </p>
+              <p style="margin:0 0 28px 0;font-size:15px;color:#3a3a3c;line-height:1.6;">
+                Kami menerima permintaan untuk mengatur ulang password akun <strong>${this.appName}</strong> Anda. Klik tombol di bawah untuk melanjutkan.
+              </p>
 
-                      <p style="margin: 0 0 16px 0; color: #555555; font-size: 14px; line-height: 1.6;">
-                        <strong>Link ini akan expired dalam 1 jam.</strong>
-                      </p>
+              <!-- Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${resetLink}" style="display:inline-block;padding:13px 36px;background-color:#0066cc;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">Atur Ulang Password</a>
+                  </td>
+                </tr>
+              </table>
 
-                      <p style="margin: 0; color: #999999; font-size: 13px; line-height: 1.6;">
-                        Jika Anda tidak meminta reset password, abaikan email ini. Password Anda tetap aman.
-                      </p>
-                    </td>
-                  </tr>
+              <p style="margin:0 0 8px 0;font-size:13px;color:#6e6e73;">Atau salin link ini ke browser:</p>
+              <p style="margin:0 0 28px 0;padding:12px 14px;background-color:#f5f5f7;border-radius:6px;word-break:break-all;font-size:12px;color:#0066cc;font-family:monospace;">${resetLink}</p>
 
-                  <!-- Footer -->
-                  <tr>
-                    <td style="background-color: #f9f9f9; padding: 30px; text-align: center; border-top: 1px solid #eeeeee;">
-                      <p style="margin: 0 0 8px 0; color: #999999; font-size: 13px;">
-                        © ${new Date().getFullYear()} ${this.appName}. All rights reserved.
-                      </p>
-                      <p style="margin: 0; color: #999999; font-size: 12px;">
-                        Email otomatis, mohon tidak membalas email ini.
-                      </p>
-                    </td>
-                  </tr>
+              <!-- Divider -->
+              <hr style="border:none;border-top:1px solid #e3e3e8;margin:0 0 20px 0;">
 
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-      </html>
-    `;
+              <p style="margin:0;font-size:13px;color:#6e6e73;line-height:1.6;">
+                Link ini berlaku selama <strong>1 jam</strong>. Jika Anda tidak meminta reset password, abaikan email ini — password Anda tidak akan berubah.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:24px 0 0 0;">
+              <p style="margin:0;font-size:12px;color:#8e8e93;">© ${new Date().getFullYear()} ${this.appName} · Email otomatis, jangan dibalas</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 
     try {
       const result = await this.resend.emails.send({
         from: this.fromEmail,
         to,
-        subject: `Reset Password - ${this.appName}`,
-        html: htmlContent,
+        subject: `Reset password akun ${this.appName} Anda`,
+        html,
       });
-
-      this.logger.log(`Reset password email sent to ${to}, ID: ${result.data?.id}`);
+      this.logger.log(
+        `Reset password email sent to ${to}, ID: ${result.data?.id}`,
+      );
     } catch (error) {
       this.logger.error(`Failed to send reset password email to ${to}`, error);
       throw error;
