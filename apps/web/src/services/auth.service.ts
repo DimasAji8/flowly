@@ -42,4 +42,8 @@ export const authService = {
   resetPassword(payload: ResetPasswordPayload) {
     return apiClient.post<{ message: string }>("/auth/reset-password", payload);
   },
+
+  changePassword(payload: { currentPassword: string; newPassword: string }) {
+    return apiClient.post<{ message: string }>("/auth/change-password", payload, { auth: true });
+  },
 };

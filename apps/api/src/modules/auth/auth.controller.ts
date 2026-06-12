@@ -19,6 +19,7 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import {
   AuthSessionResponse,
   MeResponse,
@@ -101,6 +102,17 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Token tidak valid atau expired' })
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
+  }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Ganti password (user yang sedang login)' })
+  @ApiResponse({ status: 200, description: 'Password berhasil diubah' })
+  @ApiResponse({ status: 400, description: 'Password saat ini salah' })
+  changePassword(@CurrentUser() user: AuthUser, @Body() dto: ChangePasswordDto) {
+    return this.authService.changePassword(user.id, dto);
   }
 
   @Get('me')

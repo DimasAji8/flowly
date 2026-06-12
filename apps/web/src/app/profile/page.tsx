@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/hooks/use-theme";
-import { LogOut, Sun, Moon } from "lucide-react";
+import { LogOut, Sun, Moon, KeyRound, ChevronRight, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
@@ -30,14 +30,53 @@ export default function ProfilePage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">
             Masuk sebagai
           </p>
-          <p className="text-base font-medium text-foreground">
-            {user?.name}
-          </p>
-          <p className="text-sm text-secondary">
-            {user?.email}
-          </p>
+          <p className="text-base font-medium text-foreground">{user?.name}</p>
+          <p className="text-sm text-secondary">{user?.email}</p>
         </div>
       </Card>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">
+          Pengaturan
+        </h2>
+        <Card padding="none">
+          {/* Alokasi Anggaran */}
+          <button
+            type="button"
+            onClick={() => router.push(ROUTES.profileAllocation)}
+            className="flex w-full items-center justify-between px-5 py-4 hover:bg-surface transition-colors border-b border-border-subtle"
+          >
+            <div className="flex items-center gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                <PieChart className="size-4" aria-hidden />
+              </span>
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-medium text-foreground">Alokasi Anggaran</span>
+                <span className="text-xs text-muted">Atur target kebutuhan, keinginan, tabungan</span>
+              </div>
+            </div>
+            <ChevronRight className="size-4 text-muted shrink-0" aria-hidden />
+          </button>
+
+          {/* Ubah Password */}
+          <button
+            type="button"
+            onClick={() => router.push("/profile/change-password")}
+            className="flex w-full items-center justify-between px-5 py-4 hover:bg-surface transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                <KeyRound className="size-4" aria-hidden />
+              </span>
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-medium text-foreground">Ubah Password</span>
+                <span className="text-xs text-muted">Ganti password akun Anda</span>
+              </div>
+            </div>
+            <ChevronRight className="size-4 text-muted shrink-0" aria-hidden />
+          </button>
+        </Card>
+      </section>
 
       <section className="flex flex-col gap-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">

@@ -15,6 +15,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { FlowlyJwtPayload, JwtPayload } from '../../common/types/auth';
 import { DEFAULT_CATEGORIES, DEFAULT_WALLETS } from './auth.defaults';
 import { EmailService } from '../email/email.service';
@@ -188,8 +189,7 @@ export class AuthService {
     };
   }
 
-  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
-    // Hash token untuk compare dengan yang di database
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {    // Hash token untuk compare dengan yang di database
     const resetTokenHash = crypto.createHash('sha256').update(dto.token).digest('hex');
 
     const user = await this.prisma.user.findFirst({
@@ -217,6 +217,19 @@ export class AuthService {
     });
 
     return { message: 'Password berhasil direset' };
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto): Promise<{ message: string }> {
+    const user = await this.usersService.findByIdOrThrow(userId);
+    const valid = await bcrypt.compare(dto.currentPassword, user.password);
+    if (!valid) throw new BadRequestException('Password saat ini tidak benar');
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: passwordHash },
+    });
+    return { message: 'Password berhasil diubah' };
   }
 
   // ===========================================================
