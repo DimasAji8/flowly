@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import { resetPasswordSchema, type ResetPasswordFormValues } from "@/lib/auth-schemas";
 import { authService } from "@/services/auth.service";
 import { Button } from "@/components/ui/button";
@@ -16,18 +17,10 @@ function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<ResetPasswordFormValues>({
-    resolver: zodResolver(resetPasswordSchema),
-  });
+  const { register, handleSubmit, setValue, formState: { errors } } =
+    useForm<ResetPasswordFormValues>({ resolver: zodResolver(resetPasswordSchema) });
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -36,15 +29,12 @@ function ResetPasswordForm() {
 
   const onSubmit = async (data: ResetPasswordFormValues) => {
     setIsLoading(true);
-    setSuccessMessage("");
-    setErrorMessage("");
-
     try {
-      const response = await authService.resetPassword(data);
-      setSuccessMessage(response.message);
-      setTimeout(() => router.push(ROUTES.login), 2000);
+      await authService.resetPassword(data);
+      toast.success("Password berhasil direset");
+      setTimeout(() => router.push(ROUTES.login), 1500);
     } catch (_error: unknown) {
-      setErrorMessage("Token tidak valid atau sudah expired.");
+      toast.error("Token tidak valid atau sudah expired");
     } finally {
       setIsLoading(false);
     }
@@ -56,28 +46,11 @@ function ResetPasswordForm() {
         <div className="bg-card rounded-xl border border-border p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-primary-text">Reset Password</h1>
-            <p className="text-sm text-secondary mt-2">
-              Masukkan password baru Anda
-            </p>
+            <p className="text-sm text-secondary mt-2">Masukkan password baru Anda</p>
           </div>
-
-          {successMessage && (
-            <div className="mb-4 p-3 rounded-lg bg-success/10 border border-success/20 text-sm text-success">
-              {successMessage}
-              <br />
-              <span className="text-xs opacity-80">Mengalihkan ke halaman login...</span>
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="mb-4 p-3 rounded-lg bg-danger/10 border border-danger/20 text-sm text-danger">
-              {errorMessage}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <input type="hidden" {...register("token")} />
-
             <Input
               label="Password Baru"
               type={showPassword ? "text" : "password"}
@@ -95,7 +68,6 @@ function ResetPasswordForm() {
                 </button>
               }
             />
-
             <Button type="submit" className="w-full" isLoading={isLoading}>
               Reset Password
             </Button>

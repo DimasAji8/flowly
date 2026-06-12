@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import { authService } from "@/services/auth.service";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,8 +26,6 @@ type FormValues = z.infer<typeof schema>;
 export function ChangePasswordForm({ onSuccess }: { onSuccess?: () => void }) {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
 
   const {
     register,
@@ -36,18 +35,16 @@ export function ChangePasswordForm({ onSuccess }: { onSuccess?: () => void }) {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormValues) => {
-    setSuccessMsg("");
-    setErrorMsg("");
     try {
-      const res = await authService.changePassword({
+      await authService.changePassword({
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
-      setSuccessMsg(res.message);
+      toast.success("Password berhasil diubah");
       reset();
-      setTimeout(() => onSuccess?.(), 1000);
+      setTimeout(() => onSuccess?.(), 500);
     } catch (_e: unknown) {
-      setErrorMsg("Password saat ini tidak benar.");
+      toast.error("Password saat ini tidak benar");
     }
   };
 
@@ -64,16 +61,6 @@ export function ChangePasswordForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      {successMsg && (
-        <div className="rounded-lg bg-success/10 border border-success/20 px-4 py-3 text-sm text-success">
-          {successMsg}
-        </div>
-      )}
-      {errorMsg && (
-        <div className="rounded-lg bg-danger/10 border border-danger/20 px-4 py-3 text-sm text-danger">
-          {errorMsg}
-        </div>
-      )}
 
       <Input
         label="Password saat ini"
