@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { toast } from "sonner";
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from "@/lib/auth-schemas";
 import { authService } from "@/services/auth.service";
 import { Button } from "@/components/ui/button";
@@ -12,32 +13,20 @@ import { ROUTES } from "@/constants/routes";
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [devToken, setDevToken] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ForgotPasswordFormValues>({
-    resolver: zodResolver(forgotPasswordSchema),
-  });
+  const { register, handleSubmit, formState: { errors } } =
+    useForm<ForgotPasswordFormValues>({ resolver: zodResolver(forgotPasswordSchema) });
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {
     setIsLoading(true);
-    setSuccessMessage("");
-    setErrorMessage("");
     setDevToken(null);
-
     try {
       const response = await authService.forgotPassword(data);
-      setSuccessMessage("Email reset password telah dikirim. Silakan cek kotak masuk (atau folder spam) di email yang Anda gunakan untuk mendaftar.");
-      if (response.token) {
-        setDevToken(response.token);
-      }
+      toast.success("Email reset password telah dikirim. Silakan cek kotak masuk atau folder spam.");
+      if (response.token) setDevToken(response.token);
     } catch (_error: unknown) {
-      setErrorMessage("Terjadi kesalahan. Silakan coba lagi.");
+      toast.error("Terjadi kesalahan. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }
@@ -54,14 +43,8 @@ export default function ForgotPasswordPage() {
             </p>
           </div>
 
-          {successMessage && (
-            <div className="mb-4 p-3 rounded-lg bg-success/10 border border-success/20 text-sm text-success">
-              {successMessage}
-            </div>
-          )}
-
           {devToken && (
-            <div className="mb-4 p-3 rounded-lg bg-warning/10 border border-warning/20 text-xs text-warning-text">
+            <div className="mb-4 p-3 rounded-lg bg-warning/10 border border-warning/20 text-xs">
               <strong>Dev Mode — Token:</strong> <code className="break-all">{devToken}</code>
               <br />
               <Link
@@ -73,12 +56,6 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          {errorMessage && (
-            <div className="mb-4 p-3 rounded-lg bg-danger/10 border border-danger/20 text-sm text-danger">
-              {errorMessage}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
               label="Email"
@@ -87,7 +64,6 @@ export default function ForgotPasswordPage() {
               {...register("email")}
               error={errors.email?.message}
             />
-
             <Button type="submit" className="w-full" isLoading={isLoading}>
               Kirim Link Reset Password
             </Button>
