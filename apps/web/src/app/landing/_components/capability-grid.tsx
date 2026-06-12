@@ -15,7 +15,7 @@ const CAPABILITIES = [
 const TESTIMONIALS = [
   { quote: "Akhirnya ada app catatan keuangan yang tidak bikin pusing. Tampilannya bersih, dan cepat banget.", name: "Rafi A.", role: "Freelancer" },
   { quote: "Suka banget fitur tabungan dengan tracking progres-nya. Motivasi buat nabung jadi lebih kuat.", name: "Dinda S.", role: "Mahasiswi" },
-  { quote: "Pakai buat keuangan bersama istri. Simpel tapi lengkap — lebih enak dari spreadsheet.", name: "Budi H.", role: "Karyawan Swasta" },
+  { quote: "Pakai buat keuangan bersama istri. Simpel tapi lengkap lebih enak dari spreadsheet.", name: "Budi H.", role: "Karyawan Swasta" },
 ];
 
 export function CapabilityGrid() {

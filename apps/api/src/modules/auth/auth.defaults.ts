@@ -4,7 +4,7 @@ export const DEFAULT_WALLETS: {
   name: string;
   balance: number;
   type: WalletType;
-}[] = [{ name: 'Cash', balance: 0, type: WalletType.cash }];
+}[] = [{ name: 'Tunai', balance: 0, type: WalletType.cash }];
 
 export const DEFAULT_CATEGORIES: {
   name: string;
@@ -15,21 +15,21 @@ export const DEFAULT_CATEGORIES: {
 }[] = [
   // Expense — Needs
   {
-    name: 'Food',
+    name: 'Makanan',
     type: TransactionType.expense,
     color: '#B91C1C',
-    icon: '🍔',
+    icon: '🍛',
     group: CategoryGroup.needs,
   },
   {
-    name: 'Transport',
+    name: 'Transportasi',
     type: TransactionType.expense,
     color: '#C2410C',
-    icon: '🚗',
+    icon: '🛵',
     group: CategoryGroup.needs,
   },
   {
-    name: 'Bills',
+    name: 'Tagihan',
     type: TransactionType.expense,
     color: '#A16207',
     icon: '🧾',
@@ -37,14 +37,14 @@ export const DEFAULT_CATEGORIES: {
   },
   // Expense — Wants
   {
-    name: 'Shopping',
+    name: 'Belanja',
     type: TransactionType.expense,
     color: '#7C3AED',
     icon: '🛍️',
     group: CategoryGroup.wants,
   },
   {
-    name: 'Other',
+    name: 'Lainnya',
     type: TransactionType.expense,
     color: '#4B5563',
     icon: '📦',
@@ -52,11 +52,16 @@ export const DEFAULT_CATEGORIES: {
   },
   // Income — no group
   {
-    name: 'Salary',
+    name: 'Gaji',
     type: TransactionType.income,
     color: '#15803D',
     icon: '💼',
   },
   { name: 'Bonus', type: TransactionType.income, color: '#0F766E', icon: '🎁' },
-  { name: 'Other', type: TransactionType.income, color: '#4B5563', icon: '💰' },
+  {
+    name: 'Lainnya',
+    type: TransactionType.income,
+    color: '#4B5563',
+    icon: '💰',
+  },
 ];
