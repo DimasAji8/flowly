@@ -437,9 +437,15 @@ export const AuthComponent = ({
                     <div style={{ paddingTop: 8 }}>
                       <AuthButton disabled={!isLoginValid || status === "loading"}>Masuk</AuthButton>
                     </div>
+                    
+                    <div style={{ textAlign: "right", marginTop: 12 }}>
+                      <Link href="/auth/forgot-password" style={{ fontSize: 13, color: "var(--color-accent)", textDecoration: "none", fontWeight: 500 }}>
+                        Lupa password?
+                      </Link>
+                    </div>
                   </form>
 
-                  <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-text-secondary)", marginTop: 24 }}>
+                  <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-text-secondary)", marginTop: 20 }}>
                     Belum punya akun?{" "}
                     <Link href={registerLink} style={{ color: "var(--color-accent)", fontWeight: 600 }}>Daftar</Link>
                   </p>

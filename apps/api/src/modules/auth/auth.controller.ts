@@ -17,6 +17,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import {
   AuthSessionResponse,
   MeResponse,
@@ -76,6 +78,29 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Refresh token invalid/expired' })
   refresh(@Body() _dto: RefreshDto, @CurrentJwtPayload() payload: JwtPayload) {
     return this.authService.refresh(payload);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ 
+    summary: 'Request reset password link',
+    description: 'Kirim request reset password. Token akan dikirim ke email (atau return di dev mode)'
+  })
+  @ApiResponse({ status: 200, description: 'Request berhasil diproses' })
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ 
+    summary: 'Reset password dengan token',
+    description: 'Reset password menggunakan token dari email'
+  })
+  @ApiResponse({ status: 200, description: 'Password berhasil direset' })
+  @ApiResponse({ status: 400, description: 'Token tidak valid atau expired' })
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   @Get('me')

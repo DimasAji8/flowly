@@ -21,3 +21,19 @@ export const loginSchema = z.object({
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email"),
+});
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  newPassword: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .max(72, "Password is too long"),
+});
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
