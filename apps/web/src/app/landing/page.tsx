@@ -41,7 +41,7 @@ export default function LandingPage() {
           title="Catat pengeluaran jangan Cuma perasaan."
           body="Gak perlu lagi tebak-tebakan uang habis ke mana. Pilih kategori, pilih dompet, selesai dalam 5 detik bahkan sambil rebahan."
           bg={T.canvas}
-          image="/img/section-2.webp"
+          image="/img/mockup-section-2.webp"
           imageAlt="Mencatat keuangan dari rumah"
         />
 
