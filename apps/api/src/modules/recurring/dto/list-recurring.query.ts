@@ -11,7 +11,7 @@ export class ListRecurringQuery {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @Transform(({ value }) => value === 'true')
+  @Transform(({ value }: { value: unknown }) => value === 'true')
   @IsBoolean()
   isActive?: boolean;
 }

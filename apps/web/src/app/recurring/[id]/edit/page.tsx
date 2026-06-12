@@ -26,6 +26,8 @@ export default function EditRecurringPage() {
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
+    // setState di effect disengaja: set status loading sebelum fetch detail.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(null);
     recurringService

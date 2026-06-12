@@ -21,9 +21,7 @@ import { ApiError } from "@/lib/api-client";
 import { useWalletStore } from "@/store/wallets.store";
 import { useCategoryStore } from "@/store/categories.store";
 import type {
-  Category,
   TransactionType,
-  Wallet,
 } from "@/types/finance";
 import { todayIsoDate, formatDateLong } from "@/utils/format-date";
 
@@ -107,6 +105,8 @@ export function RecurringForm({
     },
   });
 
+  // watch() dari react-hook-form tidak bisa dimemo React Compiler (keterbatasan library).
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedType = watch("type") as TransactionType;
   const categoryId = watch("categoryId");
   const walletId = watch("walletId");
@@ -134,16 +134,17 @@ export function RecurringForm({
     return () => {
       cancelled = true;
     };
+  // fetchWallets/fetchCategories adalah action store Zustand yang stabil.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue, isEditing]);
 
   useEffect(() => {
     if (categories.length === 0) return;
-    const currentId = watch("categoryId");
-    const current = categories.find((c) => c.id === currentId);
+    const current = categories.find((c) => c.id === categoryId);
     if (current && current.type === selectedType) return;
     const next = categories.find((c) => c.type === selectedType);
     if (next) setValue("categoryId", next.id);
-  }, [selectedType, categories, setValue, watch]);
+  }, [selectedType, categories, categoryId, setValue]);
 
   const filteredCategories = useMemo(
     () => categories.filter((c) => c.type === selectedType),

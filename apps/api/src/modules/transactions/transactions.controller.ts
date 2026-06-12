@@ -95,10 +95,7 @@ export class TransactionsController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail transaksi' })
   @ApiResponse({ status: 200, type: TransactionResponse })
-  findOne(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
 
@@ -129,10 +126,7 @@ export class TransactionsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Hapus transaksi (auto-recalc wallet balance)' })
   @ApiResponse({ status: 204 })
-  remove(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
   }
 }

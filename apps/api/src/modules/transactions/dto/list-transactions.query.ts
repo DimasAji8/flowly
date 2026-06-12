@@ -50,7 +50,7 @@ export class ListTransactionsQuery {
   @IsInt()
   @Min(1)
   @Max(500)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? Number(value) : value,
   )
   limit?: number = 20;

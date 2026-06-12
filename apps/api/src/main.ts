@@ -69,11 +69,10 @@ async function bootstrap() {
   }
 
   await app.listen(port);
-  // eslint-disable-next-line no-console
+
   console.log(`🚀 API running on http://localhost:${port}/${API_PREFIX}`);
   if (nodeEnv !== 'production') {
-    // eslint-disable-next-line no-console
     console.log(`📚 Docs at  http://localhost:${port}/${API_PREFIX}/docs`);
   }
 }
-bootstrap();
+void bootstrap();

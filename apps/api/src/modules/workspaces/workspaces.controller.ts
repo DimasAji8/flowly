@@ -59,7 +59,9 @@ export class WorkspacesController {
   @Patch('current/allocation')
   @UseGuards(WorkspaceGuard)
   @ApiSecurity('workspace-id')
-  @ApiOperation({ summary: 'Update target alokasi anggaran (needs/wants/savings %)' })
+  @ApiOperation({
+    summary: 'Update target alokasi anggaran (needs/wants/savings %)',
+  })
   updateAllocation(
     @CurrentWorkspace() workspace: WorkspaceContext,
     @Body() body: UpdateAllocationTargetsBody,

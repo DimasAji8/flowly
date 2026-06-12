@@ -52,7 +52,7 @@ export function CapabilityGrid() {
         <div className="lp-testimonial-grid">
           {TESTIMONIALS.map(({ quote, name, role }) => (
             <div key={name} style={{ background: T.canvas, borderRadius: 20, padding: "28px 24px", border: `1px solid ${T.hairline}` }}>
-              <p style={{ fontSize: 15, lineHeight: 1.7, color: T.ink, marginBottom: 20 }}>"{quote}"</p>
+              <p style={{ fontSize: 15, lineHeight: 1.7, color: T.ink, marginBottom: 20 }}>&ldquo;{quote}&rdquo;</p>
               <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{name}</div>
               <div style={{ fontSize: 13, color: T.textMuted }}>{role}</div>
             </div>

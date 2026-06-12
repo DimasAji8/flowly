@@ -1,0 +1,38 @@
+[Unit]
+Description=Teman Kas - Web (Next.js)
+Documentation=https://temankas.com
+After=network.target temankas-api.service
+Wants=temankas-api.service
+
+[Service]
+Type=simple
+User=temankas
+Group=temankas
+WorkingDirectory=/srv/apps/temankas/current
+
+# Port web (lihat docs/deployment: 4000)
+Environment=NODE_ENV=production
+Environment=PORT=4000
+# File env produksi di-generate saat deploy dari GitHub Secrets
+EnvironmentFile=-/srv/apps/temankas/current/apps/web/.env.production
+
+ExecStart=/usr/bin/npm run start:web
+
+Restart=on-failure
+RestartSec=5
+# Beri waktu Next.js boot sebelum dianggap gagal
+TimeoutStartSec=60
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/srv/apps/temankas
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=temankas-web
+
+[Install]
+WantedBy=multi-user.target

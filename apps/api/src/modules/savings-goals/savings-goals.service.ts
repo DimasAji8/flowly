@@ -16,7 +16,10 @@ import {
 export class SavingsGoalsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(workspaceId: string, query: import('./dto/list-savings-goals.query').ListSavingsGoalsQuery = {}): Promise<SerializedSavingsGoal[]> {
+  async list(
+    workspaceId: string,
+    query: import('./dto/list-savings-goals.query').ListSavingsGoalsQuery = {},
+  ): Promise<SerializedSavingsGoal[]> {
     const where: Prisma.SavingsGoalWhereInput = { workspaceId };
     if (query.isPaused !== undefined) where.isPaused = query.isPaused;
 

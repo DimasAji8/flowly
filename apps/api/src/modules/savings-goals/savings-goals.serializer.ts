@@ -13,9 +13,7 @@ export interface SerializedSavingsGoal {
   updatedAt: Date;
 }
 
-export function serializeSavingsGoal(
-  goal: SavingsGoal,
-): SerializedSavingsGoal {
+export function serializeSavingsGoal(goal: SavingsGoal): SerializedSavingsGoal {
   return {
     id: goal.id,
     linkedWalletId: goal.linkedWalletId,

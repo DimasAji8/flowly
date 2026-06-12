@@ -69,11 +69,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Tukar refresh token dengan access token baru',
-    description: 'Body berisi `refreshToken`. Tidak butuh Authorization header.',
+    description:
+      'Body berisi `refreshToken`. Tidak butuh Authorization header.',
   })
   @ApiResponse({ status: 200, type: RefreshResponse })
   @ApiResponse({ status: 401, description: 'Refresh token invalid/expired' })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   refresh(@Body() _dto: RefreshDto, @CurrentJwtPayload() payload: JwtPayload) {
     return this.authService.refresh(payload);
   }

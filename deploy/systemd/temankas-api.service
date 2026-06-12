@@ -1,0 +1,38 @@
+[Unit]
+Description=Teman Kas - API (NestJS)
+Documentation=https://api.temankas.com
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=temankas
+Group=temankas
+WorkingDirectory=/srv/apps/temankas/current
+
+# Port API (lihat docs/deployment: 3333)
+Environment=NODE_ENV=production
+Environment=PORT=3333
+# File env produksi di-generate saat deploy dari GitHub Secrets
+# (berisi DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET, CORS_ORIGIN, dll)
+EnvironmentFile=-/srv/apps/temankas/current/apps/api/.env.production
+
+ExecStart=/usr/bin/npm run start:api
+
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=60
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/srv/apps/temankas
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=temankas-api
+
+[Install]
+WantedBy=multi-user.target

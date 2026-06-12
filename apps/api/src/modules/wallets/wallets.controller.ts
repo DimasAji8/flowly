@@ -45,10 +45,7 @@ export class WalletsController {
   @ApiOperation({ summary: 'Detail wallet' })
   @ApiResponse({ status: 200, type: WalletResponse })
   @ApiResponse({ status: 404, description: 'Wallet tidak ditemukan' })
-  findOne(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.walletsService.findById(ws.id, id);
   }
 
@@ -87,10 +84,7 @@ export class WalletsController {
     status: 409,
     description: 'Wallet masih punya transaksi terkait',
   })
-  remove(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.walletsService.remove(ws.id, id);
   }
 }

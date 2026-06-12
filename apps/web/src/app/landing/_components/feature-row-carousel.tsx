@@ -2,7 +2,7 @@
 
 import { ROUTES } from "@/constants/routes";
 import { T } from "./tokens";
-import { Reveal, PhoneFrame, GhostButton } from "./primitives";
+import { Reveal, GhostButton } from "./primitives";
 import { MasonryGallery } from "./masonry-gallery";
 
 // ─── Feature row with masonry gallery for multiple images ────────
@@ -13,7 +13,6 @@ export function FeatureRowCarousel({
   body,
   bg,
   slides,
-  screen,
   reverse = false,
 }: {
   id?: string;

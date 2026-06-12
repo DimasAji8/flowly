@@ -44,6 +44,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const h = new Date().getHours();
+    // setState di effect disengaja: salam bergantung jam klien (hindari hydration mismatch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (h < 11) setGreeting("Selamat pagi");
     else if (h < 15) setGreeting("Selamat siang");
     else if (h < 18) setGreeting("Selamat sore");

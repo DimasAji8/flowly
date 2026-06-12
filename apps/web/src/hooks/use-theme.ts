@@ -21,6 +21,9 @@ export function useTheme() {
 
   useEffect(() => {
     const t = getStored();
+    // setState di effect disengaja: localStorage tidak tersedia saat SSR,
+    // jadi tema dibaca setelah mount untuk menghindari hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResolvedTheme(t);
     apply(t);
   }, []);

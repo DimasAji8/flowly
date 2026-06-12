@@ -33,6 +33,8 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
   const [step, setStep] = useState<"form" | "confirm">("form");
 
   useEffect(() => {
+    // setState di effect disengaja: reset form saat modal ditutup/dibuka (sync dari prop).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!open) { setAmountDisplay(""); setError(null); setStep("form"); }
   }, [open]);
 

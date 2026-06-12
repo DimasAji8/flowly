@@ -40,14 +40,19 @@ export class TransactionsService {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.transaction.findMany({
         where,
-        orderBy: [
-          { transactionDate: 'desc' },
-          { createdAt: 'desc' },
-        ],
+        orderBy: [{ transactionDate: 'desc' }, { createdAt: 'desc' }],
         skip: (page - 1) * limit,
         take: limit,
         include: {
-          category: { select: { id: true, name: true, color: true, icon: true, group: true } },
+          category: {
+            select: {
+              id: true,
+              name: true,
+              color: true,
+              icon: true,
+              group: true,
+            },
+          },
           wallet: { select: { id: true, name: true } },
         },
       }),
@@ -64,7 +69,15 @@ export class TransactionsService {
     const tx = await this.prisma.transaction.findFirst({
       where: { id, workspaceId },
       include: {
-        category: { select: { id: true, name: true, color: true, icon: true, group: true } },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            icon: true,
+            group: true,
+          },
+        },
         wallet: { select: { id: true, name: true } },
       },
     });
@@ -314,13 +327,7 @@ export class TransactionsService {
     reverse = false,
   ) {
     const sign =
-      type === TransactionType.income
-        ? reverse
-          ? -1
-          : 1
-        : reverse
-          ? 1
-          : -1;
+      type === TransactionType.income ? (reverse ? -1 : 1) : reverse ? 1 : -1;
     const delta = amount.mul(sign);
     await tx.wallet.update({
       where: { id: walletId },

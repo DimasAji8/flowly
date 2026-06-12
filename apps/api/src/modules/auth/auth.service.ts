@@ -102,7 +102,12 @@ export class AuthService {
 
     const tokens = await this.signTokens(user);
     return {
-      user: { id: user.id, name: user.name, email: user.email, gender: user.gender },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+      },
       workspaceId: workspace.id,
       ...tokens,
     };
@@ -119,7 +124,12 @@ export class AuthService {
     const workspaceId = await this.getPrimaryWorkspaceId(user.id);
     const tokens = await this.signTokens(user);
     return {
-      user: { id: user.id, name: user.name, email: user.email, gender: user.gender },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+      },
       workspaceId,
       ...tokens,
     };

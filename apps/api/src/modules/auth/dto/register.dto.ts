@@ -21,7 +21,7 @@ export class RegisterDto {
 
   @ApiProperty({ example: 'dimas@example.com', format: 'email' })
   @IsEmail()
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   email!: string;

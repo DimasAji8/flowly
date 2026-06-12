@@ -7,6 +7,7 @@ export class CategoryResponse {
   @ApiProperty({ enum: TransactionType }) type!: TransactionType;
   @ApiProperty() color!: string;
   @ApiProperty() icon!: string;
-  @ApiProperty({ enum: CategoryGroup, nullable: true }) group!: CategoryGroup | null;
+  @ApiProperty({ enum: CategoryGroup, nullable: true })
+  group!: CategoryGroup | null;
   @ApiProperty() createdAt!: string;
 }

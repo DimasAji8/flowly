@@ -18,7 +18,7 @@ export class UpdateSavingsGoalDto {
   @IsString()
   @MinLength(1)
   @MaxLength(60)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() : value,
   )
   name?: string;
@@ -51,7 +51,7 @@ export class UpdateSavingsGoalDto {
   @IsOptional()
   @IsString()
   @MaxLength(280)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() : value,
   )
   note?: string;

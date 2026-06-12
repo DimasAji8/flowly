@@ -280,7 +280,7 @@ export function ScreenSavings() {
 
       {/* Goals List */}
       <div style={{ flex: 1, overflow: "auto" }}>
-        {goals.map((g, idx) => (
+        {goals.map((g) => (
           <div 
             key={g.l} 
             style={{ 

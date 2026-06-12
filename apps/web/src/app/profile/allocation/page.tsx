@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ROUTES } from "@/constants/routes";
 import { useWorkspaceStore } from "@/store/workspace.store";
 import { workspaceService } from "@/services/workspace.service";
 
@@ -22,6 +21,8 @@ export default function AllocationPage() {
   useEffect(() => { void fetchTargets(); }, [fetchTargets]);
 
   useEffect(() => {
+    // setState di effect disengaja: sinkronkan input lokal dari target store saat berubah.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNeeds(targets.needsTarget);
     setWants(targets.wantsTarget);
     setSavings(targets.savingsTarget);

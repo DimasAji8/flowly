@@ -49,10 +49,7 @@ export class RecurringController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail recurring' })
   @ApiResponse({ status: 200, type: RecurringResponse })
-  findOne(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
 
@@ -82,10 +79,7 @@ export class RecurringController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Hapus recurring' })
   @ApiResponse({ status: 204 })
-  remove(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
   }
 }

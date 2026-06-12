@@ -6,7 +6,7 @@ import Link from "next/link";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { DeleteTransactionModal } from "@/components/transaction/delete-transaction-modal";
-import { FilterBar, type FilterConfig } from "@/components/ui/filter-bar";
+import { FilterBar } from "@/components/ui/filter-bar";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
 import { useWalletStore } from "@/store/wallets.store";
@@ -26,13 +26,14 @@ const TYPE_OPTIONS = [
 ];
 
 export default function TransactionsPage() {
-  const now = new Date();
   const [year, setYear] = useState(0);
   const [month, setMonth] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const d = new Date();
+    // setState di effect disengaja: tanggal "sekarang" hanya valid di klien (hindari hydration mismatch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setYear(d.getFullYear());
     setMonth(d.getMonth() + 1);
     setMounted(true);
@@ -74,12 +75,14 @@ export default function TransactionsPage() {
       .finally(() => setLoading(false));
   }, [year, month, mounted, typeFilter, walletFilter, categoryFilter]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
+    // Muat data store sekali saat mount (action store mengembalikan promise).
     fetchWallets();
     fetchCategories();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

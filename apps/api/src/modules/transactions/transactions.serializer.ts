@@ -34,13 +34,25 @@ export function serializeTransaction(tx: Transaction): SerializedTransaction {
 }
 
 export interface SerializedTransactionWithRefs extends SerializedTransaction {
-  category: { id: string; name: string; color: string; icon: string; group: string | null };
+  category: {
+    id: string;
+    name: string;
+    color: string;
+    icon: string;
+    group: string | null;
+  };
   wallet: { id: string; name: string };
 }
 
 export function serializeTransactionWithRefs(
   tx: Transaction & {
-    category: { id: string; name: string; color: string; icon: string; group: string | null };
+    category: {
+      id: string;
+      name: string;
+      color: string;
+      icon: string;
+      group: string | null;
+    };
     wallet: { id: string; name: string };
   },
 ): SerializedTransactionWithRefs {

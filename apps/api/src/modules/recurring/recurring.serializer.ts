@@ -13,7 +13,9 @@ export interface SerializedRecurring {
   createdAt: Date;
 }
 
-export function serializeRecurring(r: RecurringTransaction): SerializedRecurring {
+export function serializeRecurring(
+  r: RecurringTransaction,
+): SerializedRecurring {
   return {
     id: r.id,
     type: r.type,

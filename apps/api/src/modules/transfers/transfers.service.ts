@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateTransferDto } from './dto/create-transfer.dto';
@@ -23,7 +27,7 @@ export class TransfersService {
         toWallet: { select: { id: true, name: true } },
       },
     });
-    return transfers.map(this.serialize);
+    return transfers.map((t) => this.serialize(t));
   }
 
   async create(workspaceId: string, dto: CreateTransferDto) {
@@ -32,8 +36,14 @@ export class TransfersService {
     }
 
     const [from, to] = await Promise.all([
-      this.prisma.wallet.findFirst({ where: { id: dto.fromWalletId, workspaceId }, select: { id: true, name: true, balance: true } }),
-      this.prisma.wallet.findFirst({ where: { id: dto.toWalletId, workspaceId }, select: { id: true, name: true } }),
+      this.prisma.wallet.findFirst({
+        where: { id: dto.fromWalletId, workspaceId },
+        select: { id: true, name: true, balance: true },
+      }),
+      this.prisma.wallet.findFirst({
+        where: { id: dto.toWalletId, workspaceId },
+        select: { id: true, name: true },
+      }),
     ]);
     if (!from) throw new BadRequestException('Wallet asal tidak ditemukan');
     if (!to) throw new BadRequestException('Wallet tujuan tidak ditemukan');
@@ -59,8 +69,14 @@ export class TransfersService {
           toWallet: { select: { id: true, name: true } },
         },
       });
-      await tx.wallet.update({ where: { id: dto.fromWalletId }, data: { balance: { decrement: amount } } });
-      await tx.wallet.update({ where: { id: dto.toWalletId }, data: { balance: { increment: amount } } });
+      await tx.wallet.update({
+        where: { id: dto.fromWalletId },
+        data: { balance: { decrement: amount } },
+      });
+      await tx.wallet.update({
+        where: { id: dto.toWalletId },
+        data: { balance: { increment: amount } },
+      });
       return created;
     });
 
@@ -68,20 +84,35 @@ export class TransfersService {
   }
 
   async remove(workspaceId: string, id: string) {
-    const transfer = await this.prisma.transfer.findFirst({ where: { id, workspaceId } });
+    const transfer = await this.prisma.transfer.findFirst({
+      where: { id, workspaceId },
+    });
     if (!transfer) throw new NotFoundException('Transfer tidak ditemukan');
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.wallet.update({ where: { id: transfer.fromWalletId }, data: { balance: { increment: transfer.amount } } });
-      await tx.wallet.update({ where: { id: transfer.toWalletId }, data: { balance: { decrement: transfer.amount } } });
+      await tx.wallet.update({
+        where: { id: transfer.fromWalletId },
+        data: { balance: { increment: transfer.amount } },
+      });
+      await tx.wallet.update({
+        where: { id: transfer.toWalletId },
+        data: { balance: { decrement: transfer.amount } },
+      });
       await tx.transfer.delete({ where: { id } });
     });
   }
 
   private serialize(t: {
-    id: string; workspaceId: string; fromWalletId: string; toWalletId: string;
-    amount: Prisma.Decimal; note: string | null; transferDate: Date; createdAt: Date;
-    fromWallet: { id: string; name: string }; toWallet: { id: string; name: string };
+    id: string;
+    workspaceId: string;
+    fromWalletId: string;
+    toWalletId: string;
+    amount: Prisma.Decimal;
+    note: string | null;
+    transferDate: Date;
+    createdAt: Date;
+    fromWallet: { id: string; name: string };
+    toWallet: { id: string; name: string };
   }) {
     return {
       id: t.id,

@@ -49,10 +49,7 @@ export class SavingsGoalsController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail target tabungan' })
   @ApiResponse({ status: 200, type: SavingsGoalResponse })
-  findOne(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
 
@@ -82,10 +79,7 @@ export class SavingsGoalsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Hapus target tabungan' })
   @ApiResponse({ status: 204 })
-  remove(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
   }
 }

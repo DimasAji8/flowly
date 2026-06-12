@@ -56,10 +56,7 @@ export class CategoriesController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail kategori' })
   @ApiResponse({ status: 200, type: CategoryResponse })
-  findOne(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
 
@@ -95,10 +92,7 @@ export class CategoriesController {
     status: 409,
     description: 'Kategori masih dipakai oleh transaksi',
   })
-  remove(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
   }
 }

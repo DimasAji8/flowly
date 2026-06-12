@@ -16,7 +16,7 @@ export class CreateSavingsGoalDto {
   @IsString()
   @MinLength(1)
   @MaxLength(60)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() : value,
   )
   name!: string;
@@ -43,11 +43,14 @@ export class CreateSavingsGoalDto {
   @IsString()
   linkedWalletId?: string;
 
-  @ApiProperty({ example: 'Untuk jaga-jaga 6 bulan biaya hidup', required: false })
+  @ApiProperty({
+    example: 'Untuk jaga-jaga 6 bulan biaya hidup',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(280)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() : value,
   )
   note?: string;

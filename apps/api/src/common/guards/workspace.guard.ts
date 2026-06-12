@@ -48,7 +48,9 @@ export class WorkspaceGuard implements CanActivate {
     }
 
     const headerValue = request.headers['x-workspace-id'];
-    const workspaceId = Array.isArray(headerValue) ? headerValue[0] : headerValue;
+    const workspaceId = Array.isArray(headerValue)
+      ? headerValue[0]
+      : headerValue;
     if (!workspaceId) {
       throw new BadRequestException('Missing X-Workspace-Id header');
     }

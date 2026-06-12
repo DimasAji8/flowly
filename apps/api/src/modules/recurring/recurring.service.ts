@@ -20,7 +20,10 @@ export class RecurringService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(workspaceId: string, query: import('./dto/list-recurring.query').ListRecurringQuery = {}): Promise<SerializedRecurring[]> {
+  async list(
+    workspaceId: string,
+    query: import('./dto/list-recurring.query').ListRecurringQuery = {},
+  ): Promise<SerializedRecurring[]> {
     const where: Prisma.RecurringTransactionWhereInput = { workspaceId };
     if (query.type !== undefined) where.type = query.type;
     if (query.isActive !== undefined) where.isActive = query.isActive;
@@ -80,9 +83,7 @@ export class RecurringService {
         ...(dto.amount !== undefined
           ? { amount: new Prisma.Decimal(dto.amount) }
           : {}),
-        ...(dto.categoryId !== undefined
-          ? { categoryId: dto.categoryId }
-          : {}),
+        ...(dto.categoryId !== undefined ? { categoryId: dto.categoryId } : {}),
         ...(dto.walletId !== undefined ? { walletId: dto.walletId } : {}),
         ...(dto.frequency !== undefined ? { frequency: dto.frequency } : {}),
         ...(dto.note !== undefined ? { note: dto.note } : {}),

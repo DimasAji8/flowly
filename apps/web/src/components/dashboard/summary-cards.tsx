@@ -21,6 +21,8 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored !== null) {
+      // setState di effect disengaja: localStorage hanya tersedia di klien (pasca-mount).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHidden(stored === "true");
     }
   }, []);

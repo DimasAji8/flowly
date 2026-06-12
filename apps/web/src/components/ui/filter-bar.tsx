@@ -28,9 +28,11 @@ export function FilterBar({ filters }: { filters: FilterConfig[] }) {
   // sync draft saat popover dibuka
   useEffect(() => {
     if (open) {
+      // setState di effect disengaja: sinkronkan draft dari props saat popover dibuka.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDraft(Object.fromEntries(filters.map((f) => [f.key, f.value])));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const activeCount = filters.filter((f) => f.value !== f.options[0]?.value).length;

@@ -39,6 +39,8 @@ export default function ReportsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // setState di effect disengaja: set status loading sebelum fetch data per-bulan.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(null);
     const from = `${year}-${String(month).padStart(2, "0")}-01`;
