@@ -22,62 +22,66 @@ jobs:
 
     env:
       APP_DIR: /srv/apps/temankas/current
+      BUILD_DIR: /srv/apps/temankas/build
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Sinkron source ke direktori aplikasi (build langsung di VPS).
-      - name: Sync source to app directory
+      # Build di direktori sementara agar current tidak terganggu selama proses.
+      - name: Sync source to build directory
         run: |
-          mkdir -p "$APP_DIR"
+          mkdir -p "$BUILD_DIR"
           rsync -a --delete \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude 'apps/web/.next' \
             --exclude 'apps/api/dist' \
-            ./ "$APP_DIR"/
+            ./ "$BUILD_DIR"/
 
       # Tulis env produksi dari GitHub Secrets (tidak pernah di-commit).
       - name: Write production env files
         run: |
-          cat > "$APP_DIR/apps/api/.env.production" <<'EOF'
+          cat > "$BUILD_DIR/apps/api/.env.production" <<'EOF'
           NODE_ENV=production
           PORT=3333
           ${{ secrets.API_ENV_PROD }}
           EOF
-          cat > "$APP_DIR/apps/web/.env.production" <<'EOF'
+          cat > "$BUILD_DIR/apps/web/.env.production" <<'EOF'
           NODE_ENV=production
           PORT=4000
           ${{ secrets.WEB_ENV_PROD }}
           EOF
-          chmod 600 "$APP_DIR/apps/api/.env.production" "$APP_DIR/apps/web/.env.production"
+          chmod 600 "$BUILD_DIR/apps/api/.env.production" "$BUILD_DIR/apps/web/.env.production"
 
       - name: Install dependencies
-        working-directory: ${{ env.APP_DIR }}
+        working-directory: ${{ env.BUILD_DIR }}
         run: npm ci
 
       - name: Generate Prisma client
-        working-directory: ${{ env.APP_DIR }}
+        working-directory: ${{ env.BUILD_DIR }}
         run: npm run db:generate
 
       - name: Lint
-        working-directory: ${{ env.APP_DIR }}
+        working-directory: ${{ env.BUILD_DIR }}
         run: npm run lint
 
       - name: Build (web + api)
-        working-directory: ${{ env.APP_DIR }}
+        working-directory: ${{ env.BUILD_DIR }}
         run: npm run build
 
       # Migrasi produksi: migrate deploy (BUKAN db push).
       - name: Run database migrations
-        working-directory: ${{ env.APP_DIR }}/apps/api
+        working-directory: ${{ env.BUILD_DIR }}/apps/api
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
         run: npx prisma migrate deploy
 
-      - name: Restart services
+      # Swap build → current, lalu restart. Service down hanya saat swap + restart.
+      - name: Swap build to current and restart services
         run: |
+          # Copy hasil build ke current (atomic per-file, bukan delete dulu)
+          rsync -a --delete "$BUILD_DIR/" "$APP_DIR/"
           sudo systemctl restart temankas-api.service
           sudo systemctl restart temankas-web.service
 

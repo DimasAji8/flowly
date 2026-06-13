@@ -68,8 +68,11 @@ sudo ufw enable
 
 ```bash
 sudo useradd --system --create-home --shell /bin/bash temankas
-sudo mkdir -p /srv/apps/temankas/current /srv/apps/temankas/backups
-sudo chown -R temankas:temankas /srv/apps/temankas
+sudo mkdir -p /srv/apps/temankas/current /srv/apps/temankas/build /srv/apps/temankas/backups
+# devalexis (runner) pemilik folder → bisa rsync/build
+# temankas (service) diberi akses baca via group atau ACL
+sudo chown -R devalexis:devalexis /srv/apps/temankas
+sudo chmod -R o+rX /srv/apps/temankas
 ```
 
 > Tiap aplikasi punya user sendiri (mis. app lain pakai user lain). Ini sengaja —
