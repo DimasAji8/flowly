@@ -1,0 +1,9 @@
+# robots.txt for Teman Kas
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /reset-password
+Disallow: /verify-email
+
+Sitemap: https://temankas.com/sitemap.xml

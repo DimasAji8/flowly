@@ -1,0 +1,33 @@
+{
+  "name": "Teman Kas - Aplikasi Pencatatan Keuangan",
+  "short_name": "Teman Kas",
+  "description": "Aplikasi mobile-first untuk mencatat dan memantau arus kas harian. Catat pemasukan, pengeluaran, target tabungan dengan mudah.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity", "business"],
+  "lang": "id-ID",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": []
+}

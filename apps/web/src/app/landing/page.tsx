@@ -16,6 +16,7 @@ import { CapabilityGrid } from "./_components/capability-grid";
 import { FaqSection } from "./_components/faq";
 import { CtaSection } from "./_components/cta";
 import { Footer } from "./_components/footer";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function LandingPage() {
 
   return (
     <>
+      <JsonLd />
       <LandingStyles />
       <GlobalNav />
 
