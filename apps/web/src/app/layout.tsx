@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     description: "Aplikasi mobile-first untuk mencatat dan memantau arus kas harian. Catat pemasukan, pengeluaran, target tabungan dengan mudah.",
     images: [
       {
-        url: "/img/og-image.jpg",
+        url: "/img/og-image.png",
         width: 1200,
         height: 630,
         alt: "Teman Kas - Aplikasi Pencatatan Keuangan",
@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Teman Kas - Sahabat Pengelola Keuanganmu",
     description: "Aplikasi mobile-first untuk mencatat dan memantau arus kas harian.",
-    images: ["/img/og-image.jpg"],
+    images: ["/img/og-image.png"],
     creator: "@temankas",
   },
   robots: {
