@@ -368,7 +368,7 @@ export const AuthComponent = ({
       {/* Left panel — characters */}
       <div className="relative hidden lg:flex flex-col justify-between bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 text-primary-foreground overflow-hidden">
         <Link href={homeLink} className="relative z-20">
-          <Image src="/img/logo-text-white.webp" alt="Teman Kas" height={48} width={192} style={{ height: 48, width: "auto" }} />
+          <Image src="/img/logo-text-white.webp" alt="Teman Kas" width={0} height={0} sizes="100vw" style={{ width: "auto", height: 48 }} />
         </Link>
 
         <div className="relative z-20 flex items-end justify-center h-[500px]">
@@ -384,21 +384,14 @@ export const AuthComponent = ({
 
       {/* Right panel — form */}
       <div className="relative flex flex-col bg-background" style={{ minHeight: "100vh" }}>
-        {/* Mobile hero header — gradient + logo (only mobile) */}
-        <div className="lg:hidden relative overflow-hidden" style={{ background: "linear-gradient(135deg, var(--color-accent) 0%, #1e40af 100%)", paddingTop: 28, paddingBottom: 40, paddingInline: 24, flexShrink: 0 }}>
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:18px_18px]" />
-          <div style={{ position: "absolute", width: 180, height: 180, borderRadius: "50%", background: "rgba(255,255,255,0.1)", top: -60, right: -40, filter: "blur(30px)" }} />
-          <div className="relative z-10 flex items-center justify-between">
-            <Link href={homeLink}>
-              <Image src="/img/logo-text-white.webp" alt="Teman Kas" height={32} width={128} style={{ height: 32, width: "auto" }} />
-            </Link>
-            <Link href={homeLink} className="flex items-center gap-1 text-sm font-medium" style={{ color: "rgba(255,255,255,0.85)" }}>
-              <ArrowLeft className="size-4" /> Beranda
-            </Link>
-          </div>
-          <p className="relative z-10 mt-5 text-sm" style={{ color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>
-            Catat keuangan, kelola dompet, dan capai target tabungan dalam satu app.
-          </p>
+        {/* Mobile top bar — minimal (only mobile) */}
+        <div className="lg:hidden flex items-center justify-between px-5 py-3" style={{ flexShrink: 0 }}>
+          <Link href={homeLink}>
+            <Image src="/img/logo-text-blue.webp" alt="Teman Kas" width={0} height={0} sizes="100vw" loading="eager" style={{ width: "auto", height: 28 }} />
+          </Link>
+          <Link href={homeLink} className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="size-4" /> Beranda
+          </Link>
         </div>
 
         {/* Desktop back to home — top left */}
@@ -408,8 +401,8 @@ export const AuthComponent = ({
           </Link>
         </div>
 
-        {/* Form — centered on desktop, top-aligned on mobile */}
-        <div className="flex justify-center items-start lg:items-center px-8 pt-8 pb-12 lg:py-8" style={{ flex: 1 }}>
+        {/* Form — centered both on desktop and mobile */}
+        <div className="flex justify-center items-center px-8 py-8 lg:py-8" style={{ flex: 1 }}>
           <div style={{ width: "100%", maxWidth: 420 }}>
             <AnimatePresence mode="wait">
               {isLogin ? (
