@@ -418,7 +418,8 @@ export const AuthComponent = ({
                     <Input id="email" label="Email" type="email" placeholder="kamu@contoh.com" value={loginEmail}
                       onChange={e => setLoginEmail(e.target.value)}
                       onFocus={() => setLoginTyping(true)} onBlur={() => setLoginTyping(false)}
-                      autoComplete="email" required />
+                      autoComplete="email" required
+                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); (document.getElementById("password") as HTMLInputElement)?.focus(); } }} />
                     <Input id="password" label="Kata sandi" type={showLoginPassword ? "text" : "password"} placeholder="••••••••"
                       value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
                       autoComplete="current-password" required
@@ -456,11 +457,13 @@ export const AuthComponent = ({
                     <Input id="name" label="Nama" type="text" placeholder="Nama kamu" value={regName}
                       onChange={e => setRegName(e.target.value)}
                       onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                      autoComplete="name" required />
+                      autoComplete="name" required
+                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); (document.getElementById("reg-email") as HTMLInputElement)?.focus(); } }} />
                     <Input id="reg-email" label="Email" type="email" placeholder="kamu@contoh.com" value={regEmail}
                       onChange={e => setRegEmail(e.target.value)}
                       onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
-                      autoComplete="email" required />
+                      autoComplete="email" required
+                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); (document.getElementById("reg-pass") as HTMLInputElement)?.focus(); } }} />
                     <Input id="reg-pass" label="Kata sandi" type={showRegPassword ? "text" : "password"} placeholder="Minimal 8 karakter"
                       value={regPassword} onChange={e => setRegPassword(e.target.value)}
                       onFocus={() => setRegTyping(true)} onBlur={() => setRegTyping(false)}
