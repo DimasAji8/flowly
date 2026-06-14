@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, ArrowLeft, Loader, PartyPopper, X, AlertCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTheme } from "@/hooks/use-theme";
 import type { GlobalOptions as ConfettiGlobalOptions, CreateTypes as ConfettiInstance, Options as ConfettiOptions } from "canvas-confetti";
 import confetti from "canvas-confetti";
 
@@ -324,8 +323,6 @@ export const AuthComponent = ({
   const activeShowPassword = isLogin ? showLoginPassword : showRegPassword;
   const activeTyping = isLogin ? loginTyping : regTyping;
 
-  const { resolvedTheme } = useTheme();
-
   return (
     <div className="grid lg:grid-cols-2" style={{ minHeight: "100vh" }}>
       <Confetti ref={confettiRef} manualstart className="fixed inset-0 w-full h-full pointer-events-none z-[999]" />
@@ -389,8 +386,9 @@ export const AuthComponent = ({
       <div className="relative flex flex-col bg-background" style={{ minHeight: "100vh" }}>
         {/* Mobile top bar — minimal (only mobile) */}
         <div className="lg:hidden flex items-center justify-between px-5 py-3" style={{ flexShrink: 0 }}>
-          <Link href={homeLink}>
-            <Image src={resolvedTheme === "dark" ? "/img/logo-black.webp" : "/img/logo-text-blue.webp"} alt="Teman Kas" width={0} height={0} sizes="100vw" loading="eager" style={{ width: "auto", height: 28 }} />
+          <Link href={homeLink} className="flex items-center gap-2">
+            <Image src="/img/logo-text-blue.webp" alt="Teman Kas" width={0} height={0} sizes="100vw" loading="eager" className="dark:hidden" style={{ width: "auto", height: 28 }} />
+            <Image src="/img/logo-black.webp" alt="Teman Kas" width={0} height={0} sizes="100vw" loading="eager" className="hidden dark:block" style={{ width: "auto", height: 28 }} />
           </Link>
           <Link href={homeLink} className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="size-4" /> Beranda
