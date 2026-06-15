@@ -28,7 +28,7 @@ export interface AuthTokens {
 }
 
 export interface AuthResponse {
-  user: { id: string; name: string; email: string; gender: string | null };
+  user: { id: string; name: string; email: string; gender: string | null; role: string };
   workspaceId: string;
   accessToken: string;
   refreshToken: string;
@@ -114,6 +114,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         gender: user.gender,
+        role: user.role,
       },
       workspaceId: workspace.id,
       ...tokens,
@@ -136,6 +137,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         gender: user.gender,
+        role: user.role,
       },
       workspaceId,
       ...tokens,
@@ -245,7 +247,11 @@ export class AuthService {
   }
 
   private signAccessToken(user: User): Promise<string> {
-    const payload: FlowlyJwtPayload = { sub: user.id, email: user.email };
+    const payload: FlowlyJwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role as 'user' | 'developer',
+    };
     return this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_SECRET'),
       expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
@@ -253,7 +259,11 @@ export class AuthService {
   }
 
   private signRefreshToken(user: User): Promise<string> {
-    const payload: FlowlyJwtPayload = { sub: user.id, email: user.email };
+    const payload: FlowlyJwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role as 'user' | 'developer',
+    };
     return this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),

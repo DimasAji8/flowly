@@ -9,6 +9,7 @@
 export interface FlowlyJwtPayload {
   sub: string;
   email: string;
+  role: 'user' | 'developer';
 }
 
 /**
@@ -24,4 +25,5 @@ export type JwtPayload = FlowlyJwtPayload;
 export interface AuthUser {
   id: string;
   email: string;
+  role: 'user' | 'developer';
 }

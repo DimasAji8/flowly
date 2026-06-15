@@ -128,6 +128,7 @@ export class AuthController {
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,
+        role: dbUser.role,
         gender: dbUser.gender,
         createdAt: dbUser.createdAt,
       },

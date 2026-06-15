@@ -11,6 +11,9 @@ export class AuthUserResponse {
   @ApiProperty({ example: 'dimas@example.com' })
   email!: string;
 
+  @ApiProperty({ enum: ['user', 'developer'], example: 'user' })
+  role!: string;
+
   @ApiPropertyOptional({ enum: Gender, example: 'm' })
   gender?: Gender | null;
 }
