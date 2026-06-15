@@ -79,3 +79,10 @@ Keuanganmu". Auth pages juga pakai brand "Teman Kas" (konsisten dengan landing).
 - Developer punya layout sendiri (`DeveloperShell`) dengan sidebar khusus (menu Dashboard/Users/Workspaces/Health + Logout)
 - User sidebar (`side-nav.tsx`) hanya menampilkan menu user biasa, developer menu dihapus
 - Endpoint developer dilindungi `JwtAuthGuard` + `DeveloperGuard` (double guard, urut penting)
+
+## Developer UI: table-based + pagination + shadcn
+- Halaman developer admin (`/developer/*`) pakai **tabel** (bukan card list) untuk data users & workspaces
+- Setiap tabel memiliki **pagination** (client-side, page size 10–15)
+- Gunakan shadcn `Table` + `Badge` components — boleh install selama tidak menimpa `button.tsx` / `input.tsx`
+- Stats summary & health tetap card-based (bukan data list)
+- Detail plan: lihat `.memory/developer-ui-plan.md`
