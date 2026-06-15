@@ -128,7 +128,7 @@ export function DeveloperShell({ children }: { children: React.ReactNode }) {
       <DeveloperSideNav />
 
       <div className="flex min-h-dvh w-full flex-col items-center lg:flex-1">
-        <div className="flex w-full flex-1 flex-col max-w-2xl lg:rounded-t-2xl lg:border-x lg:border-t lg:border-border-subtle lg:mt-4">
+        <div className="flex w-full flex-1 flex-col lg:rounded-t-2xl lg:border-x lg:border-t lg:border-border-subtle lg:mt-4">
           <DeveloperMobileHeader />
           <main className="flex-1 px-5 pb-12 pt-6 lg:px-8 lg:pb-12 lg:pt-8">
             {children}
