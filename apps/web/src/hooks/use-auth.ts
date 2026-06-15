@@ -30,9 +30,10 @@ export function useRedirectIfAuthed() {
 
   useEffect(() => {
     if (isReady && isAuthed) {
-      router.replace(ROUTES.dashboard);
+      const dest = user?.role === "developer" ? ROUTES.developer : ROUTES.dashboard;
+      router.replace(dest);
     }
-  }, [isReady, isAuthed, router]);
+  }, [isReady, isAuthed, user, router]);
 
   return { isReady, isAuthed };
 }

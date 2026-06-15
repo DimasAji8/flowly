@@ -9,7 +9,7 @@
 const STORAGE_KEY = "flowly.auth";
 
 export interface StoredAuth {
-  user: { id: string; name: string; email: string };
+  user: { id: string; name: string; email: string; role?: string };
   workspaceId: string;
   accessToken: string;
   refreshToken: string;

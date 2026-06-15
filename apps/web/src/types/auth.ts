@@ -1,7 +1,10 @@
+export type UserRole = "user" | "developer";
+
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
+  role?: UserRole;
   gender?: "m" | "f" | null;
   createdAt?: string;
 }

@@ -24,7 +24,8 @@ export default function LandingPage() {
 
   useEffect(() => {
     if (isReady && user && accessToken) {
-      router.replace(ROUTES.dashboard);
+      const dest = user.role === "developer" ? ROUTES.developer : ROUTES.dashboard;
+      router.replace(dest);
     }
   }, [isReady, user, accessToken, router]);
 

@@ -14,6 +14,7 @@ export const ROUTES = {
   recurring: "/recurring",
   profileAllocation: "/profile/allocation",
   reports: "/reports",
+  developer: "/developer",
 } as const;
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];

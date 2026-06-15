@@ -21,7 +21,8 @@ export default function LoginPage() {
     try {
       const session = await authService.login({ email, password });
       setSession(session);
-      router.replace(ROUTES.dashboard);
+      const isDev = session.user.role === "developer";
+      router.replace(isDev ? ROUTES.developer : ROUTES.dashboard);
     } catch (e) {
       if (e instanceof ApiError) throw new Error(e.message);
       throw new Error("Terjadi kesalahan. Coba lagi.");

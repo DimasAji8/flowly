@@ -8,18 +8,21 @@ import { LayoutDashboard, CalendarDays, ArrowLeftRight, Wallet, Target, Tag, Rep
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
 
-const SIDE_NAV_ITEMS = [
-  { href: ROUTES.dashboard,          label: "Beranda",       icon: LayoutDashboard },
-  { href: ROUTES.transactions,       label: "Transaksi",     icon: ArrowLeftRight, matchPrefix: "/transactions" },
-  { href: ROUTES.calendar,           label: "Kalender",      icon: CalendarDays },
-  { href: ROUTES.wallets,            label: "Dompet",        icon: Wallet, matchPrefix: "/wallets" },
-  { href: ROUTES.savingsGoals,       label: "Tabungan",      icon: Target },
-  { href: ROUTES.categories,         label: "Kategori",      icon: Tag },
-  { href: ROUTES.recurring,          label: "Berulang",      icon: Repeat },
-  { href: ROUTES.profileAllocation,  label: "Alokasi",       icon: PieChart },
-  { href: ROUTES.reports,            label: "Laporan",      icon: BarChart2 },
-  { href: ROUTES.profile,            label: "Profil",        icon: CircleUserRound },
-];
+function useNavItems() {
+  const items = [
+    { href: ROUTES.dashboard,          label: "Beranda",       icon: LayoutDashboard },
+    { href: ROUTES.transactions,       label: "Transaksi",     icon: ArrowLeftRight, matchPrefix: "/transactions" },
+    { href: ROUTES.calendar,           label: "Kalender",      icon: CalendarDays },
+    { href: ROUTES.wallets,            label: "Dompet",        icon: Wallet, matchPrefix: "/wallets" },
+    { href: ROUTES.savingsGoals,       label: "Tabungan",      icon: Target },
+    { href: ROUTES.categories,         label: "Kategori",      icon: Tag },
+    { href: ROUTES.recurring,          label: "Berulang",      icon: Repeat },
+    { href: ROUTES.profileAllocation,  label: "Alokasi",       icon: PieChart },
+    { href: ROUTES.reports,            label: "Laporan",      icon: BarChart2 },
+    { href: ROUTES.profile,            label: "Profil",        icon: CircleUserRound },
+  ];
+  return items;
+}
 
 /**
  * Sidebar navigation untuk desktop (≥ md). Sticky di kiri.
@@ -28,6 +31,7 @@ export function SideNav() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const { resolvedTheme } = useTheme();
+  const SIDE_NAV_ITEMS = useNavItems();
   const avatarSrc = user?.gender === "m" ? "/svg/m.svg" : user?.gender === "f" ? "/svg/f.svg" : null;
 
   return (
