@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Users,
@@ -10,6 +10,11 @@ import {
   Database,
   UserPlus,
   TrendingUp,
+  Wallet,
+  Target,
+  Repeat,
+  ArrowLeftRight,
+  UserCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -59,6 +64,105 @@ function BigStat({
 }
 
 // ---------------------------------------------------------------------------
+// Mini stat — small compact count card
+// ---------------------------------------------------------------------------
+function MiniStat({
+  icon: Icon,
+  label,
+  value,
+  color = "text-accent",
+  bgColor = "bg-accent-soft",
+}: {
+  icon: React.FC<{ className?: string; strokeWidth?: number }>;
+  label: string;
+  value: string | number;
+  color?: string;
+  bgColor?: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-border-subtle px-4 py-3">
+      <span
+        className={`grid size-9 shrink-0 place-items-center rounded-xl ${bgColor} ${color}`}
+      >
+        <Icon className="size-4" strokeWidth={2} />
+      </span>
+      <div className="flex flex-col min-w-0">
+        <span className="text-[11px] text-muted font-medium">{label}</span>
+        <span className="text-base font-bold text-foreground tabular-nums">
+          {value}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Simple horizontal bar chart
+// ---------------------------------------------------------------------------
+function SimpleBar({
+  value,
+  max,
+  label,
+  color = "bg-accent",
+}: {
+  value: number;
+  max: number;
+  label: string;
+  color?: string;
+}) {
+  const pct = max > 0 ? (value / max) * 100 : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-8 text-[11px] text-muted text-right shrink-0">
+        {label}
+      </span>
+      <div className="flex-1 h-4 bg-card-subtle rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          style={{ width: `${Math.max(pct, 2)}%` }}
+        />
+      </div>
+      <span className="text-xs font-semibold text-foreground tabular-nums w-6 text-right">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Simple month bar chart (CSS bars)
+// ---------------------------------------------------------------------------
+function MonthChart({
+  data,
+}: {
+  data: { month: string; count: number }[];
+}) {
+  const max = Math.max(...data.map((d) => d.count), 1);
+  return (
+    <div className="flex items-end gap-2 pt-2" style={{ height: 80 }}>
+      {data.map((d) => {
+        const pct = (d.count / max) * 100;
+        return (
+          <div
+            key={d.month}
+            className="flex-1 flex flex-col items-center gap-1 h-full justify-end"
+          >
+            <span className="text-[10px] font-semibold text-foreground tabular-nums">
+              {d.count}
+            </span>
+            <div
+              className="w-full rounded-t-md bg-accent transition-all duration-500"
+              style={{ height: `${Math.max(pct, 4)}%` }}
+            />
+            <span className="text-[9px] text-muted">{d.month}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Health badge
 // ---------------------------------------------------------------------------
 function HealthDot({ status }: { status: string }) {
@@ -78,7 +182,7 @@ export default function DeveloperPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const [stats, setStats] = useState<DeveloperStats | null>(null);
-  const [recentUsers, setRecentUsers] = useState<DeveloperUser[]>([]);
+  const [allUsers, setAllUsers] = useState<DeveloperUser[]>([]);
   const [health, setHealth] = useState<DeveloperHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +203,7 @@ export default function DeveloperPage() {
         developerService.getHealth(),
       ]);
       setStats(s);
-      setRecentUsers(u.slice(0, 5));
+      setAllUsers(u);
       setHealth(h);
     } catch (err) {
       setError(
@@ -119,6 +223,49 @@ export default function DeveloperPage() {
     setRefreshing(true);
     await fetchAll();
     setRefreshing(false);
+  };
+
+  // ── Computed: gender ──────────────────────────────────────────────────
+  const genderCounts = useMemo(() => {
+    let m = 0, f = 0, unset = 0;
+    for (const u of allUsers) {
+      if (u.gender === "m") m++;
+      else if (u.gender === "f") f++;
+      else unset++;
+    }
+    return { m, f, unset };
+  }, [allUsers]);
+
+  // ── Computed: monthly signups (last 6 months) ─────────────────────────
+  const monthlySignups = useMemo(() => {
+    const now = new Date();
+    const months: { label: string; count: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("id-ID", { month: "short" });
+      months.push({ key, label, count: 0 });
+    }
+    for (const u of allUsers) {
+      const d = new Date(u.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const found = months.find((m) => m.key === key);
+      if (found) found.count++;
+    }
+    return months.map((m) => ({ month: m.label, count: m.count }));
+  }, [allUsers]);
+
+  // ── Recent users (first 5) ────────────────────────────────────────────
+  const recentUsers = useMemo(() => allUsers.slice(0, 5), [allUsers]);
+
+  const miniColor = (i: number) => {
+    const palettes = [
+      { color: "text-blue-500", bg: "bg-blue-500/10" },
+      { color: "text-emerald-500", bg: "bg-emerald-500/10" },
+      { color: "text-orange-500", bg: "bg-orange-500/10" },
+      { color: "text-pink-500", bg: "bg-pink-500/10" },
+    ];
+    return palettes[i % palettes.length];
   };
 
   // ── Guard ──────────────────────────────────────────────────────────────
@@ -230,7 +377,83 @@ export default function DeveloperPage() {
         </div>
       </section>
 
-      {/* ── 2-col: Recent Users + Health ─────────────────────────────── */}
+      {/* ── Mini Stats (counts only, no financial) ───────────────────── */}
+      <section>
+        <div className="flex items-center gap-1.5 mb-3">
+          <Database className="size-3.5 text-muted" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+            Ringkasan Data
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <MiniStat
+            icon={Wallet}
+            label="Dompet"
+            value={stats?.wallets ?? 0}
+            {...miniColor(0)}
+          />
+          <MiniStat
+            icon={Target}
+            label="Target Tabungan"
+            value={stats?.savingsGoals ?? 0}
+            {...miniColor(1)}
+          />
+          <MiniStat
+            icon={ArrowLeftRight}
+            label="Transfer"
+            value={stats?.transfers ?? 0}
+            {...miniColor(2)}
+          />
+          <MiniStat
+            icon={Repeat}
+            label="Berulang"
+            value={stats?.recurringTransactions ?? 0}
+            {...miniColor(3)}
+          />
+        </div>
+      </section>
+
+      {/* ── Gender + Monthly Chart (2-col) ────────────────────────────── */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {/* Gender Distribution */}
+        <Card padding="md" className="flex flex-col gap-3">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted flex items-center gap-1.5">
+            <UserCheck className="size-3.5" />
+            Distribusi Gender
+          </span>
+          <div className="flex flex-col gap-2">
+            <SimpleBar
+              label="Pria"
+              value={genderCounts.m}
+              max={allUsers.length}
+              color="bg-blue-500"
+            />
+            <SimpleBar
+              label="Wanita"
+              value={genderCounts.f}
+              max={allUsers.length}
+              color="bg-rose-400"
+            />
+            <SimpleBar
+              label="—"
+              value={genderCounts.unset}
+              max={allUsers.length}
+              color="bg-gray-400"
+            />
+          </div>
+        </Card>
+
+        {/* Monthly Signups */}
+        <Card padding="md" className="flex flex-col gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted flex items-center gap-1.5">
+            <TrendingUp className="size-3.5" />
+            Registrasi 6 Bulan
+          </span>
+          <MonthChart data={monthlySignups} />
+        </Card>
+      </div>
+
+      {/* ── Recent Users + Health ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Recent Users */}
         <Card padding="md" className="flex flex-col gap-3">
@@ -239,7 +462,7 @@ export default function DeveloperPage() {
               <UserPlus className="size-3.5" />
               User Terbaru
             </span>
-            <span className="text-[10px] text-muted">10 terakhir</span>
+            <span className="text-[10px] text-muted">5 terakhir</span>
           </div>
           <div className="flex flex-col -mx-5">
             {recentUsers.map((u, i) => (
@@ -326,7 +549,8 @@ export default function DeveloperPage() {
               </div>
             </div>
             <p className="text-[10px] text-muted border-t border-border-subtle pt-3">
-              {health.platform} · {new Date(health.timestamp).toLocaleString("id-ID")}
+              {health.platform} ·{" "}
+              {new Date(health.timestamp).toLocaleString("id-ID")}
             </p>
           </Card>
         )}

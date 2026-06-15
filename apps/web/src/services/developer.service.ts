@@ -16,6 +16,7 @@ export interface DeveloperUser {
   id: string;
   name: string;
   email: string;
+  gender: string | null;
   role: string;
   createdAt: string;
   ownedWorkspaces: number;
