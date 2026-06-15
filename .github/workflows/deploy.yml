@@ -47,6 +47,13 @@ jobs:
           PORT=3333
           ${{ secrets.API_ENV_PROD }}
           EOF
+
+          # Developer debug account (optional) — dari 1 secret format "email:password"
+          if [[ -n "${{ secrets.DEV_ACCOUNT }}" ]]; then
+            IFS=':' read -r devEmail devPass <<< "${{ secrets.DEV_ACCOUNT }}"
+            echo "DEV_USER_EMAIL=$devEmail"   >> "$BUILD_DIR/apps/api/.env.production"
+            echo "DEV_USER_PASSWORD=$devPass" >> "$BUILD_DIR/apps/api/.env.production"
+          fi
           cat > "$BUILD_DIR/apps/web/.env.production" <<'EOF'
           NODE_ENV=production
           PORT=4000
