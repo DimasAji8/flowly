@@ -15,6 +15,7 @@ import { JobsModule } from './jobs/jobs.module';
 
 import { TransfersModule } from './modules/transfers/transfers.module';
 import { DeveloperModule } from './modules/developer/developer.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DeveloperModule } from './modules/developer/developer.module';
     JobsModule,
     TransfersModule,
     DeveloperModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
