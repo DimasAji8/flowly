@@ -274,3 +274,19 @@ model RecurringTransaction {
   @@index([isActive, nextRunAt])
   @@map("recurring_transactions")
 }
+
+// =====================================================
+// Review (landing page testimonials from users)
+// =====================================================
+
+model Review {
+  id        String   @id @default(cuid())
+  name      String
+  rating    Int
+  content   String
+  isShown   Boolean  @default(true) @map("is_shown")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("reviews")
+}
