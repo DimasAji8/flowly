@@ -1,28 +1,32 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, MoreVertical, Pause, Pencil, Play, Trash2 } from "lucide-react";
+import { ArrowRight, Banknote, MoreVertical, Pause, Pencil, Play, Trash2 } from "lucide-react";
 
 interface ActionMenuProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onTransfer?: () => void;
+  onWithdraw?: () => void;
   onTogglePause?: () => void;
   isPaused?: boolean;
   editLabel?: string;
   deleteLabel?: string;
   transferLabel?: string;
+  withdrawLabel?: string;
 }
 
 export function ActionMenu({
   onEdit,
   onDelete,
   onTransfer,
+  onWithdraw,
   onTogglePause,
   isPaused = false,
   editLabel = "Edit",
   deleteLabel = "Hapus",
   transferLabel = "Transfer",
+  withdrawLabel = "Tarik Tunai",
 }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -70,6 +74,16 @@ export function ActionMenu({
             >
               <ArrowRight className="size-3.5 text-muted" aria-hidden />
               {transferLabel}
+            </button>
+          )}
+          {onWithdraw && (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); onWithdraw(); }}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-card-subtle"
+            >
+              <Banknote className="size-3.5 text-muted" aria-hidden />
+              {withdrawLabel}
             </button>
           )}
           {onTogglePause && (

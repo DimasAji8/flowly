@@ -94,3 +94,17 @@ Keuanganmu". Auth pages juga pakai brand "Teman Kas" (konsisten dengan landing).
 - **User Terbaru** — 5 user terakhir dengan avatar initial + DEV badge
 - **System Health** — Database status+latency, uptime (d/h/m), heap memory, Node.js, timestamp
 - Semua data **non-finansial** (count/jumlah saja)
+
+## Tarik Tunai (2026-06-16)
+- **Konsep**: aksi naratif "ambil uang tunai dari dompet" — di belakang layar adalah Transfer dari dompet non-Tunai → dompet Tunai. BUKAN expense (tidak lewat `transactions`), BUKAN duplikasi schema.
+- **Backend**: NO schema/migration baru. Reuse `POST /api/v1/transfers` (atomic decrement source + increment destination di `prisma.$transaction`). Dompet Tunai auto-create via `POST /api/v1/wallets` (name: "Tunai", type: cash, balance: 0) jika user belum punya wallet dengan `type === "cash"`.
+- **Frontend**:
+  - `components/wallet/withdrawal-modal.tsx` — single `Modal` dengan step state `'form' | 'confirm'` (mengikuti aturan "JANGAN nest ConfirmModal di dalam Modal"). Step konfirmasi pakai `onBack` prop `Modal` (tombol ArrowLeft muncul otomatis), bukan modal kedua.
+  - Form: kartu ringkasan dompet asal (nama + saldo) + hint tujuan (existing Tunai atau auto-create "Tunai") + input jumlah (formatRupiah) + catatan opsional. Tombol submit pakai `leftIcon={<Banknote />}` dengan label "Lanjut".
+  - Step konfirmasi: kartu ringkasan (Dari / Ke / Jumlah + catatan) + tombol "Kembali" / "Konfirmasi".
+  - Auto-detect cash wallet: `wallets.find((w) => w.type === "cash")` — jika null, auto-create saat konfirmasi.
+  - Refresh store: `useWalletStore.getState().invalidate()` + `fetch()` setelah sukses agar saldo & dompet baru ter-update di list.
+- **ActionMenu** (`components/ui/action-menu.tsx`): tambah prop `onWithdraw` opsional + `withdrawLabel` (default "Tarik Tunai"), icon `Banknote` (lucide). Hanya di-render jika prop diberikan.
+- **Wiring di `wallets/page.tsx`**: ActionMenu untuk wallet dengan `w.type !== "cash"` dapat `onWithdraw={() => { setWithdrawFromId(w.id); setWithdrawOpen(true); }}`. State `withdrawOpen` + `withdrawFromId` + `<WithdrawalModal />` di-render di bawah `<TransferModal />`. KEY MODAL WAJIB PREFIX unik (`transfer-` vs `withdraw-`) — pola key `${open}-${id}` saja menghasilkan duplicate key `false-` saat kedua modal tertutup.
+- **Date**: hardcoded `isoToday()` (sama dengan `TransferModal` existing). Bisa di-extend ke date picker di masa depan.
+- **Tunai source**: dompet `type === "cash"` tidak menampilkan opsi Tarik Tunai (logic di parent wallets page: `w.type !== "cash"`). Tidak ada validasi tambahan — `transfersService` sudah throw "Saldo tidak cukup" jika amount > balance.

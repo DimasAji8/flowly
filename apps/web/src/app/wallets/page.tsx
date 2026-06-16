@@ -11,6 +11,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { ActionMenu } from "@/components/ui/action-menu";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { TransferModal } from "@/components/wallet/transfer-modal";
+import { WithdrawalModal } from "@/components/wallet/withdrawal-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,6 +74,8 @@ export default function WalletsPage() {
 
   const [transferOpen, setTransferOpen] = useState(false);
   const [transferFromId, setTransferFromId] = useState<string | undefined>();
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [withdrawFromId, setWithdrawFromId] = useState<string | undefined>();
   const [confirmWallet, setConfirmWallet] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
@@ -180,6 +183,7 @@ export default function WalletsPage() {
                         {formatCurrency(w.balance)}
                       </span>
                       <ActionMenu
+                        onWithdraw={w.type !== "cash" ? () => { setWithdrawFromId(w.id); setWithdrawOpen(true); } : undefined}
                         onEdit={() => openEdit(w)}
                         onTransfer={wallets.length >= 2 ? () => { setTransferFromId(w.id); setTransferOpen(true); } : undefined}
                         onDelete={() => setConfirmWallet({ id: w.id, name: w.name })}
@@ -277,12 +281,20 @@ export default function WalletsPage() {
       </Modal>
 
       <TransferModal
-        key={`${transferOpen}-${transferFromId ?? ""}`}
+        key={`transfer-${transferOpen}-${transferFromId ?? ""}`}
         open={transferOpen}
         onClose={() => { setTransferOpen(false); setTransferFromId(undefined); }}
         onSuccess={reload}
         wallets={wallets}
         defaultFromId={transferFromId}
+      />
+
+      <WithdrawalModal
+        key={`withdraw-${withdrawOpen}-${withdrawFromId ?? ""}`}
+        open={withdrawOpen}
+        onClose={() => { setWithdrawOpen(false); setWithdrawFromId(undefined); }}
+        onSuccess={reload}
+        defaultFromId={withdrawFromId}
       />
 
       <ConfirmModal
