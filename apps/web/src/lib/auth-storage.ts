@@ -1,3 +1,5 @@
+import type { UserRole } from "@/types/auth";
+
 /**
  * Token storage helper.
  *
@@ -9,7 +11,7 @@
 const STORAGE_KEY = "flowly.auth";
 
 export interface StoredAuth {
-  user: { id: string; name: string; email: string; role?: string };
+  user: { id: string; name: string; email: string; role?: UserRole };
   workspaceId: string;
   accessToken: string;
   refreshToken: string;

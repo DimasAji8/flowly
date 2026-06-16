@@ -65,6 +65,7 @@ model User {
   role                   UserRole  @default(user)
   resetPasswordToken     String?   @map("reset_password_token")
   resetPasswordExpiresAt DateTime? @map("reset_password_expires_at")
+  lastSeenAt             DateTime? @map("last_seen_at")
   createdAt              DateTime  @default(now()) @map("created_at")
   updatedAt              DateTime  @updatedAt @map("updated_at")
 
@@ -72,6 +73,7 @@ model User {
   memberships     WorkspaceMember[]
   transactions    Transaction[]
 
+  @@index([lastSeenAt])
   @@map("users")
 }
 

@@ -41,23 +41,34 @@ type PaginationLinkProps = {
 function PaginationLink({
   className,
   isActive,
-  size = "icon",
+  size = "sm",
   ...props
 }: PaginationLinkProps) {
+  const base = [
+    "inline-flex items-center justify-center gap-2",
+    "font-medium cursor-pointer",
+    "transition-all duration-150 ease-out",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  ].join(" ");
+
+  const variant = isActive
+    ? "bg-card text-foreground border border-border hover:bg-card-subtle"
+    : "text-secondary hover:bg-card-subtle hover:text-foreground";
+
+  const sizeMap = {
+    sm: "h-9 px-3 text-sm rounded-lg",
+    md: "h-11 px-4 text-sm rounded-xl",
+    lg: "h-12 px-5 text-base rounded-xl",
+  };
+
   return (
-    <Button
-      asChild
-      variant={isActive ? "outline" : "ghost"}
-      size={size}
-      className={cn(className)}
-    >
-      <a
-        aria-current={isActive ? "page" : undefined}
-        data-slot="pagination-link"
-        data-active={isActive}
-        {...props}
-      />
-    </Button>
+    <a
+      aria-current={isActive ? "page" : undefined}
+      data-slot="pagination-link"
+      data-active={isActive}
+      className={cn(base, variant, sizeMap[size], className)}
+      {...props}
+    />
   )
 }
 
@@ -69,7 +80,7 @@ function PaginationPrevious({
   return (
     <PaginationLink
       aria-label="Go to previous page"
-      size="default"
+      size="sm"
       className={cn("pl-1.5!", className)}
       {...props}
     >
@@ -87,7 +98,7 @@ function PaginationNext({
   return (
     <PaginationLink
       aria-label="Go to next page"
-      size="default"
+      size="sm"
       className={cn("pr-1.5!", className)}
       {...props}
     >
