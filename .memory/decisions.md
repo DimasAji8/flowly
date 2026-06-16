@@ -76,13 +76,21 @@ Keuanganmu". Auth pages juga pakai brand "Teman Kas" (konsisten dengan landing).
 - Backend: `UserRole` enum (`user | developer`), `DeveloperGuard` + `@DeveloperOnly()` decorator
 - Developer hanya bisa login dengan akun khusus yang di-set via env (DEV_USER_EMAIL/PASSWORD)
 - Login/register/landing redirect: jika `role === "developer"` → `/developer`, bukan dashboard user
-- Developer punya layout sendiri (`DeveloperShell`) dengan sidebar khusus (menu Dashboard/Users/Workspaces/Health + Logout)
+- Developer punya layout sendiri (`DeveloperShell`) dengan sidebar khusus (menu Dashboard/Users/Workspaces/Health + Logout), full-width (no max-w constraint)
 - User sidebar (`side-nav.tsx`) hanya menampilkan menu user biasa, developer menu dihapus
 - Endpoint developer dilindungi `JwtAuthGuard` + `DeveloperGuard` (double guard, urut penting)
 
 ## Developer UI: table-based + pagination + shadcn
-- Halaman developer admin (`/developer/*`) pakai **tabel** (bukan card list) untuk data users & workspaces
-- Setiap tabel memiliki **pagination** (client-side, page size 10–15)
-- Gunakan shadcn `Table` + `Badge` components — boleh install selama tidak menimpa `button.tsx` / `input.tsx`
-- Stats summary & health tetap card-based (bukan data list)
+- Halaman `/developer/users` dan `/developer/workspaces` pakai **tabel** shadcn + pagination
+- Dashboard (`/developer/page.tsx`) pakai **BigStat cards + MiniStat + bar charts**, bukan tabel/finansial
+- Gunakan shadcn `Table` + `Badge` + `Pagination` components — boleh install selama tidak menimpa `button.tsx` / `input.tsx`
 - Detail plan: lihat `.memory/developer-ui-plan.md`
+
+## Developer Dashboard (final design, 2026-06-15)
+- **3 BigStat** cards (Total User, Workspace, Transaksi) — large icon, text-2xl
+- **Ringkasan Data** — 4 MiniStat berwarna: Dompet, Target Tabungan, Transfer, Berulang (count only, no financial)
+- **Distribusi Gender** — horizontal bar chart (Pria/Wanita/tidak diisi) dari data gender user
+- **Registrasi 6 Bulan** — vertical bar chart tracking signup trend
+- **User Terbaru** — 5 user terakhir dengan avatar initial + DEV badge
+- **System Health** — Database status+latency, uptime (d/h/m), heap memory, Node.js, timestamp
+- Semua data **non-finansial** (count/jumlah saja)

@@ -22,8 +22,10 @@ NOT an enterprise accounting/ERP/crypto dashboard.
 - Income is always green (Success), expense always red (Danger).
 - Budget allocation per workspace: needs/wants/savings targets (default 50/30/20).
 - **Developer role**: UserRole enum (`user | developer`). Developer memiliki
-  dashboard, layout, sidebar sendiri. Auto-seed dari env saat startup. Login
-  langsung redirect ke `/developer`, bukan dashboard user.
+  dashboard, layout, sidebar sendiri (full-width). Auto-seed dari env saat startup.
+  Login langsung redirect ke `/developer`, bukan dashboard user.
+- **Developer dashboard**: non-financial stats — BigStat cards, MiniStat counts,
+  gender distribution bar chart, monthly signups chart, recent users, system health.
 
 ## Main Features
 Auth, Dashboard (monthly income/expense/net + chart + recent + spending insights),
