@@ -34,7 +34,7 @@ export const reviewService = {
 
   /** Toggle show/hide (developer only) */
   toggleShow(id: string) {
-    return apiClient.post<Review>(`/reviews/${id}/toggle`, { auth: true });
+    return apiClient.post<Review>(`/reviews/${id}/toggle`, undefined, { auth: true });
   },
 
   /** Delete review (developer only) */
