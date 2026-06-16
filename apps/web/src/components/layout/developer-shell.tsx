@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Shield, Users, Database, Activity, LogOut } from "lucide-react";
+import { Shield, Users, Database, Activity, MessageSquare, LogOut } from "lucide-react";
 import { useRequireAuth } from "@/hooks/use-auth";
 import { useAuthStore } from "@/store/auth.store";
 import { ROUTES } from "@/constants/routes";
@@ -11,6 +11,7 @@ const DEV_NAV_ITEMS = [
   { href: ROUTES.developer, label: "Dashboard", icon: Shield },
   { href: `${ROUTES.developer}/users`, label: "Users", icon: Users },
   { href: `${ROUTES.developer}/workspaces`, label: "Workspaces", icon: Database },
+  { href: `${ROUTES.developer}/reviews`, label: "Reviews", icon: MessageSquare },
   { href: `${ROUTES.developer}/health`, label: "Health", icon: Activity },
 ];
 
