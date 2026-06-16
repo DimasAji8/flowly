@@ -13,6 +13,8 @@ import { FeatureRow } from "./_components/feature-row";
 import { FeatureRowSavings } from "./_components/feature-row-savings";
 import { Banner } from "./_components/banner";
 import { CapabilityGrid } from "./_components/capability-grid";
+import { ReviewCarouselSection } from "./_components/review-carousel";
+import { ReviewFormSection } from "./_components/review-form";
 import { FaqSection } from "./_components/faq";
 import { CtaSection } from "./_components/cta";
 import { Footer } from "./_components/footer";
@@ -75,6 +77,10 @@ export default function LandingPage() {
         />
 
         <CapabilityGrid />
+
+        <ReviewCarouselSection />
+
+        <ReviewFormSection />
 
         <FaqSection />
 
