@@ -316,7 +316,7 @@ export default function DeveloperPage() {
         activeUsers30d: s.activeUsers30d ?? 0,
         transactionsThisWeek: s.transactionsThisWeek ?? 0,
       });
-      setAllUsers(u);
+      setAllUsers(u.data);
       setHealth(h);
     } catch (err) {
       setError(
