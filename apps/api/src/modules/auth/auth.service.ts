@@ -28,7 +28,13 @@ export interface AuthTokens {
 }
 
 export interface AuthResponse {
-  user: { id: string; name: string; email: string; gender: string | null; role: string };
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    gender: string | null;
+    role: string;
+  };
   workspaceId: string;
   accessToken: string;
   refreshToken: string;
@@ -151,19 +157,25 @@ export class AuthService {
     return { accessToken };
   }
 
-  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string; token?: string }> {
+  async forgotPassword(
+    dto: ForgotPasswordDto,
+  ): Promise<{ message: string; token?: string }> {
     const user = await this.usersService.findByEmail(dto.email);
-    
+
     // Selalu return success message untuk security (avoid user enumeration)
     if (!user) {
-      return { 
-        message: 'Jika email terdaftar, link reset password akan dikirim ke email Anda' 
+      return {
+        message:
+          'Jika email terdaftar, link reset password akan dikirim ke email Anda',
       };
     }
 
     // Generate random token (32 bytes = 64 hex chars)
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const resetTokenHash = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 jam dari sekarang
 
     await this.prisma.user.update({
@@ -176,7 +188,11 @@ export class AuthService {
 
     // Kirim email dengan link reset password
     try {
-      await this.emailService.sendResetPasswordEmail(user.email, resetToken, user.name);
+      await this.emailService.sendResetPasswordEmail(
+        user.email,
+        resetToken,
+        user.name,
+      );
     } catch (error) {
       // Log error tapi tetap return success untuk avoid user enumeration
       console.error('Failed to send reset password email:', error);
@@ -184,15 +200,20 @@ export class AuthService {
 
     // Untuk development, return token di response (HAPUS di production!)
     const isDev = this.configService.get<string>('NODE_ENV') !== 'production';
-    
+
     return {
-      message: 'Jika email terdaftar, link reset password akan dikirim ke email Anda',
+      message:
+        'Jika email terdaftar, link reset password akan dikirim ke email Anda',
       ...(isDev && { token: resetToken }), // Only in dev mode
     };
   }
 
-  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {    // Hash token untuk compare dengan yang di database
-    const resetTokenHash = crypto.createHash('sha256').update(dto.token).digest('hex');
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    // Hash token untuk compare dengan yang di database
+    const resetTokenHash = crypto
+      .createHash('sha256')
+      .update(dto.token)
+      .digest('hex');
 
     const user = await this.prisma.user.findFirst({
       where: {
@@ -202,7 +223,9 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new BadRequestException('Token reset password tidak valid atau sudah expired');
+      throw new BadRequestException(
+        'Token reset password tidak valid atau sudah expired',
+      );
     }
 
     // Hash password baru
@@ -221,7 +244,10 @@ export class AuthService {
     return { message: 'Password berhasil direset' };
   }
 
-  async changePassword(userId: string, dto: ChangePasswordDto): Promise<{ message: string }> {
+  async changePassword(
+    userId: string,
+    dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
     const user = await this.usersService.findByIdOrThrow(userId);
     const valid = await bcrypt.compare(dto.currentPassword, user.password);
     if (!valid) throw new BadRequestException('Password saat ini tidak benar');
@@ -250,7 +276,7 @@ export class AuthService {
     const payload: FlowlyJwtPayload = {
       sub: user.id,
       email: user.email,
-      role: user.role as 'user' | 'developer',
+      role: user.role,
     };
     return this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_SECRET'),
@@ -262,7 +288,7 @@ export class AuthService {
     const payload: FlowlyJwtPayload = {
       sub: user.id,
       email: user.email,
-      role: user.role as 'user' | 'developer',
+      role: user.role,
     };
     return this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),

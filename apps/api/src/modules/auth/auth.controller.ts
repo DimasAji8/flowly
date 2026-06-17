@@ -83,9 +83,10 @@ export class AuthController {
 
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Request reset password link',
-    description: 'Kirim request reset password. Token akan dikirim ke email (atau return di dev mode)'
+    description:
+      'Kirim request reset password. Token akan dikirim ke email (atau return di dev mode)',
   })
   @ApiResponse({ status: 200, description: 'Request berhasil diproses' })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
@@ -94,9 +95,9 @@ export class AuthController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Reset password dengan token',
-    description: 'Reset password menggunakan token dari email'
+    description: 'Reset password menggunakan token dari email',
   })
   @ApiResponse({ status: 200, description: 'Password berhasil direset' })
   @ApiResponse({ status: 400, description: 'Token tidak valid atau expired' })
@@ -111,7 +112,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Ganti password (user yang sedang login)' })
   @ApiResponse({ status: 200, description: 'Password berhasil diubah' })
   @ApiResponse({ status: 400, description: 'Password saat ini salah' })
-  changePassword(@CurrentUser() user: AuthUser, @Body() dto: ChangePasswordDto) {
+  changePassword(
+    @CurrentUser() user: AuthUser,
+    @Body() dto: ChangePasswordDto,
+  ) {
     return this.authService.changePassword(user.id, dto);
   }
 

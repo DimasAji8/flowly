@@ -1,4 +1,11 @@
-import { IsInt, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateReviewDto {
@@ -14,7 +21,10 @@ export class CreateReviewDto {
   @Max(5)
   rating!: number;
 
-  @ApiProperty({ description: 'Isi review', example: 'Aplikasi ini sangat membantu…' })
+  @ApiProperty({
+    description: 'Isi review',
+    example: 'Aplikasi ini sangat membantu…',
+  })
   @IsString()
   @MinLength(10)
   @MaxLength(500)

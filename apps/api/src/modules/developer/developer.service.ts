@@ -84,16 +84,22 @@ export class DeveloperService {
     // Isi hari yang kosong dengan 0 agar chart tetap kontinu
     const dayMap = new Map<string, number>();
     for (const row of txByDayRaw) {
-      const d =
-        row.date instanceof Date ? row.date : new Date(row.date as unknown as string);
+      const d = row.date instanceof Date ? row.date : new Date(row.date);
       const key = this.toDateKey(d);
       dayMap.set(key, Number(row.count));
     }
-    const transactionsByDay: Array<{ date: string; label: string; count: number }> = [];
+    const transactionsByDay: Array<{
+      date: string;
+      label: string;
+      count: number;
+    }> = [];
     for (let i = TREND_DAYS - 1; i >= 0; i--) {
       const d = new Date(now.getTime() - i * ONE_DAY_MS);
       const key = this.toDateKey(d);
-      const label = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+      const label = d.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+      });
       transactionsByDay.push({ date: key, label, count: dayMap.get(key) ?? 0 });
     }
 
@@ -101,50 +107,61 @@ export class DeveloperService {
     // Wallet, savings goal, transfer, recurring → workspace-scoped, harus
     // dicek via ownedWorkspaces ATAU memberships.
     // Transaction → langsung punya userId.
-    const [usersWithWallet, usersWithTransaction, usersWithTransfer, usersWithSavingsGoal, usersWithRecurring] =
-      await Promise.all([
-        this.prisma.user.count({
-          where: {
-            OR: [
-              { ownedWorkspaces: { some: { wallets: { some: {} } } } },
-              { memberships: { some: { workspace: { wallets: { some: {} } } } } },
-            ],
-          },
-        }),
-        this.prisma.user.count({ where: { transactions: { some: {} } } }),
-        this.prisma.user.count({
-          where: {
-            OR: [
-              { ownedWorkspaces: { some: { transfers: { some: {} } } } },
-              { memberships: { some: { workspace: { transfers: { some: {} } } } } },
-            ],
-          },
-        }),
-        this.prisma.user.count({
-          where: {
-            OR: [
-              { ownedWorkspaces: { some: { savingsGoals: { some: {} } } } },
-              { memberships: { some: { workspace: { savingsGoals: { some: {} } } } } },
-            ],
-          },
-        }),
-        this.prisma.user.count({
-          where: {
-            OR: [
-              {
-                ownedWorkspaces: {
-                  some: { recurringTransactions: { some: {} } },
-                },
+    const [
+      usersWithWallet,
+      usersWithTransaction,
+      usersWithTransfer,
+      usersWithSavingsGoal,
+      usersWithRecurring,
+    ] = await Promise.all([
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { ownedWorkspaces: { some: { wallets: { some: {} } } } },
+            { memberships: { some: { workspace: { wallets: { some: {} } } } } },
+          ],
+        },
+      }),
+      this.prisma.user.count({ where: { transactions: { some: {} } } }),
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { ownedWorkspaces: { some: { transfers: { some: {} } } } },
+            {
+              memberships: { some: { workspace: { transfers: { some: {} } } } },
+            },
+          ],
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { ownedWorkspaces: { some: { savingsGoals: { some: {} } } } },
+            {
+              memberships: {
+                some: { workspace: { savingsGoals: { some: {} } } },
               },
-              {
-                memberships: {
-                  some: { workspace: { recurringTransactions: { some: {} } } },
-                },
+            },
+          ],
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          OR: [
+            {
+              ownedWorkspaces: {
+                some: { recurringTransactions: { some: {} } },
               },
-            ],
-          },
-        }),
-      ]);
+            },
+            {
+              memberships: {
+                some: { workspace: { recurringTransactions: { some: {} } } },
+              },
+            },
+          ],
+        },
+      }),
+    ]);
 
     // Rata-rata transaksi per user yang punya ≥1 transaksi
     const txPerUserGroup = await this.prisma.transaction.groupBy({
@@ -211,21 +228,21 @@ export class DeveloperService {
     return `${y}-${m}-${day}`;
   }
 
-  async listUsers(
-    pagination: PaginationQueryDto,
-  ): Promise<PaginatedResponse<{
-    id: string;
-    name: string;
-    email: string;
-    gender: string | null;
-    role: string;
-    createdAt: Date;
-    updatedAt: Date;
-    lastSeenAt: Date | null;
-    ownedWorkspaces: number;
-    memberOf: number;
-    transactions: number;
-  }>> {
+  async listUsers(pagination: PaginationQueryDto): Promise<
+    PaginatedResponse<{
+      id: string;
+      name: string;
+      email: string;
+      gender: string | null;
+      role: string;
+      createdAt: Date;
+      updatedAt: Date;
+      lastSeenAt: Date | null;
+      ownedWorkspaces: number;
+      memberOf: number;
+      transactions: number;
+    }>
+  > {
     const page = pagination.page ?? 1;
     const pageSize = pagination.pageSize ?? 50;
 
@@ -272,24 +289,24 @@ export class DeveloperService {
     return buildPaginatedResponse(data, total, page, pageSize);
   }
 
-  async getWorkspaceStats(
-    pagination: PaginationQueryDto,
-  ): Promise<{
-    total: number;
-    totalMembers: number;
-    avgMembersPerWorkspace: number;
-    totalSavingsGoals: number;
-  } & PaginatedResponse<{
-    id: string;
-    name: string;
-    ownerId: string;
-    members: number;
-    wallets: number;
-    categories: number;
-    transactions: number;
-    savingsGoals: number;
-    createdAt: Date;
-  }>> {
+  async getWorkspaceStats(pagination: PaginationQueryDto): Promise<
+    {
+      total: number;
+      totalMembers: number;
+      avgMembersPerWorkspace: number;
+      totalSavingsGoals: number;
+    } & PaginatedResponse<{
+      id: string;
+      name: string;
+      ownerId: string;
+      members: number;
+      wallets: number;
+      categories: number;
+      transactions: number;
+      savingsGoals: number;
+      createdAt: Date;
+    }>
+  > {
     const page = pagination.page ?? 1;
     const pageSize = pagination.pageSize ?? 50;
 
