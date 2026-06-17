@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -18,6 +19,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DeveloperGuard } from '../../common/guards/developer.guard';
 import { DeveloperOnly } from '../../common/decorators/developer-only.decorator';
+import { PaginationQueryDto } from '../../common/dto/pagination.query';
 
 @ApiTags('reviews')
 @Controller('reviews')
@@ -40,15 +42,15 @@ export class ReviewsController {
     return this.reviewsService.getShown();
   }
 
-  /** Developer: list all reviews */
+  /** Developer: list all reviews (paginated) */
   @Get()
   @UseGuards(JwtAuthGuard, DeveloperGuard)
   @DeveloperOnly()
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Semua review (developer only)' })
   @ApiResponse({ status: 200, description: 'List semua review' })
-  findAll() {
-    return this.reviewsService.findAll();
+  findAll(@Query() pagination: PaginationQueryDto) {
+    return this.reviewsService.findAll(pagination);
   }
 
   /** Developer: toggle show/hide */

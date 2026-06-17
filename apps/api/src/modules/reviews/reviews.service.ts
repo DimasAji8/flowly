@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { PaginationQueryDto } from '../../common/dto/pagination.query';
+import {
+  PaginatedResponse,
+  buildPaginatedResponse,
+} from '../../common/types/pagination';
 
 @Injectable()
 export class ReviewsService {
@@ -26,11 +31,31 @@ export class ReviewsService {
     });
   }
 
-  /** Developer: list all reviews */
-  async findAll() {
-    return this.prisma.review.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+  /** Developer: list all reviews (paginated) */
+  async findAll(
+    pagination: PaginationQueryDto,
+  ): Promise<PaginatedResponse<{
+    id: string;
+    name: string;
+    rating: number;
+    content: string;
+    isShown: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }>> {
+    const page = pagination.page ?? 1;
+    const pageSize = pagination.pageSize ?? 50;
+
+    const [data, total] = await Promise.all([
+      this.prisma.review.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.prisma.review.count(),
+    ]);
+
+    return buildPaginatedResponse(data, total, page, pageSize);
   }
 
   /** Developer: toggle isShown */
