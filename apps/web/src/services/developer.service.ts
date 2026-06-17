@@ -61,21 +61,29 @@ export interface DeveloperUser {
   transactions: number;
 }
 
-export interface DeveloperWorkspaceStats {
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export type DeveloperWorkspaceStats = {
   total: number;
   totalMembers: number;
   avgMembersPerWorkspace: number;
-  list: Array<{
-    id: string;
-    name: string;
-    createdAt: string;
-    members: number;
-    wallets: number;
-    categories: number;
-    transactions: number;
-    savingsGoals: number;
-  }>;
-}
+  totalSavingsGoals: number;
+} & PaginatedResponse<{
+  id: string;
+  name: string;
+  createdAt: string;
+  members: number;
+  wallets: number;
+  categories: number;
+  transactions: number;
+  savingsGoals: number;
+}>;
 
 export interface DeveloperHealth {
   status: string;
@@ -92,12 +100,20 @@ export const developerService = {
     return apiClient.get<DeveloperStats>("/developer/stats", { auth: true });
   },
 
-  listUsers() {
-    return apiClient.get<DeveloperUser[]>("/developer/users", { auth: true });
+  listUsers(page = 1, pageSize = 10) {
+    const qs = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    return apiClient.get<PaginatedResponse<DeveloperUser>>(
+      `/developer/users?${qs}`,
+      { auth: true },
+    );
   },
 
-  getWorkspaceStats() {
-    return apiClient.get<DeveloperWorkspaceStats>("/developer/workspaces", { auth: true });
+  getWorkspaceStats(page = 1, pageSize = 10) {
+    const qs = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    return apiClient.get<DeveloperWorkspaceStats>(
+      `/developer/workspaces?${qs}`,
+      { auth: true },
+    );
   },
 
   getHealth() {

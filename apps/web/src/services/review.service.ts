@@ -10,6 +10,14 @@ export interface Review {
   updatedAt: string;
 }
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export interface CreateReviewData {
   name: string;
   rating: number;
@@ -27,9 +35,10 @@ export const reviewService = {
     return apiClient.get<Review[]>("/reviews/shown");
   },
 
-  /** List all reviews (developer only) */
-  findAll() {
-    return apiClient.get<Review[]>("/reviews", { auth: true });
+  /** List all reviews, paginated (developer only) */
+  findAll(page = 1, pageSize = 10) {
+    const qs = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    return apiClient.get<PaginatedResponse<Review>>(`/reviews?${qs}`, { auth: true });
   },
 
   /** Toggle show/hide (developer only) */
