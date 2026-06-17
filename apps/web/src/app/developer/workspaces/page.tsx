@@ -1,62 +1,156 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Database, RefreshCw, Users, Wallet, Tag, Target } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Database,
+  RefreshCw,
+  Users,
+  Wallet,
+  Target,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import {
   developerService,
   type DeveloperWorkspaceStats,
 } from "@/services/developer.service";
 
+type WorkspaceRow = DeveloperWorkspaceStats["data"][number];
+
+const PAGE_SIZE = 10;
+
 export default function DeveloperWorkspacesPage() {
-  const [data, setData] = useState<DeveloperWorkspaceStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [rows, setRows] = useState<WorkspaceRow[] | null>(null);
+  const [summary, setSummary] = useState<Omit<
+    DeveloperWorkspaceStats,
+    "data"
+  > | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async (targetPage: number) => {
     setError(null);
     try {
-      const ws = await developerService.getWorkspaceStats();
-      setData(ws);
+      const res = await developerService.getWorkspaceStats(
+        targetPage,
+        PAGE_SIZE,
+      );
+      const {
+        data: list,
+        total: t,
+        totalPages: tp,
+        page: p,
+        pageSize: _ps,
+        ...rest
+      } = res;
+      setRows(list);
+      setSummary({ ...rest, total: t, totalPages: tp, page: p, pageSize: _ps });
+      setTotal(t);
+      setTotalPages(tp);
+      setPage(p);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Gagal memuat data workspace",
       );
-    } finally {
-      setLoading(false);
+      setRows([]);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchData(page);
+  }, [page, fetchData]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchData();
+    await fetchData(page);
     setRefreshing(false);
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-6">
-        <Skeleton className="h-7 w-48" />
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-2xl" />
-          ))}
-        </div>
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 rounded-2xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const columns: DataTableColumn<WorkspaceRow>[] = useMemo(
+    () => [
+      {
+        key: "name",
+        header: "Nama",
+        render: (ws) => (
+          <span className="text-sm font-medium text-foreground truncate block max-w-[240px]">
+            {ws.name}
+          </span>
+        ),
+      },
+      {
+        key: "members",
+        header: "Anggota",
+        align: "right",
+        render: (ws) => (
+          <span className="text-sm text-foreground tabular-nums">
+            {ws.members.toLocaleString("id-ID")}
+          </span>
+        ),
+      },
+      {
+        key: "wallets",
+        header: "Dompet",
+        align: "right",
+        hideOnMobile: true,
+        render: (ws) => (
+          <span className="text-sm text-secondary tabular-nums">
+            {ws.wallets.toLocaleString("id-ID")}
+          </span>
+        ),
+      },
+      {
+        key: "categories",
+        header: "Kategori",
+        align: "right",
+        hideOnMobile: true,
+        render: (ws) => (
+          <span className="text-sm text-secondary tabular-nums">
+            {ws.categories.toLocaleString("id-ID")}
+          </span>
+        ),
+      },
+      {
+        key: "transactions",
+        header: "Transaksi",
+        align: "right",
+        render: (ws) => (
+          <span className="text-sm font-medium text-foreground tabular-nums">
+            {ws.transactions.toLocaleString("id-ID")}
+          </span>
+        ),
+      },
+      {
+        key: "savingsGoals",
+        header: "Tabungan",
+        align: "right",
+        render: (ws) => (
+          <span className="text-sm text-secondary tabular-nums">
+            {ws.savingsGoals.toLocaleString("id-ID")}
+          </span>
+        ),
+      },
+      {
+        key: "createdAt",
+        header: "Dibuat",
+        align: "right",
+        hideOnMobile: true,
+        render: (ws) => (
+          <span className="text-xs text-muted">
+            {new Date(ws.createdAt).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
 
   if (error) {
     return (
@@ -86,8 +180,9 @@ export default function DeveloperWorkspacesPage() {
               Workspaces
             </h1>
             <p className="text-xs text-muted">
-              {data?.total ?? 0} total · rata-rata{" "}
-              {data?.avgMembersPerWorkspace.toFixed(1)} anggota
+              {summary
+                ? `${summary.total} total · rata-rata ${summary.avgMembersPerWorkspace.toFixed(1)} anggota`
+                : "Memuat..."}
             </p>
           </div>
         </div>
@@ -105,7 +200,7 @@ export default function DeveloperWorkspacesPage() {
       </div>
 
       {/* Stats mini */}
-      {data && (
+      {summary && (
         <>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <Card padding="md" className="flex items-center gap-3">
@@ -117,7 +212,7 @@ export default function DeveloperWorkspacesPage() {
                   Total
                 </span>
                 <span className="text-base font-semibold text-foreground tabular-nums">
-                  {data.total}
+                  {summary.total}
                 </span>
               </div>
             </Card>
@@ -130,7 +225,7 @@ export default function DeveloperWorkspacesPage() {
                   Total Members
                 </span>
                 <span className="text-base font-semibold text-foreground tabular-nums">
-                  {data.totalMembers}
+                  {summary.totalMembers}
                 </span>
               </div>
             </Card>
@@ -143,7 +238,7 @@ export default function DeveloperWorkspacesPage() {
                   Rata-rata Anggota
                 </span>
                 <span className="text-base font-semibold text-foreground tabular-nums">
-                  {data.avgMembersPerWorkspace.toFixed(2)}
+                  {summary.avgMembersPerWorkspace.toFixed(2)}
                 </span>
               </div>
             </Card>
@@ -153,45 +248,29 @@ export default function DeveloperWorkspacesPage() {
               </span>
               <div className="flex flex-col min-w-0">
                 <span className="text-[11px] text-muted font-medium">
-                  Total Savings
+                  Total Tabungan
                 </span>
                 <span className="text-base font-semibold text-foreground tabular-nums">
-                  {data.list.reduce((sum, ws) => sum + ws.savingsGoals, 0)}
+                  {summary.totalSavingsGoals}
                 </span>
               </div>
             </Card>
           </div>
 
-          {/* List */}
-          <div className="flex flex-col gap-2">
+          {/* Tabel semua workspace */}
+          <div className="flex flex-col gap-3">
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
               Semua Workspace
             </h2>
-            {data.list.map((ws) => (
-              <Card
-                key={ws.id}
-                padding="sm"
-                className="flex items-center justify-between gap-4"
-              >
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-medium text-foreground truncate">
-                    {ws.name}
-                  </span>
-                  <span className="text-xs text-muted">
-                    {ws.members} anggota · {ws.wallets} dompet ·{" "}
-                    {ws.categories} kategori · {ws.transactions} transaksi ·{" "}
-                    {ws.savingsGoals} tabungan
-                  </span>
-                </div>
-                <span className="text-[10px] text-muted shrink-0 whitespace-nowrap">
-                  {new Date(ws.createdAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
-              </Card>
-            ))}
+            <DataTable
+              data={rows}
+              columns={columns}
+              keyExtractor={(ws) => ws.id}
+              pagination={{ page, pageSize: PAGE_SIZE, total, totalPages }}
+              onPageChange={setPage}
+              emptyTitle="Belum ada workspace"
+              emptyDescription="Belum ada workspace yang terdaftar."
+            />
           </div>
         </>
       )}

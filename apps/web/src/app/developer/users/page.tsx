@@ -1,57 +1,134 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Users, RefreshCw, Shield, Calendar } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Users, RefreshCw } from "lucide-react";
+import { Chip } from "@/components/ui/chip";
+import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import {
   developerService,
   type DeveloperUser,
 } from "@/services/developer.service";
+import { formatRelativeTime } from "@/utils/format-date";
+
+const PAGE_SIZE = 10;
 
 export default function DeveloperUsersPage() {
-  const [users, setUsers] = useState<DeveloperUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<DeveloperUser[] | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async (targetPage: number) => {
     setError(null);
     try {
-      const data = await developerService.listUsers();
-      setUsers(data);
+      const res = await developerService.listUsers(targetPage, PAGE_SIZE);
+      setUsers(res.data);
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
+      setPage(res.page);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Gagal memuat data users",
-      );
-    } finally {
-      setLoading(false);
+      setError(err instanceof Error ? err.message : "Gagal memuat data users");
+      setUsers([]);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchUsers(page);
+  }, [page, fetchUsers]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchUsers();
+    await fetchUsers(page);
     setRefreshing(false);
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-6">
-        <Skeleton className="h-7 w-40" />
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 rounded-2xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const columns: DataTableColumn<DeveloperUser>[] = useMemo(
+    () => [
+      {
+        key: "name",
+        header: "Pengguna",
+        render: (u) => (
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent select-none">
+              {u.name.charAt(0).toUpperCase()}
+            </span>
+            <span className="flex items-center gap-2 min-w-0">
+              <span className="text-sm font-medium text-foreground truncate">
+                {u.name}
+              </span>
+              {u.role === "developer" && (
+                <Chip tone="accent" size="sm">
+                  DEV
+                </Chip>
+              )}
+            </span>
+          </div>
+        ),
+      },
+      {
+        key: "email",
+        header: "Email",
+        hideOnMobile: true,
+        render: (u) => (
+          <span className="text-sm text-muted truncate block max-w-[260px]">
+            {u.email}
+          </span>
+        ),
+      },
+      {
+        key: "role",
+        header: "Role",
+        hideOnMobile: true,
+        render: (u) =>
+          u.role === "developer" ? (
+            <Chip tone="accent" size="sm">
+              Developer
+            </Chip>
+          ) : (
+            <Chip tone="neutral" size="sm">
+              User
+            </Chip>
+          ),
+      },
+      {
+        key: "transactions",
+        header: "Transaksi",
+        align: "right",
+        render: (u) => (
+          <span className="text-sm font-medium text-foreground tabular-nums">
+            {u.transactions.toLocaleString("id-ID")}
+          </span>
+        ),
+      },
+      {
+        key: "lastSeenAt",
+        header: "Terakhir Dilihat",
+        hideOnMobile: true,
+        render: (u) => (
+          <span className="text-xs text-muted">
+            {formatRelativeTime(u.lastSeenAt)}
+          </span>
+        ),
+      },
+      {
+        key: "createdAt",
+        header: "Tgl Daftar",
+        align: "right",
+        render: (u) => (
+          <span className="text-xs text-muted">
+            {new Date(u.createdAt).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
 
   if (error) {
     return (
@@ -80,7 +157,7 @@ export default function DeveloperUsersPage() {
             <h1 className="text-lg font-semibold tracking-tight text-foreground">
               Users
             </h1>
-            <p className="text-xs text-muted">{users.length} total pengguna</p>
+            <p className="text-xs text-muted">{total} total pengguna</p>
           </div>
         </div>
         <button
@@ -96,47 +173,15 @@ export default function DeveloperUsersPage() {
         </button>
       </div>
 
-      {/* List */}
-      <div className="flex flex-col gap-2">
-        {users.map((u) => (
-          <Card
-            key={u.id}
-            padding="sm"
-            className="flex items-center justify-between gap-3"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent select-none">
-                {u.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-medium text-foreground truncate flex items-center gap-2">
-                  {u.name}
-                  {u.role === "developer" && (
-                    <span className="text-[10px] font-semibold text-violet-500 bg-violet-500/10 rounded-full px-2 py-0.5">
-                      DEV
-                    </span>
-                  )}
-                </span>
-                <span className="text-xs text-muted truncate">{u.email}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5 text-[11px] text-muted shrink-0">
-              <span>{u.ownedWorkspaces} WS</span>
-              <span className="text-border-subtle">·</span>
-              <span>{u.memberOf} anggota</span>
-              <span className="text-border-subtle">·</span>
-              <span>{u.transactions} tx</span>
-              <span className="text-border-subtle">·</span>
-              <span>
-                {new Date(u.createdAt).toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "short",
-                })}
-              </span>
-            </div>
-          </Card>
-        ))}
-      </div>
+      <DataTable
+        data={users}
+        columns={columns}
+        keyExtractor={(u) => u.id}
+        pagination={{ page, pageSize: PAGE_SIZE, total, totalPages }}
+        onPageChange={setPage}
+        emptyTitle="Belum ada user"
+        emptyDescription="Belum ada pengguna yang terdaftar."
+      />
     </div>
   );
 }

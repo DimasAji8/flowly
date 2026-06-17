@@ -1,41 +1,52 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { MessageSquare, Eye, EyeOff, Trash2, RefreshCw } from "lucide-react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import {
+  MessageSquare,
+  Eye,
+  EyeOff,
+  Trash2,
+  RefreshCw,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Chip } from "@/components/ui/chip";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { reviewService, type Review } from "@/services/review.service";
 
+const PAGE_SIZE = 10;
+
 export default function DeveloperReviewsPage() {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Review | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const fetchReviews = useCallback(async () => {
+  const fetchReviews = useCallback(async (targetPage: number) => {
     setError(null);
     try {
-      const data = await reviewService.findAll();
-      setReviews(data);
+      const res = await reviewService.findAll(targetPage, PAGE_SIZE);
+      setReviews(res.data);
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
+      setPage(res.page);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Gagal memuat review",
-      );
-    } finally {
-      setLoading(false);
+      setError(err instanceof Error ? err.message : "Gagal memuat review");
+      setReviews([]);
     }
   }, []);
 
   useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+    fetchReviews(page);
+  }, [page, fetchReviews]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchReviews();
+    await fetchReviews(page);
     setRefreshing(false);
   };
 
@@ -43,12 +54,14 @@ export default function DeveloperReviewsPage() {
     try {
       const updated = await reviewService.toggleShow(id);
       setReviews((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, isShown: updated.isShown } : r)),
+        prev
+          ? prev.map((r) =>
+              r.id === id ? { ...r, isShown: updated.isShown } : r,
+            )
+          : prev,
       );
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Gagal mengubah status",
-      );
+      setError(err instanceof Error ? err.message : "Gagal mengubah status");
     }
   };
 
@@ -57,33 +70,123 @@ export default function DeveloperReviewsPage() {
     setDeleteLoading(true);
     try {
       await reviewService.remove(deleteTarget.id);
-      setReviews((prev) => prev.filter((r) => r.id !== deleteTarget.id));
       setDeleteTarget(null);
+      // Refresh list to reflect new total
+      await fetchReviews(page);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Gagal menghapus review",
-      );
+      setError(err instanceof Error ? err.message : "Gagal menghapus review");
     } finally {
       setDeleteLoading(false);
     }
   };
 
-  // ── Loading ──────────────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-6">
-        <Skeleton className="h-7 w-48" />
-        <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const columns: DataTableColumn<Review>[] = useMemo(
+    () => [
+      {
+        key: "name",
+        header: "Pengguna",
+        render: (r) => (
+          <div className="flex items-start gap-3 min-w-0">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent select-none">
+              {r.name.charAt(0).toUpperCase()}
+            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-medium text-foreground truncate max-w-[200px]">
+                {r.name}
+              </span>
+              <span
+                className="flex gap-0.5 mt-0.5"
+                aria-label={`Rating ${r.rating} dari 5`}
+              >
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`text-[10px] leading-none ${
+                      i < r.rating ? "text-accent" : "text-border"
+                    }`}
+                  >
+                    ★
+                  </span>
+                ))}
+              </span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: "content",
+        header: "Review",
+        render: (r) => (
+          <p className="text-sm text-secondary leading-snug line-clamp-2 max-w-[420px]">
+            &ldquo;{r.content}&rdquo;
+          </p>
+        ),
+      },
+      {
+        key: "isShown",
+        header: "Status",
+        align: "center",
+        render: (r) =>
+          r.isShown ? (
+            <Chip tone="success" size="sm">
+              Ditampilkan
+            </Chip>
+          ) : (
+            <Chip tone="danger" size="sm">
+              Disembunyikan
+            </Chip>
+          ),
+      },
+      {
+        key: "createdAt",
+        header: "Tanggal",
+        align: "right",
+        hideOnMobile: true,
+        render: (r) => (
+          <span className="text-xs text-muted">
+            {new Date(r.createdAt).toLocaleDateString("id-ID", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+        ),
+      },
+      {
+        key: "actions",
+        header: "Aksi",
+        align: "right",
+        render: (r) => (
+          <div className="inline-flex items-center gap-1 justify-end">
+            <button
+              type="button"
+              onClick={() => handleToggle(r.id)}
+              className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-accent transition-colors"
+              title={r.isShown ? "Sembunyikan" : "Tampilkan"}
+            >
+              {r.isShown ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeleteTarget(r)}
+              className="grid size-8 place-items-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-500 transition-colors"
+              title="Hapus"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [],
+  );
 
-  // ── Error ────────────────────────────────────────────────────────────
-  if (error && reviews.length === 0) {
+  // ── Error total (tidak ada data) ────────────────────────────────────
+  if (error && total === 0) {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
@@ -117,7 +220,7 @@ export default function DeveloperReviewsPage() {
               Reviews
             </h1>
             <p className="text-xs text-muted">
-              Kelola testimoni pengguna ({reviews.length})
+              Kelola testimoni pengguna ({total})
             </p>
           </div>
         </div>
@@ -141,87 +244,15 @@ export default function DeveloperReviewsPage() {
         </div>
       )}
 
-      {/* Empty state */}
-      {reviews.length === 0 && (
-        <Card padding="lg" className="text-center">
-          <MessageSquare className="mx-auto size-10 text-muted mb-3" strokeWidth={1.5} />
-          <p className="text-sm text-muted">Belum ada review.</p>
-        </Card>
-      )}
-
-      {/* Review list */}
-      <div className="space-y-3">
-        {reviews.map((review) => (
-          <Card key={review.id} padding="md" className="flex items-start gap-4">
-            {/* Avatar */}
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-bold text-accent">
-              {review.name.charAt(0).toUpperCase()}
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-sm font-semibold text-foreground">
-                  {review.name}
-                </span>
-                {/* Stars */}
-                <span className="flex gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={`text-xs ${
-                        i < review.rating ? "text-accent" : "text-border"
-                      }`}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </span>
-                {/* Shown badge */}
-                <span
-                  className={`ml-auto text-[11px] font-medium px-2 py-0.5 rounded-full ${
-                    review.isShown
-                      ? "bg-emerald-500/10 text-emerald-600"
-                      : "bg-red-500/10 text-red-500"
-                  }`}
-                >
-                  {review.isShown ? "Ditampilkan" : "Disembunyikan"}
-                </span>
-              </div>
-              <p className="text-sm text-secondary leading-relaxed line-clamp-2">
-                "{review.content}"
-              </p>
-              <p className="text-[11px] text-muted mt-1.5">
-                {new Date(review.createdAt).toLocaleDateString("id-ID", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-1 shrink-0">
-              <button
-                type="button"
-                onClick={() => handleToggle(review.id)}
-                className="grid size-8 place-items-center rounded-lg text-muted hover:bg-card-subtle hover:text-accent transition-colors"
-                title={review.isShown ? "Sembunyikan" : "Tampilkan"}
-              >
-                {review.isShown ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(review)}
-                className="grid size-8 place-items-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-500 transition-colors"
-                title="Hapus"
-              >
-                <Trash2 className="size-4" />
-              </button>
-            </div>
-          </Card>
-        ))}
-      </div>
+      <DataTable
+        data={reviews}
+        columns={columns}
+        keyExtractor={(r) => r.id}
+        pagination={{ page, pageSize: PAGE_SIZE, total, totalPages }}
+        onPageChange={setPage}
+        emptyTitle="Belum ada review"
+        emptyDescription="Belum ada testimoni yang masuk."
+      />
 
       {/* Delete confirmation */}
       <ConfirmModal
