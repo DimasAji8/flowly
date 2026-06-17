@@ -13,8 +13,7 @@ interface SummaryCardsProps {
 const STORAGE_KEY = "teman-kas.balance-hidden";
 
 export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
-  const netNum = Number(net);
-  const isPositive = netNum >= 0;
+  const isLowBalance = totalBalance !== undefined && totalBalance < 500_000;
   const [hidden, setHidden] = useState(true);
 
   // Load preference from localStorage
@@ -44,12 +43,12 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
       <div
         className="relative overflow-hidden rounded-3xl p-6"
         style={{
-          background: isPositive
-            ? "linear-gradient(135deg, #1a4731 0%, #15803d 100%)"
-            : "linear-gradient(135deg, #4a1515 0%, #b91c1c 100%)",
-          boxShadow: isPositive
-            ? "0 8px 32px -8px rgba(21, 128, 61, 0.45), 0 2px 8px rgba(0,0,0,0.12)"
-            : "0 8px 32px -8px rgba(185, 28, 28, 0.45), 0 2px 8px rgba(0,0,0,0.12)",
+          background: isLowBalance
+            ? "linear-gradient(135deg, #4a1515 0%, #b91c1c 100%)"
+            : "linear-gradient(135deg, #1a4731 0%, #15803d 100%)",
+          boxShadow: isLowBalance
+            ? "0 8px 32px -8px rgba(185, 28, 28, 0.45), 0 2px 8px rgba(0,0,0,0.12)"
+            : "0 8px 32px -8px rgba(21, 128, 61, 0.45), 0 2px 8px rgba(0,0,0,0.12)",
         }}
       >
         <div className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full opacity-10" style={{ background: "white" }} aria-hidden />
