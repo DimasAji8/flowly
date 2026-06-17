@@ -82,6 +82,37 @@ export function formatRelativeDate(dateString: string): string {
   return `${d} ${MONTHS_ID[m - 1]} ${y}`;
 }
 
+/**
+ * ISO datetime → format relatif dalam Bahasa Indonesia.
+ * - < 1 menit  → "Baru saja"
+ * - < 1 jam    → "X menit lalu"
+ * - < 24 jam   → "X jam lalu"
+ * - < 7 hari   → "X hari lalu"
+ * - ≥ 7 hari   → "22 Mei 2026"
+ */
+export function formatRelativeTime(iso: string | null | undefined): string {
+  if (!iso) return "Belum pernah";
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return "—";
+
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  if (diffSec < 60) return "Baru saja";
+  if (diffMin < 60) return `${diffMin} menit lalu`;
+  if (diffHour < 24) return `${diffHour} jam lalu`;
+  if (diffDay < 7) return `${diffDay} hari lalu`;
+
+  const d = date.getDate();
+  const m = date.getMonth() + 1;
+  const y = date.getFullYear();
+  return `${d} ${MONTHS_ID[m - 1]} ${y}`;
+}
+
 /** Range bulan ini sebagai YYYY-MM-DD. */
 export function currentMonthRange(): { from: string; to: string } {
   const now = new Date();
