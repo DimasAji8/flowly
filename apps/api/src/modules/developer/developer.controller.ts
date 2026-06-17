@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -9,6 +9,7 @@ import { DeveloperService } from './developer.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DeveloperGuard } from '../../common/guards/developer.guard';
 import { DeveloperOnly } from '../../common/decorators/developer-only.decorator';
+import { PaginationQueryDto } from '../../common/dto/pagination.query';
 
 @ApiTags('developer')
 @ApiBearerAuth('access-token')
@@ -31,8 +32,8 @@ export class DeveloperController {
   @Get('users')
   @ApiOperation({ summary: 'Daftar semua user (developer only)' })
   @ApiResponse({ status: 200, description: 'List semua user terdaftar' })
-  users() {
-    return this.developerService.listUsers();
+  users(@Query() pagination: PaginationQueryDto) {
+    return this.developerService.listUsers(pagination);
   }
 
   @Get('workspaces')
@@ -41,8 +42,8 @@ export class DeveloperController {
     status: 200,
     description: 'Jumlah workspace, anggota per workspace',
   })
-  workspaces() {
-    return this.developerService.getWorkspaceStats();
+  workspaces(@Query() pagination: PaginationQueryDto) {
+    return this.developerService.getWorkspaceStats(pagination);
   }
 
   @Get('health')

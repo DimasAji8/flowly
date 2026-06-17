@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { PaginationQueryDto } from '../../common/dto/pagination.query';
+import {
+  PaginatedResponse,
+  buildPaginatedResponse,
+} from '../../common/types/pagination';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const TREND_DAYS = 7;
@@ -206,29 +211,51 @@ export class DeveloperService {
     return `${y}-${m}-${day}`;
   }
 
-  async listUsers() {
-    const users = await this.prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        gender: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        lastSeenAt: true,
-        _count: {
-          select: {
-            ownedWorkspaces: true,
-            memberships: true,
-            transactions: true,
+  async listUsers(
+    pagination: PaginationQueryDto,
+  ): Promise<PaginatedResponse<{
+    id: string;
+    name: string;
+    email: string;
+    gender: string | null;
+    role: string;
+    createdAt: Date;
+    updatedAt: Date;
+    lastSeenAt: Date | null;
+    ownedWorkspaces: number;
+    memberOf: number;
+    transactions: number;
+  }>> {
+    const page = pagination.page ?? 1;
+    const pageSize = pagination.pageSize ?? 50;
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        orderBy: [{ role: 'desc' }, { createdAt: 'desc' }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          gender: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+          lastSeenAt: true,
+          _count: {
+            select: {
+              ownedWorkspaces: true,
+              memberships: true,
+              transactions: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.user.count(),
+    ]);
 
-    return users.map((u) => ({
+    const data = users.map((u) => ({
       id: u.id,
       name: u.name,
       email: u.email,
@@ -241,11 +268,63 @@ export class DeveloperService {
       memberOf: u._count.memberships,
       transactions: u._count.transactions,
     }));
+
+    return buildPaginatedResponse(data, total, page, pageSize);
   }
 
-  async getWorkspaceStats() {
+  async getWorkspaceStats(
+    pagination: PaginationQueryDto,
+  ): Promise<{
+    total: number;
+    totalMembers: number;
+    avgMembersPerWorkspace: number;
+    totalSavingsGoals: number;
+  } & PaginatedResponse<{
+    id: string;
+    name: string;
+    ownerId: string;
+    members: number;
+    wallets: number;
+    categories: number;
+    transactions: number;
+    savingsGoals: number;
+    createdAt: Date;
+  }>> {
+    const page = pagination.page ?? 1;
+    const pageSize = pagination.pageSize ?? 50;
+
+    // Summary dihitung dari SELURUH data, bukan hanya halaman saat ini
+    const [totalWorkspaces, allWorkspaces] = await Promise.all([
+      this.prisma.workspace.count(),
+      // Ambil hanya _count.members & _count.savingsGoals untuk summary
+      this.prisma.workspace.findMany({
+        select: {
+          _count: {
+            select: { members: true, savingsGoals: true },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+    ]);
+
+    const totalMembers = allWorkspaces.reduce(
+      (sum, w) => sum + w._count.members,
+      0,
+    );
+    const totalSavingsGoals = allWorkspaces.reduce(
+      (sum, w) => sum + w._count.savingsGoals,
+      0,
+    );
+    const avgMembersPerWorkspace =
+      totalWorkspaces > 0
+        ? Math.round((totalMembers / totalWorkspaces) * 10) / 10
+        : 0;
+
+    // List halaman saat ini
     const workspaces = await this.prisma.workspace.findMany({
       orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       select: {
         id: true,
         name: true,
@@ -264,29 +343,23 @@ export class DeveloperService {
       },
     });
 
-    const totalMembers = workspaces.reduce(
-      (sum, w) => sum + w._count.members,
-      0,
-    );
+    const data = workspaces.map((w) => ({
+      id: w.id,
+      name: w.name,
+      ownerId: w.ownerId,
+      members: w._count.members,
+      wallets: w._count.wallets,
+      categories: w._count.categories,
+      transactions: w._count.transactions,
+      savingsGoals: w._count.savingsGoals,
+      createdAt: w.createdAt,
+    }));
 
     return {
-      total: workspaces.length,
       totalMembers,
-      avgMembersPerWorkspace:
-        workspaces.length > 0
-          ? Math.round((totalMembers / workspaces.length) * 10) / 10
-          : 0,
-      list: workspaces.map((w) => ({
-        id: w.id,
-        name: w.name,
-        ownerId: w.ownerId,
-        members: w._count.members,
-        wallets: w._count.wallets,
-        categories: w._count.categories,
-        transactions: w._count.transactions,
-        savingsGoals: w._count.savingsGoals,
-        createdAt: w.createdAt,
-      })),
+      totalSavingsGoals,
+      avgMembersPerWorkspace,
+      ...buildPaginatedResponse(data, totalWorkspaces, page, pageSize),
     };
   }
 
