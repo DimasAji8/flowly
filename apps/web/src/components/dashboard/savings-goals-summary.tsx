@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Target } from "lucide-react";
+import { ArrowRight, HandCoins } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import type { SavingsGoal } from "@/types/finance";
 import { formatCurrency } from "@/utils/format-currency";
@@ -47,7 +47,7 @@ export function SavingsGoalsSummary({ items }: SavingsGoalsSummaryProps) {
           return (
             <Link key={goal.id} href={ROUTES.savingsGoals} className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-card-subtle">
               <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
-                <Target className="size-4" aria-hidden />
+                <HandCoins className="size-4" aria-hidden />
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <div className="flex items-start justify-between gap-3">

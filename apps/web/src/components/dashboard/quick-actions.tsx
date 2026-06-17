@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Target, Tag, Repeat, PieChart, BarChart2 } from "lucide-react";
+import { HandCoins, Tag, Repeat, PieChart, BarChart2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 
 const ACTIONS = [
   { href: ROUTES.reports,          icon: BarChart2, label: "Laporan"   },
-  { href: ROUTES.savingsGoals,     icon: Target,    label: "Tabungan"  },
+  { href: ROUTES.savingsGoals,     icon: HandCoins, label: "Tabungan"  },
   { href: ROUTES.categories,       icon: Tag,       label: "Kategori"  },
   { href: ROUTES.profileAllocation,icon: PieChart,  label: "Alokasi"   },
   { href: ROUTES.recurring,        icon: Repeat,    label: "Berulang"  },

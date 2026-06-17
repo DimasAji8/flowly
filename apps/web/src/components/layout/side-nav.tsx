@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/hooks/use-theme";
-import { LayoutDashboard, CalendarDays, ArrowLeftRight, Wallet, Target, Tag, Repeat, PieChart, CircleUserRound, BarChart2 } from "lucide-react";
+import { LayoutDashboard, CalendarDays, ArrowLeftRight, Wallet, HandCoins, Tag, Repeat, PieChart, CircleUserRound, BarChart2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -14,7 +14,7 @@ function useNavItems() {
     { href: ROUTES.transactions,       label: "Transaksi",     icon: ArrowLeftRight, matchPrefix: "/transactions" },
     { href: ROUTES.calendar,           label: "Kalender",      icon: CalendarDays },
     { href: ROUTES.wallets,            label: "Dompet",        icon: Wallet, matchPrefix: "/wallets" },
-    { href: ROUTES.savingsGoals,       label: "Tabungan",      icon: Target },
+    { href: ROUTES.savingsGoals,       label: "Tabungan",      icon: HandCoins },
     { href: ROUTES.categories,         label: "Kategori",      icon: Tag },
     { href: ROUTES.recurring,          label: "Berulang",      icon: Repeat },
     { href: ROUTES.profileAllocation,  label: "Alokasi",       icon: PieChart },

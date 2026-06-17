@@ -81,19 +81,20 @@ Keuanganmu". Auth pages juga pakai brand "Teman Kas" (konsisten dengan landing).
 - Endpoint developer dilindungi `JwtAuthGuard` + `DeveloperGuard` (double guard, urut penting)
 
 ## Developer UI: table-based + pagination + shadcn
-- Halaman `/developer/users` dan `/developer/workspaces` pakai **tabel** shadcn + pagination
-- Dashboard (`/developer/page.tsx`) pakai **BigStat cards + MiniStat + bar charts**, bukan tabel/finansial
+- Halaman `/developer/users`, `/developer/workspaces`, `/developer/reviews` pakai **DataTable** (`components/ui/data-table.tsx`) — generic `T extends object`, kolom + server-side pagination, skeleton loading.
+- Dashboard (`/developer/page.tsx`) pakai **BigStat cards + engagement metrics + bar charts**, bukan tabel.
+- API endpoints `/developer/users` dan `/developer/workspaces` kini **paginated** via `PaginationQueryDto`.
+- `formatRelativeTime(iso)` di `utils/format-date.ts` untuk kolom "Terakhir Dilihat" pada tabel users.
 - Gunakan shadcn `Table` + `Badge` + `Pagination` components — boleh install selama tidak menimpa `button.tsx` / `input.tsx`
 - Detail plan: lihat `.memory/developer-ui-plan.md`
 
-## Developer Dashboard (final design, 2026-06-15)
-- **3 BigStat** cards (Total User, Workspace, Transaksi) — large icon, text-2xl
-- **Ringkasan Data** — 4 MiniStat berwarna: Dompet, Target Tabungan, Transfer, Berulang (count only, no financial)
-- **Distribusi Gender** — horizontal bar chart (Pria/Wanita/tidak diisi) dari data gender user
-- **Registrasi 6 Bulan** — vertical bar chart tracking signup trend
-- **User Terbaru** — 5 user terakhir dengan avatar initial + DEV badge
-- **System Health** — Database status+latency, uptime (d/h/m), heap memory, Node.js, timestamp
-- Semua data **non-finansial** (count/jumlah saja)
+## Developer Dashboard (final design, 2026-06-16)
+- **3 BigStat** cards (Total User, Transaksi, Volume) + engagement KPI
+- **Tren Transaksi 7 Hari** — bar chart `TrendChart`, data dari `transactionsByDay`
+- **Adopsi Fitur** — `AdoptionStat` (% rate) + `NumericStat` (nilai tunggal)
+- **Distribusi Gender** + **Registrasi 6 Bulan** chart
+- **User Terbaru** (5) + **System Health**
+- Semua data **non-finansial** (count/jumlah/rate)
 
 ## Tarik Tunai (2026-06-16)
 - **Konsep**: aksi naratif "ambil uang tunai dari dompet" — di belakang layar adalah Transfer dari dompet non-Tunai → dompet Tunai. BUKAN expense (tidak lewat `transactions`), BUKAN duplikasi schema.
