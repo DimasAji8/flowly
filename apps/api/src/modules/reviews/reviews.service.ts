@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
 import { PaginationQueryDto } from '../../common/dto/pagination.query';
 import {
   PaginatedResponse,
@@ -32,17 +31,17 @@ export class ReviewsService {
   }
 
   /** Developer: list all reviews (paginated) */
-  async findAll(
-    pagination: PaginationQueryDto,
-  ): Promise<PaginatedResponse<{
-    id: string;
-    name: string;
-    rating: number;
-    content: string;
-    isShown: boolean;
-    createdAt: Date;
-    updatedAt: Date;
-  }>> {
+  async findAll(pagination: PaginationQueryDto): Promise<
+    PaginatedResponse<{
+      id: string;
+      name: string;
+      rating: number;
+      content: string;
+      isShown: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+    }>
+  > {
     const page = pagination.page ?? 1;
     const pageSize = pagination.pageSize ?? 50;
 

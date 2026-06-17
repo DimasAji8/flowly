@@ -41,6 +41,7 @@ export default function DeveloperReviewsPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchReviews(page);
   }, [page, fetchReviews]);
 

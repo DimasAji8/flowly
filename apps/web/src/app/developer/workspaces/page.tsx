@@ -9,7 +9,6 @@ import {
   Target,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import {
   developerService,
@@ -61,6 +60,7 @@ export default function DeveloperWorkspacesPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData(page);
   }, [page, fetchData]);
 

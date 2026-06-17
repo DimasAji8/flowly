@@ -50,6 +50,7 @@ function StarPicker({
 }
 
 // ─── Quote mark decoration ────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function QuoteMark({ style }: { style?: React.CSSProperties }) {
   return (
     <svg
@@ -374,8 +375,8 @@ export function ReviewFormSection() {
                     margin: 0,
                   }}
                 >
-                  "Aplikasi keuangan terbaik yang pernah saya gunakan.
-                  Antarmuka yang bersih dan fitur yang lengkap."
+                  &ldquo;Aplikasi keuangan terbaik yang pernah saya gunakan.
+                  Antarmuka yang bersih dan fitur yang lengkap.&rdquo;
                 </p>
                 <div
                   style={{

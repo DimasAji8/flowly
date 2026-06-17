@@ -63,6 +63,7 @@ export function WithdrawalModal({
   // Reset state when modal opens
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStep("form");
       setAmountDisplay("");
       setAmountValue(0);
