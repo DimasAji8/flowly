@@ -78,6 +78,21 @@ Keuanganmu". Auth pages juga pakai brand "Teman Kas" (konsisten dengan landing).
 - Login/register/landing redirect: jika `role === "developer"` → `/developer`, bukan dashboard user
 - Developer punya layout sendiri (`DeveloperShell`) dengan sidebar khusus (menu Dashboard/Users/Workspaces/Health + Logout), full-width (no max-w constraint)
 - User sidebar (`side-nav.tsx`) hanya menampilkan menu user biasa, developer menu dihapus
+
+## Cross-page data sync via custom event `flowly:transaction-added`
+Setelah mutasi data (tambah/edit/hapus transaksi, transfer, setoran tabungan, recurring),
+semua halaman harus refresh tanpa manual reload. Pattern:
+1. **Dispatcher** (modal/form): `window.dispatchEvent(new Event("flowly:transaction-added"))`
+   setelah API call berhasil + store invalidation.
+2. **Listener** (page): `useEffect` listen event → invalidate store → reload data.
+3. **Store invalidation**: `useWalletStore.getState().invalidate()` + `useCategoryStore.getState().invalidate()`
+   dipanggil di listener sebelum reload, supaya shared store juga fresh.
+4. **Dashboard** harus pakai `useWalletStore` (bukan fetch langsung dari API) supaya
+   wallet store invalidation berpengaruh.
+- Dispatcher files: `transaction-modal`, `delete-transaction-modal`, `transfer-modal`,
+  `withdrawal-modal`, `savings-goal-contribution-modal`, `savings-goal-modal`, `recurring-modal`
+- Listener files: `dashboard`, `transactions`, `wallets`, `calendar`, `savings-goals`,
+  `recurring`, `reports`, `wallets/transfers`
 - Endpoint developer dilindungi `JwtAuthGuard` + `DeveloperGuard` (double guard, urut penting)
 
 ## Developer UI: table-based + pagination + shadcn

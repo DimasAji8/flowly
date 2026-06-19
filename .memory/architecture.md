@@ -54,3 +54,16 @@ docs/instructions/   ← source spec (00-index.md …)
 - Atomic seeding on register via `prisma.$transaction`.
 - Recurring job must be **idempotent** (no double-generate on restart); process
   in UTC, render to user timezone on frontend.
+
+## Cross-page Data Sync (Custom Event Pattern)
+Semua halaman harus auto-refresh setelah mutasi data. Pattern:
+1. **Dispatcher** (modal/form): `window.dispatchEvent(new Event("flowly:transaction-added"))`
+   setelah API call berhasil + store invalidation.
+2. **Listener** (page): `useEffect` listen event → invalidate store → reload data.
+3. **Shared stores** (`useWalletStore`, `useCategoryStore`): invalidate via
+   `store.getState().invalidate()` di listener sebelum reload.
+4. **Dashboard** harus pakai `useWalletStore` (bukan fetch langsung dari API).
+- Dispatcher: `transaction-modal`, `delete-transaction-modal`, `transfer-modal`,
+  `withdrawal-modal`, `savings-goal-contribution-modal`, `savings-goal-modal`, `recurring-modal`
+- Listener: `dashboard`, `transactions`, `wallets`, `calendar`, `savings-goals`,
+  `recurring`, `reports`, `wallets/transfers`
