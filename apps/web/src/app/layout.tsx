@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Urbanist, Geist } from "next/font/google";
+import { Urbanist, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthHydrator } from "@/components/layout/auth-hydrator";
@@ -7,17 +7,15 @@ import { ToastProvider } from "@/components/ui/toast-provider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const urbanist = Urbanist({
+  subsets: ["latin"],
+  variable: "--font-urbanist",
+  display: "swap",
+});
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
-  display: "swap",
-});
-
-const urbanist = Urbanist({
-  subsets: ["latin"],
-  variable: "--font-urbanist",
   display: "swap",
 });
 
@@ -112,7 +110,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full", "antialiased", playfair.variable, urbanist.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="en" className={cn("h-full", "antialiased", urbanist.variable, playfair.variable, "font-sans")} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <Script id="theme-init" strategy="beforeInteractive">{`try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;if(t==='dark'){c.add('dark');}else{c.add('light');}}catch(e){}`}</Script>
         <ThemeProvider>
