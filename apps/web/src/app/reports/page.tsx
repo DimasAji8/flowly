@@ -27,6 +27,7 @@ export default function ReportsPage() {
   const { targets, fetch: fetchTargets } = useWorkspaceStore();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const [categorySpends, setCategorySpends] = useState<CategorySpend[]>([]);
   const [totalIncome, setTotalIncome] = useState(0);
@@ -86,7 +87,16 @@ export default function ReportsPage() {
 
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, month]);
+  }, [year, month, reloadKey]);
+
+  // Refresh data saat transaksi ditambah/diubah/dihapus dari halaman lain
+  useEffect(() => {
+    const handler = () => {
+      setReloadKey((k) => k + 1);
+    };
+    window.addEventListener("flowly:transaction-added", handler);
+    return () => window.removeEventListener("flowly:transaction-added", handler);
+  }, []);
 
   const savingsWalletIds = useMemo(
     () => new Set(wallets.filter((w) => w.type === "savings").map((w) => w.id)),

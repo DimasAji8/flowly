@@ -91,6 +91,13 @@ export default function RecurringListPage() {
     }
   }, [typeFilter, statusFilter]);
 
+  // Refresh data saat transaksi ditambah/diubah/dihapus dari halaman lain
+  useEffect(() => {
+    const handler = () => { void fetchItems(); };
+    window.addEventListener("flowly:transaction-added", handler);
+    return () => window.removeEventListener("flowly:transaction-added", handler);
+  }, [fetchItems]);
+
   const toggleActive = async (r: RecurringTransaction) => {
     try {
       await recurringService.update(r.id, { isActive: !r.isActive });

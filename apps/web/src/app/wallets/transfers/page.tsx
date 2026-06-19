@@ -41,6 +41,13 @@ export default function TransferHistoryPage() {
       .finally(() => setLoading(false));
   }, [year, month, refreshKey]);
 
+  // Refresh data saat transfer ditambah/dihapus dari halaman lain
+  useEffect(() => {
+    const handler = () => setRefreshKey((k) => k + 1);
+    window.addEventListener("flowly:transaction-added", handler);
+    return () => window.removeEventListener("flowly:transaction-added", handler);
+  }, []);
+
   const handleDelete = async (id: string) => {
     try {
       await transfersService.remove(id);

@@ -83,6 +83,13 @@ export default function WalletsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Refresh wallet data saat transaksi ditambah/diubah/dihapus dari halaman lain
+  useEffect(() => {
+    const handler = () => reload();
+    window.addEventListener("flowly:transaction-added", handler);
+    return () => window.removeEventListener("flowly:transaction-added", handler);
+  }, []);
+
   const handleCreateWallet = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim()) return;

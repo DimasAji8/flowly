@@ -86,7 +86,12 @@ export default function TransactionsPage() {
   }, []);
 
   useEffect(() => {
-    const handler = () => load();
+    const handler = () => {
+      // Invalidate store agar data dompet/kategori ter-update
+      useWalletStore.getState().invalidate();
+      useCategoryStore.getState().invalidate();
+      load();
+    };
     window.addEventListener("flowly:transaction-added", handler);
     return () => window.removeEventListener("flowly:transaction-added", handler);
   }, [load]);

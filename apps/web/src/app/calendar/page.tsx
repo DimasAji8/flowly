@@ -23,6 +23,8 @@ export default function CalendarPage() {
   const [loadingDay, setLoadingDay] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [reloadKey, setReloadKey] = useState(0);
+
   useEffect(() => {
     let cancelled = false;
     transactionsService
@@ -33,7 +35,7 @@ export default function CalendarPage() {
       })
       .finally(() => { if (!cancelled) setLoadingMonth(false); });
     return () => { cancelled = true; };
-  }, [year, month]);
+  }, [year, month, reloadKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,7 +45,14 @@ export default function CalendarPage() {
       .catch(() => { if (!cancelled) setDayItems([]); })
       .finally(() => { if (!cancelled) setLoadingDay(false); });
     return () => { cancelled = true; };
-  }, [selectedDate]);
+  }, [selectedDate, reloadKey]);
+
+  // Refresh data saat transaksi ditambah/diubah/dihapus dari halaman lain
+  useEffect(() => {
+    const handler = () => setReloadKey((k) => k + 1);
+    window.addEventListener("flowly:transaction-added", handler);
+    return () => window.removeEventListener("flowly:transaction-added", handler);
+  }, []);
 
   const dataMap = useMemo(() => {
     const m = new Map<string, DayData>();

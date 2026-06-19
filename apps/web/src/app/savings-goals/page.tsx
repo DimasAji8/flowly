@@ -94,6 +94,17 @@ export default function SavingsGoalsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Refresh data saat transaksi ditambah/diubah/dihapus dari halaman lain
+  useEffect(() => {
+    const handler = () => {
+      useWalletStore.getState().invalidate();
+      void reload();
+    };
+    window.addEventListener("flowly:transaction-added", handler);
+    return () => window.removeEventListener("flowly:transaction-added", handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const walletNameById = useMemo(
     () => new Map(wallets.map((w) => [w.id, w.name])),
     [wallets],
