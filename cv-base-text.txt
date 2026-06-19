@@ -1,0 +1,102 @@
+DIMAS DANANG AJI W. I
+Fullstack Web Developer
++62 851-5788-1562 | ajid0818@gmail.com | linkedin.com/in/dimas-aji | dimasaji.tech
+Tangerang, Indonesia
+
+
+PROFESSIONAL SUMMARY
+Fullstack Web Developer who builds and ships products end to end, working primarily in TypeScript
+across the stack — NestJS and Express.js on the backend, React and Next.js on the frontend — with
+solid experience in PHP/Laravel. Comfortable owning a feature from database schema and API design
+through to a responsive, accessible UI. Strong foundations in scalable REST API design, relational
+and NoSQL data modeling, authentication, and clean, maintainable architecture. BNSP-certified
+programmer with a Bachelor's in Informatics Engineering (GPA 3.50/4.00).
+
+
+TECHNICAL SKILLS
+Languages          TypeScript, JavaScript, PHP, SQL
+Backend            NestJS, Express.js, Laravel, REST API design, JWT & bcrypt auth, Prisma ORM,
+                   class-validator, scheduled/cron jobs
+Frontend           React, Next.js (App Router), Tailwind CSS, Zustand, React Hook Form, Zod,
+                   Recharts, responsive & accessible UI
+Databases          PostgreSQL, MySQL, MongoDB
+Tools & Practices  Git, npm workspaces (monorepo), Swagger/OpenAPI, multi-tenant architecture,
+                   API documentation, debugging & performance tuning
+
+
+WORK EXPERIENCE
+
+LPTI Universitas Pamulang — South Tangerang, Indonesia
+Web Developer | May 2025 - Present
+- Develop backend services for core campus platforms, including an Academic Information System
+  that manages student records and academic workflows used across faculties.
+- Built a tuition savings and payment feature that lets students plan and settle their financial
+  obligations, integrating data flow between the academic and finance modules.
+- Designed reliable API services and structured backend processes that improved data consistency
+  across previously disconnected modules.
+- Work directly with internal campus teams to turn operational requirements into practical digital
+  solutions and drive smooth system adoption.
+
+PT. Travedia Terbit Semesta — Tangerang, Banten
+Backend Web Developer | Nov 2024 - Mar 2025
+- Designed, implemented, and maintained REST APIs powering communication between frontend and
+  backend for the company's travel reservation platform (Node.js & Express).
+- Modeled secure, efficient, and scalable database structures using MongoDB and MySQL for
+  travel-related data.
+- Diagnosed and resolved bugs across testing and operations, and authored technical documentation
+  for APIs, database structures, and backend systems.
+- Collaborated closely with frontend developers to ensure seamless end-to-end integration and
+  performed regular maintenance to improve performance, security, and reliability.
+
+
+PROJECTS
+
+Teman Kas — Personal Finance App | 2026
+Fullstack Web Developer · Next.js, NestJS, Prisma, PostgreSQL, TypeScript
+- Built a full-stack personal finance app from the ground up as an npm-workspaces monorepo:
+  Next.js 16 (App Router) + Tailwind v4 frontend and NestJS 11 + Prisma 6 + PostgreSQL backend.
+- Designed a clean single-user data model with workspace-scoped isolation for organized financial
+  data management across wallets, transactions, and savings goals.
+- Implemented secure stateless authentication with JWT access/refresh tokens, bcrypt hashing, and
+  silent single-flight token refresh on the client.
+- Built atomic onboarding that provisions a workspace, default wallets, and default categories
+  in one Prisma transaction, so new users can start recording transactions immediately.
+- Delivered core features end to end: income/expense transactions, multi-wallet management with
+  transfers, custom categories, monthly calendar view, savings goals with progress tracking, budget
+  allocation (50/30/20), and scheduler-driven recurring transactions via an idempotent cron job.
+- Designed a calm, accessible, one-handed mobile UI with reusable components, dashboards, charts
+  (Recharts), and validated forms (React Hook Form + Zod), tuned for a sub-5-second flow to record
+  a transaction.
+
+Poultry Farm Management App — Alexis Farm Industries — Jakarta, Indonesia | 2025
+Fullstack Web Developer · Next.js, TypeScript, Prisma
+- Built and maintained a poultry farm management web app covering feed, egg production, sales,
+  finance, and master data.
+- Developed APIs and database workflows, and created responsive dashboards and reusable components
+  to support daily operations and reporting.
+- Handled debugging, data validation, and ongoing improvements for system stability and performance.
+
+E-Catalog Website — Ryan Putra Ritelindo — Tangerang, Indonesia | Nov 2024 - Dec 2024
+Backend Web Developer · Laravel, Filament, MySQL
+- Developed a robust, scalable backend for the e-catalog website using Laravel.
+- Built an intuitive admin panel with Filament for efficient catalog content management.
+- Designed and optimized the MySQL schema and APIs for reliable product/catalog data and seamless
+  frontend-backend interaction.
+
+
+EDUCATION
+
+Pamulang University — South Tangerang, Indonesia
+Bachelor of Informatics Engineering — GPA 3.50/4.00 | Aug 2020 - Nov 2024
+- Studied core computer science: algorithms, data structures, databases, and networking.
+- Built system-analysis and modern web development skills through hands-on, team-based projects
+  solving real-world problems.
+
+
+CERTIFICATIONS & ACHIEVEMENTS
+- BNSP-Certified Programmer (2024) — Badan Nasional Sertifikasi Profesi, Indonesia. Passed
+  competency exams covering problem analysis, solution implementation, and application development.
+
+SOFT SKILLS
+Problem Solving · Critical Thinking · Collaboration · Adaptability · Attention to Detail ·
+Communication · Creativity
