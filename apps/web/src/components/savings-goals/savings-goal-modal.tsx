@@ -107,6 +107,8 @@ export function SavingsGoalModal({
         toast.success("Target tabungan ditambahkan");
       }
       setConfirmOpen(false);
+      // Dispatch event agar semua halaman refresh data
+      window.dispatchEvent(new Event("flowly:transaction-added"));
       handleClose();
       await onSuccess();
     } catch (e) {

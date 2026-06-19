@@ -8,6 +8,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { transfersService } from "@/services/transfers.service";
+import { useWalletStore } from "@/store/wallets.store";
 import { ApiError } from "@/lib/api-client";
 import { isoToday } from "@/utils/format-date";
 import type { Wallet } from "@/types/finance";
@@ -125,6 +126,10 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
       });
       toast.success("Transfer berhasil");
       setConfirmOpen(false);
+      // Invalidate wallet store karena saldo dompet berubah
+      useWalletStore.getState().invalidate();
+      // Dispatch event agar semua halaman refresh data
+      window.dispatchEvent(new Event("flowly:transaction-added"));
       handleClose();
       onSuccess();
     } catch (e) {

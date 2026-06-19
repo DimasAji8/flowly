@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { transactionsService } from "@/services/transactions.service";
+import { useWalletStore } from "@/store/wallets.store";
 
 interface DeleteTransactionModalProps {
   open: boolean;
@@ -22,6 +23,10 @@ export function DeleteTransactionModal({ open, onClose, onSuccess, transactionId
     try {
       await transactionsService.remove(transactionId);
       toast.success("Transaksi dihapus");
+      // Invalidate wallet store karena saldo dompet berubah saat transaksi dihapus
+      useWalletStore.getState().invalidate();
+      // Dispatch event agar semua halaman refresh data
+      window.dispatchEvent(new Event("flowly:transaction-added"));
       onClose();
       onSuccess();
     } catch {

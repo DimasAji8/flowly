@@ -121,6 +121,9 @@ export function WithdrawalModal({
       useWalletStore.getState().invalidate();
       void useWalletStore.getState().fetch();
 
+      // Dispatch event agar semua halaman refresh data
+      window.dispatchEvent(new Event("flowly:transaction-added"));
+
       toast.success("Tarik tunai berhasil");
       onSuccess?.();
       onClose();

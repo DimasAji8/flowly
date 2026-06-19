@@ -58,6 +58,8 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
         currentAmount: Number(goal.currentAmount) + contribution,
       });
       toast.success("Setoran tabungan ditambahkan");
+      // Dispatch event agar semua halaman refresh data
+      window.dispatchEvent(new Event("flowly:transaction-added"));
       onClose();
       await onSuccess();
     } catch (e) {

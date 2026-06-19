@@ -7,6 +7,7 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { TransactionForm } from "@/components/forms/transaction-form";
 import { transactionsService } from "@/services/transactions.service";
+import { useWalletStore } from "@/store/wallets.store";
 import type { CreateTransactionFormValues } from "@/lib/transaction-schemas";
 import type { Transaction, TransactionType } from "@/types/finance";
 
@@ -40,6 +41,10 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
       });
       toast.success("Transaksi ditambahkan");
     }
+    // Invalidate wallet store karena saldo dompet berubah
+    useWalletStore.getState().invalidate();
+    // Dispatch event agar semua halaman (dashboard, kalender, dll) refresh data
+    window.dispatchEvent(new Event("flowly:transaction-added"));
     handleClose();
     onSuccess();
   };

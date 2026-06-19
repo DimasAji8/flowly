@@ -81,6 +81,8 @@ export function RecurringModal({ open, onClose, onSuccess }: RecurringModalProps
                 isActive: values.isActive ?? true,
               });
               toast.success("Recurring ditambahkan");
+              // Dispatch event agar semua halaman refresh data
+              window.dispatchEvent(new Event("flowly:transaction-added"));
               handleClose();
               onSuccess();
             }}
