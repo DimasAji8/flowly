@@ -1,23 +1,13 @@
 import type { Metadata } from "next";
-import { Urbanist, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import "@fontsource-variable/urbanist";
+import "@fontsource/playfair-display/400.css";
+import "@fontsource/playfair-display/700.css";
 import { AuthHydrator } from "@/components/layout/auth-hydrator";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { cn } from "@/lib/utils";
-
-const urbanist = Urbanist({
-  subsets: ["latin"],
-  variable: "--font-urbanist",
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://temankas.com'),
@@ -110,7 +100,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full", "antialiased", urbanist.variable, playfair.variable, "font-sans")} suppressHydrationWarning>
+    <html lang="en" className={cn("h-full", "antialiased", "font-sans")} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <Script id="theme-init" strategy="beforeInteractive">{`try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;if(t==='dark'){c.add('dark');}else{c.add('light');}}catch(e){}`}</Script>
         <ThemeProvider>
