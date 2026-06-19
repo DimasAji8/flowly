@@ -13,9 +13,9 @@ import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
 import { transactionsService } from "@/services/transactions.service";
-import { walletsService } from "@/services/wallets.service";
 import { useAuthStore } from "@/store/auth.store";
-import type { MonthlySummary, Transaction, SavingsGoal, Wallet } from "@/types/finance";
+import { useWalletStore } from "@/store/wallets.store";
+import type { MonthlySummary, Transaction, SavingsGoal } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
 
 export default function DashboardPage() {
@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
-  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const { wallets, fetch: fetchWallets } = useWalletStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -65,9 +65,9 @@ export default function DashboardPage() {
       transactionsService.monthlySummary(),
       transactionsService.list({ limit: 5, page: 1, from, to }),
       savingsGoalsService.list(),
-      walletsService.list(),
+      fetchWallets(),
     ])
-      .then(([s, all, goals, ws]) => {
+      .then(([s, all, goals]) => {
         if (cancelled) return;
         setSummary(s);
         setRecent(all.data
@@ -76,7 +76,6 @@ export default function DashboardPage() {
           .slice(0, 3)
         );
         setSavingsGoals(goals);
-        setWallets(ws);
         setError(null);
       })
       .catch((e: unknown) => {
@@ -86,10 +85,15 @@ export default function DashboardPage() {
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reloadKey]);
 
   useEffect(() => {
-    const handler = () => load();
+    const handler = () => {
+      // Invalidate wallet store agar data saldo ter-update
+      useWalletStore.getState().invalidate();
+      load();
+    };
     window.addEventListener("flowly:transaction-added", handler);
     return () => window.removeEventListener("flowly:transaction-added", handler);
   }, [load]);
