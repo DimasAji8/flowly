@@ -98,6 +98,9 @@ jobs:
       - name: Swap build to current and restart services
         run: |
           # Copy hasil build ke current (atomic per-file, bukan delete dulu)
+          # NOTE: rsync tanpa sudo karena current/ di-chown ke runner user dulu,
+          # lalu dikembalikan ke temankas setelahnya.
+          sudo chown -R "$USER:$USER" "$APP_DIR/"
           rsync -a --delete "$BUILD_DIR/" "$APP_DIR/"
           # Pastikan semua file bisa dibaca oleh service user (temankas)
           sudo chown -R temankas:temankas "$APP_DIR/"
