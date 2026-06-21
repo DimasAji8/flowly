@@ -15,8 +15,6 @@ async function bootstrap() {
     'CORS_ORIGIN',
     'http://localhost:3000',
   );
-  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
-
   app.setGlobalPrefix(API_PREFIX);
   app.useGlobalPipes(
     new ValidationPipe({
