@@ -55,7 +55,7 @@ jobs:
 
           # B2B API Key (untuk integrasi developer mobile)
           if [[ -n "$B2B_CONFIG" ]]; then
-            echo "$B2B_CONFIG" >> "$BUILD_DIR/apps/api/.env.production"
+            printf '%s\n' "$B2B_CONFIG" >> "$BUILD_DIR/apps/api/.env.production"
           fi
 
           # Developer debug account (optional)
