@@ -39,7 +39,13 @@ export class WorkspaceGuard implements CanActivate {
       user?: AuthUser;
       headers: Record<string, string | string[] | undefined>;
       workspace?: WorkspaceContext;
+      __b2b?: boolean;
     }>();
+
+    // B2B pass-through: workspace sudah di-inject oleh B2bAuthGuard
+    if (request.__b2b) {
+      return true;
+    }
 
     const user = request.user;
     if (!user) {
