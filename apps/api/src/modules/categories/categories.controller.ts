@@ -14,6 +14,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiResponse,
   ApiSecurity,
@@ -55,7 +56,8 @@ export class CategoriesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Detail kategori' })
-  @ApiResponse({ status: 200, type: CategoryResponse })
+  @ApiParam({ name: 'id', description: 'ID kategori' })
+  @ApiResponse({ status: 200, description: 'Data kategori', type: CategoryResponse })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
@@ -75,7 +77,8 @@ export class CategoriesController {
   @ApiOperation({
     summary: 'Update kategori (rename / recolor — type tidak bisa diubah)',
   })
-  @ApiResponse({ status: 200, type: CategoryResponse })
+  @ApiParam({ name: 'id', description: 'ID kategori' })
+  @ApiResponse({ status: 200, description: 'Kategori berhasil diupdate', type: CategoryResponse })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Param('id') id: string,
@@ -87,7 +90,8 @@ export class CategoriesController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Hapus kategori' })
-  @ApiResponse({ status: 204 })
+  @ApiParam({ name: 'id', description: 'ID kategori' })
+  @ApiResponse({ status: 204, description: 'Berhasil dihapus' })
   @ApiResponse({
     status: 409,
     description: 'Kategori masih dipakai oleh transaksi',

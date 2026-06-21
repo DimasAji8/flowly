@@ -2,6 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -31,16 +32,20 @@ export class DeveloperController {
 
   @Get('users')
   @ApiOperation({ summary: 'Daftar semua user (developer only)' })
-  @ApiResponse({ status: 200, description: 'List semua user terdaftar' })
+  @ApiQuery({ name: 'page', required: false, description: 'Halaman (default: 1)', type: Number })
+  @ApiQuery({ name: 'pageSize', required: false, description: 'Item per halaman (default: 50, max: 200)', type: Number })
+  @ApiResponse({ status: 200, description: 'List user terdaftar (paginated)' })
   users(@Query() pagination: PaginationQueryDto) {
     return this.developerService.listUsers(pagination);
   }
 
   @Get('workspaces')
   @ApiOperation({ summary: 'Statistik workspace' })
+  @ApiQuery({ name: 'page', required: false, description: 'Halaman (default: 1)', type: Number })
+  @ApiQuery({ name: 'pageSize', required: false, description: 'Item per halaman (default: 50, max: 200)', type: Number })
   @ApiResponse({
     status: 200,
-    description: 'Jumlah workspace, anggota per workspace',
+    description: 'Jumlah workspace, anggota per workspace (paginated)',
   })
   workspaces(@Query() pagination: PaginationQueryDto) {
     return this.developerService.getWorkspaceStats(pagination);

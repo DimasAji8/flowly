@@ -14,6 +14,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -48,7 +49,8 @@ export class RecurringController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Detail recurring' })
-  @ApiResponse({ status: 200, type: RecurringResponse })
+  @ApiParam({ name: 'id', description: 'ID recurring transaction' })
+  @ApiResponse({ status: 200, description: 'Data recurring', type: RecurringResponse })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
@@ -66,7 +68,8 @@ export class RecurringController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update recurring' })
-  @ApiResponse({ status: 200, type: RecurringResponse })
+  @ApiParam({ name: 'id', description: 'ID recurring transaction' })
+  @ApiResponse({ status: 200, description: 'Recurring berhasil diupdate', type: RecurringResponse })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Param('id') id: string,
@@ -78,7 +81,8 @@ export class RecurringController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Hapus recurring' })
-  @ApiResponse({ status: 204 })
+  @ApiParam({ name: 'id', description: 'ID recurring transaction' })
+  @ApiResponse({ status: 204, description: 'Berhasil dihapus' })
   remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
   }

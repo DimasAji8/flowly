@@ -2,6 +2,8 @@ import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiProperty,
+  ApiPropertyOptional,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -20,8 +22,13 @@ import {
 } from './dto/workspace-response.dto';
 
 class UpdateAllocationTargetsBody {
+  @ApiPropertyOptional({ example: 50, description: 'Target kebutuhan (%)' })
   @IsOptional() @IsInt() @Min(0) @Max(100) needsTarget?: number;
+
+  @ApiPropertyOptional({ example: 30, description: 'Target keinginan (%)' })
   @IsOptional() @IsInt() @Min(0) @Max(100) wantsTarget?: number;
+
+  @ApiPropertyOptional({ example: 20, description: 'Target tabungan (%)' })
   @IsOptional() @IsInt() @Min(0) @Max(100) savingsTarget?: number;
 }
 
@@ -62,6 +69,7 @@ export class WorkspacesController {
   @ApiOperation({
     summary: 'Update target alokasi anggaran (needs/wants/savings %)',
   })
+  @ApiResponse({ status: 200, description: 'Target alokasi berhasil diupdate' })
   updateAllocation(
     @CurrentWorkspace() workspace: WorkspaceContext,
     @Body() body: UpdateAllocationTargetsBody,

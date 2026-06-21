@@ -13,6 +13,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -43,7 +44,8 @@ export class WalletsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Detail wallet' })
-  @ApiResponse({ status: 200, type: WalletResponse })
+  @ApiParam({ name: 'id', description: 'ID wallet' })
+  @ApiResponse({ status: 200, description: 'Data wallet', type: WalletResponse })
   @ApiResponse({ status: 404, description: 'Wallet tidak ditemukan' })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.walletsService.findById(ws.id, id);
@@ -62,7 +64,8 @@ export class WalletsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update wallet (rename)' })
-  @ApiResponse({ status: 200, type: WalletResponse })
+  @ApiParam({ name: 'id', description: 'ID wallet' })
+  @ApiResponse({ status: 200, description: 'Wallet berhasil diupdate', type: WalletResponse })
   @ApiResponse({ status: 404, description: 'Wallet tidak ditemukan' })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
@@ -79,6 +82,7 @@ export class WalletsController {
     description:
       'Akan gagal jika wallet masih punya transaksi atau recurring transaction.',
   })
+  @ApiParam({ name: 'id', description: 'ID wallet' })
   @ApiResponse({ status: 204, description: 'Berhasil dihapus' })
   @ApiResponse({
     status: 409,

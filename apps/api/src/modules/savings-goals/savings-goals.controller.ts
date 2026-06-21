@@ -14,6 +14,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -48,7 +49,8 @@ export class SavingsGoalsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Detail target tabungan' })
-  @ApiResponse({ status: 200, type: SavingsGoalResponse })
+  @ApiParam({ name: 'id', description: 'ID target tabungan' })
+  @ApiResponse({ status: 200, description: 'Data target tabungan', type: SavingsGoalResponse })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
@@ -66,7 +68,8 @@ export class SavingsGoalsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update target tabungan' })
-  @ApiResponse({ status: 200, type: SavingsGoalResponse })
+  @ApiParam({ name: 'id', description: 'ID target tabungan' })
+  @ApiResponse({ status: 200, description: 'Target berhasil diupdate', type: SavingsGoalResponse })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Param('id') id: string,
@@ -78,7 +81,8 @@ export class SavingsGoalsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Hapus target tabungan' })
-  @ApiResponse({ status: 204 })
+  @ApiParam({ name: 'id', description: 'ID target tabungan' })
+  @ApiResponse({ status: 204, description: 'Berhasil dihapus' })
   remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
   }

@@ -61,8 +61,8 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login dengan email & password' })
-  @ApiResponse({ status: 200, type: AuthSessionResponse })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 200, description: 'Login berhasil — dapat access & refresh token', type: AuthSessionResponse })
+  @ApiResponse({ status: 401, description: 'Email atau password salah' })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
