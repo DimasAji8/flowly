@@ -48,6 +48,13 @@ jobs:
           ${{ secrets.API_ENV_PROD }}
           EOF
 
+          # B2B API Key (untuk integrasi developer mobile)
+          if [[ -n "${{ secrets.B2B_CONFIG }}" ]]; then
+            cat >> "$BUILD_DIR/apps/api/.env.production" <<'EOF'
+${{ secrets.B2B_CONFIG }}
+EOF
+          fi
+
           # Developer debug account (optional) — dari 1 secret format "email:password"
           if [[ -n "${{ secrets.DEV_ACCOUNT }}" ]]; then
             IFS=':' read -r devEmail devPass <<< "${{ secrets.DEV_ACCOUNT }}"
