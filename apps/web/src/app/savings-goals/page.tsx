@@ -101,7 +101,6 @@ export default function SavingsGoalsPage() {
     };
     window.addEventListener("flowly:transaction-added", handler);
     return () => window.removeEventListener("flowly:transaction-added", handler);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const walletNameById = useMemo(
