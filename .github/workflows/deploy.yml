@@ -41,30 +41,33 @@ jobs:
 
       # Tulis env produksi dari GitHub Secrets (tidak pernah di-commit).
       - name: Write production env files
+        env:
+          B2B_CONFIG: ${{ secrets.B2B_CONFIG }}
+          DEV_ACCOUNT: ${{ secrets.DEV_ACCOUNT }}
+          API_ENV_PROD: ${{ secrets.API_ENV_PROD }}
+          WEB_ENV_PROD: ${{ secrets.WEB_ENV_PROD }}
         run: |
           cat > "$BUILD_DIR/apps/api/.env.production" <<'EOF'
           NODE_ENV=production
           PORT=3333
-          ${{ secrets.API_ENV_PROD }}
+          $API_ENV_PROD
           EOF
 
           # B2B API Key (untuk integrasi developer mobile)
-          if [[ -n "${{ secrets.B2B_CONFIG }}" ]]; then
-            cat >> "$BUILD_DIR/apps/api/.env.production" <<'EOF'
-${{ secrets.B2B_CONFIG }}
-EOF
+          if [[ -n "$B2B_CONFIG" ]]; then
+            echo "$B2B_CONFIG" >> "$BUILD_DIR/apps/api/.env.production"
           fi
 
-          # Developer debug account (optional) — dari 1 secret format "email:password"
-          if [[ -n "${{ secrets.DEV_ACCOUNT }}" ]]; then
-            IFS=':' read -r devEmail devPass <<< "${{ secrets.DEV_ACCOUNT }}"
+          # Developer debug account (optional)
+          if [[ -n "$DEV_ACCOUNT" ]]; then
+            IFS=':' read -r devEmail devPass <<< "$DEV_ACCOUNT"
             echo "DEV_USER_EMAIL=$devEmail"   >> "$BUILD_DIR/apps/api/.env.production"
             echo "DEV_USER_PASSWORD=$devPass" >> "$BUILD_DIR/apps/api/.env.production"
           fi
           cat > "$BUILD_DIR/apps/web/.env.production" <<'EOF'
           NODE_ENV=production
           PORT=4000
-          ${{ secrets.WEB_ENV_PROD }}
+          $WEB_ENV_PROD
           EOF
           chmod 600 "$BUILD_DIR/apps/api/.env.production" "$BUILD_DIR/apps/web/.env.production"
 
