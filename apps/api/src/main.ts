@@ -57,9 +57,19 @@ async function bootstrap() {
       },
       'b2b-api-key',
     )
+    .addSecurityRequirements('b2b-api-key')
     .build();
 
   const b2bDocument = SwaggerModule.createDocument(app, b2bConfig);
+
+  // Hapus security per-endpoint (dari decorator controller) dan ganti pake b2b-api-key
+  for (const path of Object.keys(b2bDocument.paths)) {
+    const methods = b2bDocument.paths[path] as Record<string, unknown>;
+    for (const method of Object.keys(methods)) {
+      (methods[method] as Record<string, unknown>).security = [{ 'b2b-api-key': [] }];
+    }
+  }
+
   SwaggerModule.setup(`${API_PREFIX}/docs`, app, b2bDocument, {
     swaggerOptions: { persistAuthorization: true },
   });
