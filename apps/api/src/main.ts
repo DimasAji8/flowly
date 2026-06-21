@@ -30,21 +30,51 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Swagger — aktif di semua environment (diproteksi Basic Auth via Nginx)
-  const config = new DocumentBuilder()
+  // ──────────────────────────────────────────────
+  // Swagger — B2B (untuk mitra developer mobile)
+  // ──────────────────────────────────────────────
+  const b2bConfig = new DocumentBuilder()
     .setTitle('Teman Kas API — B2B Documentation')
     .setDescription(
-      'Mobile-first cashflow journal. Multi-tenant via workspace.\n\n' +
-        '**Cara akses API:**\n\n' +
-        '**1. B2B (API Key) — untuk integrasi mobile/partner**\n' +
-        'Jika kamu adalah developer eksternal, cukup kirim header:\n' +
-        '> `X-API-Key: <api_key>`\n' +
-        'Tidak perlu JWT / Workspace-ID. API Key akan otomatis di-rate limit.\n\n' +
-        '**2. Standard (JWT) — untuk pengguna biasa**\n' +
-        'Klik tombol "Authorize" di bawah → paste JWT (tanpa prefix `Bearer`).\n' +
-        'Kirim header `X-Workspace-Id` dengan workspace id kamu.\n\n' +
+      'Mobile-first cashflow journal.\n\n' +
+        '**Cara akses:**\n' +
+        'Cukup kirim header di setiap request:\n' +
+        '> `X-API-Key: <api_key>`\n\n' +
+        'Tidak perlu JWT / Workspace-ID.\n\n' +
         '---\n' +
-        '_Dokumentasi ini untuk mitra pengembang. Akses diproteksi._',
+        '_Dokumentasi ini khusus untuk mitra pengembang._',
+    )
+    .setVersion('1.0')
+    .setContact('Teman Kas', 'https://temankas.com', 'api@temankas.com')
+    .addApiKey(
+      {
+        type: 'apiKey',
+        in: 'header',
+        name: 'X-API-Key',
+        description:
+          'API Key B2B — satu-satunya yang dibutuhkan.\n' +
+          'Cukup kirim header ini, authorize saja.',
+      },
+      'b2b-api-key',
+    )
+    .build();
+
+  const b2bDocument = SwaggerModule.createDocument(app, b2bConfig);
+  SwaggerModule.setup(`${API_PREFIX}/docs`, app, b2bDocument, {
+    swaggerOptions: { persistAuthorization: true },
+  });
+
+  // ──────────────────────────────────────────────
+  // Swagger — Internal (untuk developer tim sendiri)
+  // ──────────────────────────────────────────────
+  const internalConfig = new DocumentBuilder()
+    .setTitle('Teman Kas API — Internal Documentation')
+    .setDescription(
+      '**Untuk developer internal tim Teman Kas.**\n\n' +
+        '**Auth:** klik "Authorize" → paste JWT (tanpa prefix `Bearer`).\n' +
+        '**Workspace-scoped endpoint:** isi `X-Workspace-Id`.\n\n' +
+        '---\n' +
+        '_Akses dibatasi untuk internal._',
     )
     .setVersion('1.0')
     .setContact('Teman Kas', 'https://temankas.com', 'api@temankas.com')
@@ -66,24 +96,11 @@ async function bootstrap() {
       },
       'workspace-id',
     )
-    .addApiKey(
-      {
-        type: 'apiKey',
-        in: 'header',
-        name: 'X-API-Key',
-        description:
-          'API Key B2B — untuk akses tanpa JWT/Workspace-ID.\n' +
-          'Cukup kirim header ini saja, tidak perlu Authorize JWT.',
-      },
-      'b2b-api-key',
-    )
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(`${API_PREFIX}/docs`, app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
+  const internalDocument = SwaggerModule.createDocument(app, internalConfig);
+  SwaggerModule.setup(`${API_PREFIX}/docs/internal`, app, internalDocument, {
+    swaggerOptions: { persistAuthorization: true },
   });
 
   await app.listen(port);
