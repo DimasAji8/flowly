@@ -47,11 +47,11 @@ jobs:
           API_ENV_PROD: ${{ secrets.API_ENV_PROD }}
           WEB_ENV_PROD: ${{ secrets.WEB_ENV_PROD }}
         run: |
-          cat > "$BUILD_DIR/apps/api/.env.production" <<'EOF'
-          NODE_ENV=production
-          PORT=3333
-          $API_ENV_PROD
-          EOF
+          printf '%s\n' \
+            "NODE_ENV=production" \
+            "PORT=3333" \
+            "$API_ENV_PROD" \
+            > "$BUILD_DIR/apps/api/.env.production"
 
           # B2B API Key (untuk integrasi developer mobile)
           if [[ -n "$B2B_CONFIG" ]]; then
@@ -64,11 +64,11 @@ jobs:
             echo "DEV_USER_EMAIL=$devEmail"   >> "$BUILD_DIR/apps/api/.env.production"
             echo "DEV_USER_PASSWORD=$devPass" >> "$BUILD_DIR/apps/api/.env.production"
           fi
-          cat > "$BUILD_DIR/apps/web/.env.production" <<'EOF'
-          NODE_ENV=production
-          PORT=4000
-          $WEB_ENV_PROD
-          EOF
+          printf '%s\n' \
+            "NODE_ENV=production" \
+            "PORT=4000" \
+            "$WEB_ENV_PROD" \
+            > "$BUILD_DIR/apps/web/.env.production"
           chmod 600 "$BUILD_DIR/apps/api/.env.production" "$BUILD_DIR/apps/web/.env.production"
 
       - name: Install dependencies
@@ -99,6 +99,14 @@ jobs:
         run: |
           # Copy hasil build ke current (atomic per-file, bukan delete dulu)
           rsync -a --delete "$BUILD_DIR/" "$APP_DIR/"
+          # Pastikan semua file bisa dibaca oleh service user (temankas)
+          sudo chown -R temankas:temankas "$APP_DIR/"
+          # .env file harus 600, direktori harus bisa diakses
+          sudo find "$APP_DIR" -type d -exec chmod 755 {} +
+          sudo find "$APP_DIR" -name '.env*' -exec chmod 600 {} +
+          # Cache Next.js harus writable
+          sudo mkdir -p "$APP_DIR/apps/web/.next/cache"
+          sudo chmod -R 775 "$APP_DIR/apps/web/.next/cache"
           sudo systemctl restart temankas-api.service
           sudo systemctl restart temankas-web.service
 
