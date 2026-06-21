@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
-  private resend: Resend;
+  private resend: Resend | null = null;
   private readonly logger = new Logger(EmailService.name);
   private readonly fromEmail: string;
   private readonly appName: string;
@@ -12,12 +12,13 @@ export class EmailService {
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('RESEND_API_KEY');
-    if (!apiKey) {
+    if (apiKey) {
+      this.resend = new Resend(apiKey);
+    } else {
       this.logger.warn(
         'RESEND_API_KEY not configured. Email sending will be disabled.',
       );
     }
-    this.resend = new Resend(apiKey);
     this.fromEmail = this.configService.get<string>(
       'EMAIL_FROM',
       'noreply@temankas.com',
@@ -110,6 +111,13 @@ export class EmailService {
   </table>
 </body>
 </html>`;
+
+    if (!this.resend) {
+      this.logger.warn(
+        `Cannot send email to ${to}: RESEND_API_KEY not configured.`,
+      );
+      return;
+    }
 
     try {
       const result = await this.resend.emails.send({
