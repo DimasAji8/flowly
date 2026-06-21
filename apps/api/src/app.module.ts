@@ -1,9 +1,11 @@
 import { Module, OnModuleInit, Logger } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { B2bAuthGuard } from './modules/auth/guards/b2b-auth.guard';
 import { UsersModule } from './modules/users/users.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { WalletsModule } from './modules/wallets/wallets.module';
@@ -35,7 +37,13 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     ReviewsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: B2bAuthGuard,
+    },
+  ],
 })
 export class AppModule implements OnModuleInit {
   private readonly logger = new Logger(AppModule.name);
