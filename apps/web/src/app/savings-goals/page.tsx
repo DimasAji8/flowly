@@ -91,7 +91,6 @@ export default function SavingsGoalsPage() {
     }
     fetchInitial();
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Refresh data saat transaksi ditambah/diubah/dihapus dari halaman lain

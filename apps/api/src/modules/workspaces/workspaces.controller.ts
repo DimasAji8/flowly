@@ -2,7 +2,6 @@ import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiProperty,
   ApiPropertyOptional,
   ApiResponse,
   ApiSecurity,

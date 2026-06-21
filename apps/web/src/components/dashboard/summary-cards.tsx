@@ -12,7 +12,7 @@ interface SummaryCardsProps {
 
 const STORAGE_KEY = "teman-kas.balance-hidden";
 
-export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
+export function SummaryCards({ income, expense, net: _net, month, totalBalance }: SummaryCardsProps) {
   const isLowBalance = totalBalance !== undefined && totalBalance < 500_000;
   const [hidden, setHidden] = useState(true);
 
