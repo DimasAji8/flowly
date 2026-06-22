@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { formatCurrency } from "@/utils/format-currency";
 
+type HeroTab = "assets" | "monthly";
+
 interface SummaryCardsProps {
   income: string;
   expense: string;
@@ -10,32 +12,53 @@ interface SummaryCardsProps {
   totalBalance?: number;
 }
 
-const STORAGE_KEY = "teman-kas.balance-hidden";
+const STORAGE_KEY_HIDDEN = "teman-kas.balance-hidden";
+const STORAGE_KEY_TAB = "teman-kas.hero-tab";
 
-export function SummaryCards({ income, expense, net: _net, month, totalBalance }: SummaryCardsProps) {
+export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
   const isLowBalance = totalBalance !== undefined && totalBalance < 500_000;
   const [hidden, setHidden] = useState(true);
+  const [activeTab, setActiveTab] = useState<HeroTab>("assets");
 
-  // Load preference from localStorage
+  // Load preferences from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) {
+    const storedHidden = localStorage.getItem(STORAGE_KEY_HIDDEN);
+    if (storedHidden !== null) {
       // setState di effect disengaja: localStorage hanya tersedia di klien (pasca-mount).
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHidden(stored === "true");
+      setHidden(storedHidden === "true");
+    }
+    const storedTab = localStorage.getItem(STORAGE_KEY_TAB);
+    if (storedTab === "assets" || storedTab === "monthly") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTab(storedTab);
     }
   }, []);
 
-  // Save preference to localStorage
   const toggleHidden = () => {
     setHidden((h) => {
       const newValue = !h;
-      localStorage.setItem(STORAGE_KEY, String(newValue));
+      localStorage.setItem(STORAGE_KEY_HIDDEN, String(newValue));
       return newValue;
     });
   };
 
+  const switchTab = (tab: HeroTab) => {
+    setActiveTab(tab);
+    localStorage.setItem(STORAGE_KEY_TAB, tab);
+  };
+
   const mask = "••••••";
+  const netValue = Number(net);
+  const isNetNegative = netValue < 0;
+
+  const heroLabel = activeTab === "assets"
+    ? "Total Saldo · semua dompet"
+    : "Sisa bulan ini";
+
+  const heroValue = activeTab === "assets"
+    ? (totalBalance !== undefined ? formatCurrency(totalBalance) : "—")
+    : formatCurrency(net);
 
   return (
     <div className="flex flex-col gap-3">
@@ -55,10 +78,32 @@ export function SummaryCards({ income, expense, net: _net, month, totalBalance }
         <div className="pointer-events-none absolute -bottom-12 -left-6 size-32 rounded-full opacity-10" style={{ background: "white" }} aria-hidden />
         <div className="pointer-events-none absolute right-16 bottom-4 size-20 rounded-full opacity-5" style={{ background: "white" }} aria-hidden />
 
-        <div className="flex items-start justify-between">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/60">
-            Total Saldo · semua dompet
-          </p>
+        {/* Tab toggle + hide button */}
+        <div className="flex items-center justify-between">
+          <div className="flex rounded-full bg-white/10 p-0.5">
+            <button
+              type="button"
+              onClick={() => switchTab("assets")}
+              className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide transition-all ${
+                activeTab === "assets"
+                  ? "bg-white/20 text-white shadow-sm"
+                  : "text-white/50 hover:text-white/70"
+              }`}
+            >
+              Total Aset
+            </button>
+            <button
+              type="button"
+              onClick={() => switchTab("monthly")}
+              className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide transition-all ${
+                activeTab === "monthly"
+                  ? "bg-white/20 text-white shadow-sm"
+                  : "text-white/50 hover:text-white/70"
+              }`}
+            >
+              Sisa Bulan
+            </button>
+          </div>
           <button
             type="button"
             onClick={toggleHidden}
@@ -69,10 +114,19 @@ export function SummaryCards({ income, expense, net: _net, month, totalBalance }
           </button>
         </div>
 
-        <p className="mt-2 text-4xl font-bold tabular-nums tracking-tight text-white drop-shadow-sm">
-          {hidden ? mask : totalBalance !== undefined ? formatCurrency(totalBalance) : "—"}
+        {/* Label */}
+        <p className="mt-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/60">
+          {heroLabel}
         </p>
 
+        {/* Hero value */}
+        <p className={`mt-1.5 text-4xl font-bold tabular-nums tracking-tight drop-shadow-sm ${
+          activeTab === "monthly" && isNetNegative ? "text-red-200" : "text-white"
+        }`}>
+          {hidden ? mask : heroValue}
+        </p>
+
+        {/* Income / Expense detail — tetap tampil di kedua tab */}
         <div className="mt-5 border-t border-white/10 pt-4">
           <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-white/40 mb-2.5 text-center">{month}</p>
           <div className="flex gap-4">
