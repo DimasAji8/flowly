@@ -18,6 +18,7 @@ import { JobsModule } from './jobs/jobs.module';
 import { TransfersModule } from './modules/transfers/transfers.module';
 import { DeveloperModule } from './modules/developer/developer.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     TransfersModule,
     DeveloperModule,
     ReviewsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [
