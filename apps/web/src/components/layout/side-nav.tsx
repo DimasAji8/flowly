@@ -50,6 +50,7 @@ export function SideNav() {
               ? pathname.startsWith(item.matchPrefix)
               : pathname === item.href;
             const Icon = item.icon;
+            const labelLower = item.label.toLowerCase();
             return (
               <li key={item.href}>
                 <Link
@@ -57,6 +58,7 @@ export function SideNav() {
                   aria-current={isActive ? "page" : undefined}
                   className={[
                     "flex h-11 items-center gap-3 rounded-xl px-3 text-base font-medium transition-colors",
+                    `side-item-${labelLower}`,
                     isActive
                       ? "bg-accent-soft text-accent"
                       : "text-secondary hover:bg-card-subtle hover:text-foreground",

@@ -53,13 +53,14 @@ export function BottomNav() {
   const renderNavItem = (item: NavItem, index: number) => {
     const isActive = index === activeIndex;
     const Icon = item.icon;
+    const labelLower = item.label.toLowerCase();
     return (
       <Link
         key={item.href}
         href={item.href}
         ref={(el) => { itemRefs.current[index] = el; }}
         aria-current={isActive ? "page" : undefined}
-        className="group relative flex flex-1 flex-col items-center justify-center gap-0.5 h-16"
+        className={`group relative flex flex-1 flex-col items-center justify-center gap-0.5 h-16 nav-item-${labelLower}`}
         style={{ "--line-width": "0px" } as React.CSSProperties}
       >
         {isActive && (
@@ -106,7 +107,7 @@ export function BottomNav() {
               type="button"
               onClick={() => setAddOpen(true)}
               aria-label="Add transaction"
-              className="relative -top-4 flex size-14 items-center justify-center rounded-full bg-accent transition-transform active:scale-95 hover:scale-105"
+              className="fab-add-mobile relative -top-4 flex size-14 items-center justify-center rounded-full bg-accent transition-transform active:scale-95 hover:scale-105"
               style={{
                 boxShadow: "0 4px 20px -2px rgba(37,99,235,0.5), 0 0 0 4px rgba(37,99,235,0.15)",
               }}

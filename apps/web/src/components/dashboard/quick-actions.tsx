@@ -14,7 +14,7 @@ const ACTIONS = [
 
 export function QuickActions() {
   return (
-    <section>
+    <section className="quick-actions">
       <div className="grid grid-cols-5 gap-3">
         {ACTIONS.map(({ href, icon: Icon, label }) => (
           <Link

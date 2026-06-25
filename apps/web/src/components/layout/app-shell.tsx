@@ -67,7 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         type="button"
         onClick={() => setAddOpen(true)}
         aria-label="Tambah transaksi"
-        className="fixed bottom-8 right-24 hidden lg:flex size-20 items-center justify-center rounded-xl bg-card text-secondary border border-border-subtle transition-transform hover:scale-105 hover:text-accent active:scale-95 z-40"
+        className="fab-add-desktop fixed bottom-8 right-24 hidden lg:flex size-20 items-center justify-center rounded-xl bg-card text-secondary border border-border-subtle transition-transform hover:scale-105 hover:text-accent active:scale-95 z-40"
         style={{ boxShadow: "var(--shadow-card-emphasis)" }}
       >
         <Plus className="size-8" strokeWidth={2} aria-hidden />

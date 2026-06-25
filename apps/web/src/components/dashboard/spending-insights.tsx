@@ -69,7 +69,7 @@ export function SpendingInsights({ categorySpends, totalIncome, targets, savings
   const hasGroupData = Object.values(groupTotals).some((v) => v > 0);
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-3 dashboard-chart">
       <h2 className="text-sm font-medium text-foreground">
         Analisis Pengeluaran
       </h2>

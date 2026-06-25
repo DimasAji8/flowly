@@ -61,7 +61,7 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
     : formatCurrency(net);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 dashboard-summary">
       {/* Hero card */}
       <div
         className="relative overflow-hidden rounded-3xl p-6"
