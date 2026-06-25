@@ -17,10 +17,35 @@ import { useAuthStore } from "@/store/auth.store";
 import { useWalletStore } from "@/store/wallets.store";
 import type { MonthlySummary, Transaction, SavingsGoal } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
+import { useTour } from "@/hooks/use-tour";
+import { getDashboardSteps } from "@/components/tour/tours/dashboard-tour";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const refreshMe = useAuthStore((s) => s.refreshMe);
+  const router = useRouter();
+
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    checkIsDesktop();
+    window.addEventListener("resize", checkIsDesktop);
+    return () => window.removeEventListener("resize", checkIsDesktop);
+  }, []);
+
+  const { startTour, navigateToNextPage } = useTour({
+    tourId: "dashboard",
+    steps: getDashboardSteps({
+      isDesktop,
+      onNavigateToWallets: () => {
+        navigateToNextPage("wallets", ROUTES.wallets, router.push);
+      },
+    }),
+  });
 
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
@@ -97,6 +122,15 @@ export default function DashboardPage() {
     window.addEventListener("flowly:transaction-added", handler);
     return () => window.removeEventListener("flowly:transaction-added", handler);
   }, [load]);
+
+  useEffect(() => {
+    if (!loading && summary) {
+      const timer = setTimeout(() => {
+        startTour();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, summary, startTour]);
 
   const totalBalance = wallets.reduce((sum, w) => sum + Number(w.balance), 0);
   const avatarSrc = user?.gender === "m" ? "/svg/m.svg" : user?.gender === "f" ? "/svg/f.svg" : null;

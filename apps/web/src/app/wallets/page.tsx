@@ -24,6 +24,9 @@ import { useWalletStore } from "@/store/wallets.store";
 import type { Wallet, WalletType } from "@/types/finance";
 import { formatCurrency } from "@/utils/format-currency";
 import { ROUTES } from "@/constants/routes";
+import { useTour } from "@/hooks/use-tour";
+import { getWalletSteps } from "@/components/tour/tours/wallet-tour";
+import { useRouter } from "next/navigation";
 
 const WALLET_TYPE_OPTIONS: { value: WalletType; label: string }[] = [
   { value: "bank", label: "Bank" },
@@ -56,6 +59,27 @@ function parseRupiah(formatted: string): number {
 
 export default function WalletsPage() {
   const { wallets, loading, error, fetch: fetchWallets } = useWalletStore();
+  const router = useRouter();
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    checkIsDesktop();
+    window.addEventListener("resize", checkIsDesktop);
+    return () => window.removeEventListener("resize", checkIsDesktop);
+  }, []);
+
+  const { startTour, navigateToNextPage } = useTour({
+    tourId: "wallets",
+    steps: getWalletSteps({
+      isDesktop,
+      onNavigateToCalendar: () => {
+        navigateToNextPage("calendar", ROUTES.calendar, router.push);
+      },
+    }),
+  });
 
   const reload = () => {
     useWalletStore.getState().invalidate();
@@ -82,6 +106,15 @@ export default function WalletsPage() {
     void fetchWallets();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        startTour();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, startTour]);
 
   // Refresh wallet data saat transaksi ditambah/diubah/dihapus dari halaman lain
   useEffect(() => {
@@ -152,7 +185,7 @@ export default function WalletsPage() {
         <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Dompet
         </h1>
-        <Button size="sm" leftIcon={<Plus className="size-4" aria-hidden />} onClick={() => setAddOpen(true)}>
+        <Button size="sm" leftIcon={<Plus className="size-4" aria-hidden />} onClick={() => setAddOpen(true)} className="btn-add-wallet">
           Tambah
         </Button>
       </header>
@@ -172,7 +205,7 @@ export default function WalletsPage() {
           Belum ada dompet.
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 wallet-list-container">
           {grouped.map(({ type, items }) => (
             <div key={type} className="flex flex-col gap-2">
               <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
@@ -206,7 +239,7 @@ export default function WalletsPage() {
 
       <Link
         href={ROUTES.walletTransfers}
-        className="flex items-center justify-between rounded-xl border border-border-subtle bg-card px-5 py-4 text-sm font-medium text-foreground hover:bg-card-subtle transition-colors"
+        className="wallet-history-link flex items-center justify-between rounded-xl border border-border-subtle bg-card px-5 py-4 text-sm font-medium text-foreground hover:bg-card-subtle transition-colors"
       >
         Lihat riwayat transfer
         <ArrowRight className="size-4 text-muted" aria-hidden />

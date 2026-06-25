@@ -10,12 +10,19 @@ import { transactionsService } from "@/services/transactions.service";
 import type { DailySummary, Transaction } from "@/types/finance";
 import { formatCurrency } from "@/utils/format-currency";
 import { formatDateLong, isoToday } from "@/utils/format-date";
+import { useTour } from "@/hooks/use-tour";
+import { calendarSteps } from "@/components/tour/tours/calendar-tour";
 
 export default function CalendarPage() {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>(isoToday());
+
+  const { startTour } = useTour({
+    tourId: "calendar",
+    steps: calendarSteps,
+  });
 
   const [daily, setDaily] = useState<DailySummary | null>(null);
   const [dayItems, setDayItems] = useState<Transaction[]>([]);
@@ -24,6 +31,15 @@ export default function CalendarPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    if (!loadingMonth && daily) {
+      const timer = setTimeout(() => {
+        startTour();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [loadingMonth, daily, startTour]);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,7 +136,7 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <Card padding="md">
+      <Card padding="md" className="calendar-card-container">
         {loadingMonth && !daily ? (
           <div className="flex flex-col gap-4">
             {/* Header skeleton */}
@@ -161,7 +177,7 @@ export default function CalendarPage() {
 
       {/* Monthly summary */}
       {!loadingMonth && (
-        <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 border border-border-subtle">
+        <div className="calendar-monthly-summary flex items-center justify-between rounded-xl bg-card px-4 py-3 border border-border-subtle">
           <div className="flex flex-col items-center gap-0.5">
             <span className="text-[10px] text-muted uppercase tracking-wide">Pemasukan</span>
             <span className="text-sm font-semibold tabular-nums text-success">
@@ -186,7 +202,7 @@ export default function CalendarPage() {
       )}
 
       {/* Selected day detail */}
-      <section className="flex flex-col gap-2">
+      <section className="calendar-daily-detail flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
           <h2 className="text-sm font-semibold text-foreground">
             {formatDateLong(selectedDate)}

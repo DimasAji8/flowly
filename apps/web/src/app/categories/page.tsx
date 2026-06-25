@@ -106,7 +106,7 @@ export default function CategoriesPage() {
         <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Kategori
         </h1>
-        <Button size="sm" leftIcon={<Plus className="size-4" aria-hidden />} onClick={() => setAddOpen(true)}>
+        <Button size="sm" leftIcon={<Plus className="size-4" aria-hidden />} onClick={() => setAddOpen(true)} className="btn-add-category">
           Tambah
         </Button>
       </header>
@@ -117,7 +117,7 @@ export default function CategoriesPage() {
           Loading…
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 category-list-container">
           <CategorySection
             title="Pengeluaran"
             tone="danger"
