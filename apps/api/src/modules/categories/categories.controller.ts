@@ -57,7 +57,11 @@ export class CategoriesController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail kategori' })
   @ApiParam({ name: 'id', description: 'ID kategori' })
-  @ApiResponse({ status: 200, description: 'Data kategori', type: CategoryResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Data kategori',
+    type: CategoryResponse,
+  })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
@@ -78,7 +82,11 @@ export class CategoriesController {
     summary: 'Update kategori (rename / recolor — type tidak bisa diubah)',
   })
   @ApiParam({ name: 'id', description: 'ID kategori' })
-  @ApiResponse({ status: 200, description: 'Kategori berhasil diupdate', type: CategoryResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Kategori berhasil diupdate',
+    type: CategoryResponse,
+  })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Param('id') id: string,

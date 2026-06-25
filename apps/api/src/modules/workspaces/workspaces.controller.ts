@@ -22,13 +22,25 @@ import {
 
 class UpdateAllocationTargetsBody {
   @ApiPropertyOptional({ example: 50, description: 'Target kebutuhan (%)' })
-  @IsOptional() @IsInt() @Min(0) @Max(100) needsTarget?: number;
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  needsTarget?: number;
 
   @ApiPropertyOptional({ example: 30, description: 'Target keinginan (%)' })
-  @IsOptional() @IsInt() @Min(0) @Max(100) wantsTarget?: number;
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  wantsTarget?: number;
 
   @ApiPropertyOptional({ example: 20, description: 'Target tabungan (%)' })
-  @IsOptional() @IsInt() @Min(0) @Max(100) savingsTarget?: number;
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  savingsTarget?: number;
 }
 
 @ApiTags('workspaces')

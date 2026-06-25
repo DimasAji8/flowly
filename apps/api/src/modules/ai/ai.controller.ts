@@ -1,5 +1,18 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AiService } from './ai.service';
 import { ParseTransactionDto } from './dto/parse-transaction.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -17,7 +30,10 @@ export class AiController {
 
   @Post('parse-transaction')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Mengekstrak teks transaksi manual menjadi format JSON terstruktur' })
+  @ApiOperation({
+    summary:
+      'Mengekstrak teks transaksi manual menjadi format JSON terstruktur',
+  })
   @ApiResponse({
     status: 200,
     description: 'Teks transaksi berhasil diekstrak dan dicocokkan ke database',

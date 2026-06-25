@@ -50,7 +50,11 @@ export class SavingsGoalsController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail target tabungan' })
   @ApiParam({ name: 'id', description: 'ID target tabungan' })
-  @ApiResponse({ status: 200, description: 'Data target tabungan', type: SavingsGoalResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Data target tabungan',
+    type: SavingsGoalResponse,
+  })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
@@ -69,7 +73,11 @@ export class SavingsGoalsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update target tabungan' })
   @ApiParam({ name: 'id', description: 'ID target tabungan' })
-  @ApiResponse({ status: 200, description: 'Target berhasil diupdate', type: SavingsGoalResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Target berhasil diupdate',
+    type: SavingsGoalResponse,
+  })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Param('id') id: string,

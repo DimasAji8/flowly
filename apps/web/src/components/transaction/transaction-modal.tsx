@@ -75,7 +75,7 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
         setShowAiInput(false);
         toast.success("AI berhasil menganalisis teks!");
       }
-    } catch (error) {
+    } catch {
       toast.error("Gagal memproses dengan AI");
     } finally {
       setAiLoading(false);

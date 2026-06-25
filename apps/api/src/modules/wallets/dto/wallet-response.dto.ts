@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class WalletResponse {
-  @ApiProperty({ example: 'cmpgwxxxxxxxxxxxxxxxxxxxx', description: 'ID unik wallet' })
+  @ApiProperty({
+    example: 'cmpgwxxxxxxxxxxxxxxxxxxxx',
+    description: 'ID unik wallet',
+  })
   id!: string;
 
   @ApiProperty({ example: 'Cash', description: 'Nama wallet' })
@@ -13,6 +16,9 @@ export class WalletResponse {
   })
   balance!: string;
 
-  @ApiProperty({ example: '2026-05-22T03:39:15.512Z', description: 'Waktu dibuat' })
+  @ApiProperty({
+    example: '2026-05-22T03:39:15.512Z',
+    description: 'Waktu dibuat',
+  })
   createdAt!: string;
 }

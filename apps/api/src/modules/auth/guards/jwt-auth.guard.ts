@@ -1,4 +1,8 @@
-import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 /**
@@ -17,7 +21,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (req.__b2b) {
       return true;
     }
-    return (super.canActivate(context) as Promise<boolean>);
+    return super.canActivate(context) as Promise<boolean>;
   }
 
   handleRequest<TUser>(

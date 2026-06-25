@@ -50,7 +50,11 @@ export class RecurringController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail recurring' })
   @ApiParam({ name: 'id', description: 'ID recurring transaction' })
-  @ApiResponse({ status: 200, description: 'Data recurring', type: RecurringResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Data recurring',
+    type: RecurringResponse,
+  })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
@@ -69,7 +73,11 @@ export class RecurringController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update recurring' })
   @ApiParam({ name: 'id', description: 'ID recurring transaction' })
-  @ApiResponse({ status: 200, description: 'Recurring berhasil diupdate', type: RecurringResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Recurring berhasil diupdate',
+    type: RecurringResponse,
+  })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Param('id') id: string,

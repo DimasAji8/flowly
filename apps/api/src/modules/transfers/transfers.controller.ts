@@ -36,8 +36,18 @@ export class TransfersController {
 
   @Get()
   @ApiOperation({ summary: 'List transfer (opsional filter year & month)' })
-  @ApiQuery({ name: 'year', required: false, description: 'Tahun (contoh: 2026)', type: String })
-  @ApiQuery({ name: 'month', required: false, description: 'Bulan (1-12)', type: String })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    description: 'Tahun (contoh: 2026)',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    description: 'Bulan (1-12)',
+    type: String,
+  })
   @ApiResponse({ status: 200, description: 'List transfer antar wallet' })
   list(
     @CurrentWorkspace() ws: WorkspaceContext,
@@ -66,7 +76,10 @@ export class TransfersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Batalkan transfer (saldo dikembalikan)' })
   @ApiParam({ name: 'id', description: 'ID transfer' })
-  @ApiResponse({ status: 204, description: 'Transfer dibatalkan & saldo dikembalikan' })
+  @ApiResponse({
+    status: 204,
+    description: 'Transfer dibatalkan & saldo dikembalikan',
+  })
   remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.transfersService.remove(ws.id, id);
   }

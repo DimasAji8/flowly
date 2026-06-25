@@ -45,7 +45,11 @@ export class WalletsController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail wallet' })
   @ApiParam({ name: 'id', description: 'ID wallet' })
-  @ApiResponse({ status: 200, description: 'Data wallet', type: WalletResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Data wallet',
+    type: WalletResponse,
+  })
   @ApiResponse({ status: 404, description: 'Wallet tidak ditemukan' })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.walletsService.findById(ws.id, id);
@@ -65,7 +69,11 @@ export class WalletsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update wallet (rename)' })
   @ApiParam({ name: 'id', description: 'ID wallet' })
-  @ApiResponse({ status: 200, description: 'Wallet berhasil diupdate', type: WalletResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Wallet berhasil diupdate',
+    type: WalletResponse,
+  })
   @ApiResponse({ status: 404, description: 'Wallet tidak ditemukan' })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,

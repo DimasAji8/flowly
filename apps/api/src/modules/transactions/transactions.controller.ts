@@ -59,9 +59,23 @@ export class TransactionsController {
   @ApiOperation({
     summary: 'Ringkasan income/expense/net cashflow untuk bulan tertentu',
   })
-  @ApiQuery({ name: 'year', required: false, description: 'Tahun (contoh: 2026)', type: Number })
-  @ApiQuery({ name: 'month', required: false, description: 'Bulan (1-12)', type: Number })
-  @ApiResponse({ status: 200, description: 'Ringkasan monthly', type: MonthlySummaryResponse })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    description: 'Tahun (contoh: 2026)',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    description: 'Bulan (1-12)',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Ringkasan monthly',
+    type: MonthlySummaryResponse,
+  })
   monthlySummary(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Query('year', new ParseIntPipe({ optional: true }))
@@ -81,8 +95,18 @@ export class TransactionsController {
   @ApiOperation({
     summary: 'Daily summary (per tanggal) untuk calendar view',
   })
-  @ApiQuery({ name: 'year', required: false, description: 'Tahun (contoh: 2026)', type: Number })
-  @ApiQuery({ name: 'month', required: false, description: 'Bulan (1-12)', type: Number })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    description: 'Tahun (contoh: 2026)',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    description: 'Bulan (1-12)',
+    type: Number,
+  })
   @ApiResponse({ status: 200, description: 'Array daily summary per tanggal' })
   dailySummary(
     @CurrentWorkspace() ws: WorkspaceContext,
@@ -102,7 +126,11 @@ export class TransactionsController {
   @Get(':id')
   @ApiOperation({ summary: 'Detail transaksi' })
   @ApiParam({ name: 'id', description: 'ID transaksi' })
-  @ApiResponse({ status: 200, description: 'Data transaksi', type: TransactionResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Data transaksi',
+    type: TransactionResponse,
+  })
   findOne(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.findById(ws.id, id);
   }
@@ -122,7 +150,11 @@ export class TransactionsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update transaksi (auto-recalc wallet balance)' })
   @ApiParam({ name: 'id', description: 'ID transaksi' })
-  @ApiResponse({ status: 200, description: 'Transaksi berhasil diupdate', type: TransactionResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaksi berhasil diupdate',
+    type: TransactionResponse,
+  })
   update(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Param('id') id: string,

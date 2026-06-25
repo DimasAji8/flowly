@@ -64,7 +64,9 @@ async function bootstrap() {
   for (const path of Object.keys(b2bDocument.paths)) {
     const methods = b2bDocument.paths[path] as Record<string, unknown>;
     for (const method of Object.keys(methods)) {
-      (methods[method] as Record<string, unknown>).security = [{ 'b2b-api-key': [] }];
+      (methods[method] as Record<string, unknown>).security = [
+        { 'b2b-api-key': [] },
+      ];
     }
   }
 

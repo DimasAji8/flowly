@@ -32,8 +32,18 @@ export class DeveloperController {
 
   @Get('users')
   @ApiOperation({ summary: 'Daftar semua user (developer only)' })
-  @ApiQuery({ name: 'page', required: false, description: 'Halaman (default: 1)', type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, description: 'Item per halaman (default: 50, max: 200)', type: Number })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Halaman (default: 1)',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Item per halaman (default: 50, max: 200)',
+    type: Number,
+  })
   @ApiResponse({ status: 200, description: 'List user terdaftar (paginated)' })
   users(@Query() pagination: PaginationQueryDto) {
     return this.developerService.listUsers(pagination);
@@ -41,8 +51,18 @@ export class DeveloperController {
 
   @Get('workspaces')
   @ApiOperation({ summary: 'Statistik workspace' })
-  @ApiQuery({ name: 'page', required: false, description: 'Halaman (default: 1)', type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, description: 'Item per halaman (default: 50, max: 200)', type: Number })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Halaman (default: 1)',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Item per halaman (default: 50, max: 200)',
+    type: Number,
+  })
   @ApiResponse({
     status: 200,
     description: 'Jumlah workspace, anggota per workspace (paginated)',
