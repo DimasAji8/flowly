@@ -9,6 +9,15 @@ export interface ParsedTransaction {
   transactionDate: string;
 }
 
+export interface FinancialInsight {
+  id: string;
+  type: "warning" | "success" | "info";
+  title: string;
+  description: string;
+  actionLabel: string | null;
+  actionUrl: string | null;
+}
+
 export const aiService = {
   parseTransaction(text: string) {
     return apiClient.post<ParsedTransaction>(
@@ -20,4 +29,29 @@ export const aiService = {
       }
     );
   },
+
+  scanReceipt(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return apiClient.post<ParsedTransaction>(
+      "/ai/scan-receipt",
+      formData,
+      {
+        auth: true,
+        workspaceScoped: true,
+      }
+    );
+  },
+
+  getInsights() {
+    return apiClient.get<FinancialInsight[]>(
+      "/ai/insights",
+      {
+        auth: true,
+        workspaceScoped: true,
+      }
+    );
+  },
 };
+

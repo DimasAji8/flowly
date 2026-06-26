@@ -61,9 +61,12 @@ async function rawFetch<T>(
   opts: RequestOptions,
   accessTokenOverride?: string,
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const isFormData = opts.body instanceof FormData;
+  const headers: Record<string, string> = {};
+
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (opts.auth) {
     const token = accessTokenOverride ?? authStorage.read()?.accessToken;
@@ -78,7 +81,11 @@ async function rawFetch<T>(
   const res = await fetch(`${API_URL}${path}`, {
     method: opts.method ?? "GET",
     headers,
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
+    body: opts.body
+      ? isFormData
+        ? (opts.body as any)
+        : JSON.stringify(opts.body)
+      : undefined,
     signal: opts.signal,
     credentials: "omit",
   });
