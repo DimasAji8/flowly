@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowDownCircle, ArrowUpCircle, Sparkles } from "lucide-react";
+import { useState, useRef } from "react";
+import { ArrowDownCircle, ArrowUpCircle, Sparkles, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
@@ -25,15 +25,21 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
   const [showAiInput, setShowAiInput] = useState(false);
   const [aiText, setAiText] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [scanLoading, setScanLoading] = useState(false);
   const [aiValues, setAiValues] = useState<Partial<CreateTransactionFormValues> | null>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClose = () => {
     setSelectedType(null);
     setShowAiInput(false);
     setAiValues(null);
     setAiText("");
+    setScanLoading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     onClose();
   };
+
 
   const handleSubmit = async (values: CreateTransactionFormValues) => {
     if (isEdit && transaction) {
@@ -82,8 +88,39 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setScanLoading(true);
+    try {
+      const res = await aiService.scanReceipt(file);
+      if (res) {
+        setAiValues({
+          type: res.type,
+          amount: res.amount,
+          categoryId: res.categoryId || "",
+          walletId: res.walletId || "",
+          note: res.note || "",
+          transactionDate: res.transactionDate,
+        });
+        setSelectedType(res.type);
+        toast.success("Struk berhasil di-scan!");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Gagal men-scan struk belanja");
+    } finally {
+      setScanLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleTriggerScan = () => {
+    fileInputRef.current?.click();
+  };
+
   // Edit mode → langsung ke form
-  const showPicker = !isEdit && selectedType === null && !showAiInput;
+  const showPicker = !isEdit && selectedType === null && !showAiInput && !scanLoading;
 
   return (
     <Modal
@@ -105,16 +142,31 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
       title={
         isEdit
           ? "Edit transaksi"
-          : showAiInput
-            ? "Tulis Cepat dengan AI"
-            : showPicker
-              ? "Tambah transaksi"
-              : selectedType === "income"
-                ? "Pemasukan"
-                : "Pengeluaran"
+          : scanLoading
+            ? "Membaca Struk..."
+            : showAiInput
+              ? "Tulis Cepat dengan AI"
+              : showPicker
+                ? "Tambah transaksi"
+                : selectedType === "income"
+                  ? "Pemasukan"
+                  : "Pengeluaran"
       }
     >
-      {showAiInput ? (
+      {scanLoading ? (
+        <div className="flex flex-col items-center justify-center py-10 gap-4 flowly-enter">
+          <div className="relative flex items-center justify-center">
+            <div className="absolute size-12 rounded-full bg-accent/20 animate-ping"></div>
+            <div className="relative rounded-full bg-accent/10 p-3">
+              <Camera className="size-6 text-accent animate-pulse" />
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-semibold text-foreground">Sedang membaca struk...</p>
+            <p className="text-xs text-muted mt-1 max-w-[240px]">AI sedang menganalisis nominal, toko, dan barang belanjaan Anda.</p>
+          </div>
+        </div>
+      ) : showAiInput ? (
         <div className="flex flex-col gap-4 py-2 flowly-enter">
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
@@ -186,6 +238,20 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
 
           <button
             type="button"
+            onClick={handleTriggerScan}
+            className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-accent hover:bg-accent/5"
+          >
+            <Camera className="size-8 shrink-0 text-accent" strokeWidth={1.5} />
+            <div>
+              <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                Scan Struk dengan AI <span className="text-[9px] bg-accent/10 text-accent px-1.5 py-0.5 rounded-full font-medium tracking-wide">BARU</span>
+              </p>
+              <p className="text-xs text-muted">Ambil foto struk belanja, AI akan mengisi formulir otomatis.</p>
+            </div>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowAiInput(true)}
             className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-accent hover:bg-accent/5"
           >
@@ -219,6 +285,13 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
           />
         </div>
       )}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
     </Modal>
   );
 }
