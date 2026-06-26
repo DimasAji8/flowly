@@ -13,10 +13,15 @@ import {
   serializeTransactionWithRefs,
   SerializedTransaction,
 } from './transactions.serializer';
+import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly aiService: AiService,
+  ) {}
+
 
   async list(workspaceId: string, query: ListTransactionsQuery) {
     const where: Prisma.TransactionWhereInput = {
@@ -114,6 +119,8 @@ export class TransactionsService {
       return created;
     });
 
+    this.aiService.invalidateInsightsCache(workspaceId);
+
     return serializeTransaction(created);
   }
 
@@ -176,6 +183,8 @@ export class TransactionsService {
       return updated;
     });
 
+    this.aiService.invalidateInsightsCache(workspaceId);
+
     return serializeTransaction(updated);
   }
 
@@ -195,6 +204,8 @@ export class TransactionsService {
       );
       await tx.transaction.delete({ where: { id: existing.id } });
     });
+
+    this.aiService.invalidateInsightsCache(workspaceId);
   }
 
   // =========================================================

@@ -4,10 +4,18 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Get,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiSecurity,
@@ -44,4 +52,45 @@ export class AiController {
   ) {
     return this.aiService.parseTransactionText(ws.id, dto.text);
   }
+
+  @Post('scan-receipt')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Menganalisis foto struk belanja untuk mengisi transaksi secara otomatis',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Data struk berhasil diekstrak dan dicocokkan ke database',
+  })
+  async scanReceipt(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 4 * 1024 * 1024 }), // 4MB
+          new FileTypeValidator({ fileType: 'image/.*' }), // Any image type
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.aiService.scanReceipt(ws.id, file);
+  }
+
+  @Get('insights')
+  @ApiOperation({
+    summary:
+      'Mendapatkan analisis finansial proaktif untuk workspace aktif',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Daftar analisis finansial berhasil dibuat',
+  })
+  async getInsights(@CurrentWorkspace() ws: WorkspaceContext) {
+    return this.aiService.getInsights(ws.id);
+  }
 }
+
