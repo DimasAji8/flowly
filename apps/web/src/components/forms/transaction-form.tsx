@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { FormError } from "@/components/ui/form-error";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -301,7 +302,7 @@ export function TransactionForm({
         {errors.transactionDate && <p className="text-xs text-danger">{errors.transactionDate.message}</p>}
       </div>
 
-      <Input label="Catatan (opsional)" placeholder="mis. Makan siang bareng tim" maxLength={280} {...register("note")} error={errors.note?.message} />
+      <Textarea label="Catatan (opsional)" placeholder="mis. Makan siang bareng tim" maxLength={280} {...register("note")} error={errors.note?.message} />
 
       <div className="mt-2 flex items-center gap-3">
         {secondaryAction}
