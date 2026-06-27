@@ -184,7 +184,7 @@ export function DeveloperShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-dvh w-full flex-col lg:flex-1">
         <div className="flex w-full flex-1 flex-col">
           <DeveloperMobileHeader />
-          <main className="flex-1 px-5 pb-24 pt-6 lg:px-10 lg:pb-16 lg:pt-10">
+          <main className="flex-1 w-full mx-auto max-w-7xl px-5 pb-24 pt-6 lg:px-10 lg:pb-16 lg:pt-10">
             {children}
           </main>
         </div>
