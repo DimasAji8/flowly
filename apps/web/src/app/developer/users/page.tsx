@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Users, RefreshCw } from "lucide-react";
+import { Users, RefreshCw, Search } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import {
   developerService,
@@ -19,6 +21,27 @@ export default function DeveloperUsersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<"all" | "developer" | "user">("all");
+
+  const filteredUsers = useMemo(() => {
+    if (!users) return null;
+    return users.filter((u) => {
+      const matchesSearch =
+        u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRole =
+        roleFilter === "all" ||
+        (roleFilter === "developer" && u.role === "developer") ||
+        (roleFilter === "user" && u.role === "user");
+      return matchesSearch && matchesRole;
+    });
+  }, [users, searchQuery, roleFilter]);
+
+  const displayTotal = filteredUsers ? filteredUsers.length : total;
+  const displayTotalPages = filteredUsers
+    ? Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE))
+    : totalPages;
 
   const fetchUsers = useCallback(async (targetPage: number) => {
     setError(null);
@@ -158,7 +181,7 @@ export default function DeveloperUsersPage() {
             <h1 className="text-lg font-semibold tracking-tight text-foreground">
               Users
             </h1>
-            <p className="text-xs text-muted">{total} total pengguna</p>
+            <p className="text-xs text-muted">{displayTotal} total pengguna</p>
           </div>
         </div>
         <button
@@ -174,14 +197,46 @@ export default function DeveloperUsersPage() {
         </button>
       </div>
 
+      {/* Search & Filter */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center bg-card p-4 rounded-xl border border-border-subtle shadow-xs">
+        <div className="flex-1">
+          <Input
+            placeholder="Cari nama atau email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            leftAdornment={<Search className="size-4 text-muted" />}
+          />
+        </div>
+        <div className="w-full md:w-56">
+          <Select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value as any)}
+            options={[
+              { value: "all", label: "Semua Role" },
+              { value: "developer", label: "Developer" },
+              { value: "user", label: "User" },
+            ]}
+          />
+        </div>
+      </div>
+
       <DataTable
-        data={users}
+        data={filteredUsers}
         columns={columns}
         keyExtractor={(u) => u.id}
-        pagination={{ page, pageSize: PAGE_SIZE, total, totalPages }}
+        pagination={{
+          page,
+          pageSize: PAGE_SIZE,
+          total: displayTotal,
+          totalPages: displayTotalPages,
+        }}
         onPageChange={setPage}
-        emptyTitle="Belum ada user"
-        emptyDescription="Belum ada pengguna yang terdaftar."
+        emptyTitle={searchQuery || roleFilter !== "all" ? "User tidak ditemukan" : "Belum ada user"}
+        emptyDescription={
+          searchQuery || roleFilter !== "all"
+            ? "Tidak ada pengguna yang cocok dengan kriteria pencarian Anda."
+            : "Belum ada pengguna yang terdaftar."
+        }
       />
     </div>
   );

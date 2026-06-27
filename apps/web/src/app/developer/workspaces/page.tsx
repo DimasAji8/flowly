@@ -7,7 +7,9 @@ import {
   Users,
   Wallet,
   Target,
+  Search,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import {
@@ -30,6 +32,19 @@ export default function DeveloperWorkspacesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRows = useMemo(() => {
+    if (!rows) return null;
+    return rows.filter((r) =>
+      r.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [rows, searchQuery]);
+
+  const displayTotal = filteredRows ? filteredRows.length : total;
+  const displayTotalPages = filteredRows
+    ? Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE))
+    : totalPages;
 
   const fetchData = useCallback(async (targetPage: number) => {
     setError(null);
@@ -259,17 +274,36 @@ export default function DeveloperWorkspacesPage() {
 
           {/* Tabel semua workspace */}
           <div className="flex flex-col gap-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
-              Semua Workspace
-            </h2>
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+                Semua Workspace
+              </h2>
+              <div className="w-full md:w-72">
+                <Input
+                  placeholder="Cari nama workspace..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  leftAdornment={<Search className="size-4 text-muted" />}
+                />
+              </div>
+            </div>
             <DataTable
-              data={rows}
+              data={filteredRows}
               columns={columns}
               keyExtractor={(ws) => ws.id}
-              pagination={{ page, pageSize: PAGE_SIZE, total, totalPages }}
+              pagination={{
+                page,
+                pageSize: PAGE_SIZE,
+                total: displayTotal,
+                totalPages: displayTotalPages,
+              }}
               onPageChange={setPage}
-              emptyTitle="Belum ada workspace"
-              emptyDescription="Belum ada workspace yang terdaftar."
+              emptyTitle={searchQuery ? "Workspace tidak ditemukan" : "Belum ada workspace"}
+              emptyDescription={
+                searchQuery
+                  ? "Tidak ada workspace yang cocok dengan kriteria pencarian Anda."
+                  : "Belum ada workspace yang terdaftar."
+              }
             />
           </div>
         </>
