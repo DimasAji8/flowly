@@ -15,6 +15,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiResponse,
@@ -23,6 +24,8 @@ import {
 } from '@nestjs/swagger';
 import { AiService } from './ai.service';
 import { ParseTransactionDto } from './dto/parse-transaction.dto';
+import { AiParsedTransactionResponseDto } from './dto/ai-parsed-transaction-response.dto';
+import { AiInsightResponseDto } from './dto/ai-insight-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
 import { CurrentWorkspace } from '../../common/decorators/current-workspace.decorator';
@@ -45,6 +48,7 @@ export class AiController {
   @ApiResponse({
     status: 200,
     description: 'Teks transaksi berhasil diekstrak dan dicocokkan ke database',
+    type: AiParsedTransactionResponseDto,
   })
   async parseTransaction(
     @CurrentWorkspace() ws: WorkspaceContext,
@@ -56,6 +60,18 @@ export class AiController {
   @Post('scan-receipt')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Berkas gambar struk belanja (png, jpeg, webp) - max 4MB',
+        },
+      },
+    },
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
@@ -64,6 +80,7 @@ export class AiController {
   @ApiResponse({
     status: 200,
     description: 'Data struk berhasil diekstrak dan dicocokkan ke database',
+    type: AiParsedTransactionResponseDto,
   })
   async scanReceipt(
     @CurrentWorkspace() ws: WorkspaceContext,
@@ -88,9 +105,9 @@ export class AiController {
   @ApiResponse({
     status: 200,
     description: 'Daftar analisis finansial berhasil dibuat',
+    type: [AiInsightResponseDto],
   })
   async getInsights(@CurrentWorkspace() ws: WorkspaceContext) {
     return this.aiService.getInsights(ws.id);
   }
 }
-

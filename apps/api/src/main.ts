@@ -113,7 +113,7 @@ async function bootstrap() {
     swaggerOptions: { persistAuthorization: true },
   });
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   console.log(`🚀 API running on http://localhost:${port}/${API_PREFIX}`);
   console.log(`📚 Docs at  http://localhost:${port}/${API_PREFIX}/docs`);
