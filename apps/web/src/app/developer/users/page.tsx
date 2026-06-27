@@ -103,8 +103,10 @@ export default function DeveloperUsersPage() {
     });
   }, [users, searchQuery, roleFilter]);
 
-  const displayTotal = filteredUsers ? filteredUsers.length : total;
-  const displayTotalPages = filteredUsers
+  const isFiltered = searchQuery !== "" || roleFilter !== "all";
+
+  const displayTotal = isFiltered && filteredUsers ? filteredUsers.length : total;
+  const displayTotalPages = isFiltered && filteredUsers
     ? Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE))
     : totalPages;
 

@@ -135,8 +135,10 @@ export default function DeveloperReviewsPage() {
     return reviews.filter((r) => r.rating === targetRating);
   }, [reviews, ratingFilter]);
 
-  const displayTotal = filteredReviews ? filteredReviews.length : total;
-  const displayTotalPages = filteredReviews
+  const isFiltered = ratingFilter !== "all";
+
+  const displayTotal = isFiltered && filteredReviews ? filteredReviews.length : total;
+  const displayTotalPages = isFiltered && filteredReviews
     ? Math.max(1, Math.ceil(filteredReviews.length / PAGE_SIZE))
     : totalPages;
 

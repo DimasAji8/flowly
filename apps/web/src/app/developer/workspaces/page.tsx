@@ -117,8 +117,10 @@ export default function DeveloperWorkspacesPage() {
     );
   }, [rows, searchQuery]);
 
-  const displayTotal = filteredRows ? filteredRows.length : total;
-  const displayTotalPages = filteredRows
+  const isFiltered = searchQuery !== "";
+
+  const displayTotal = isFiltered && filteredRows ? filteredRows.length : total;
+  const displayTotalPages = isFiltered && filteredRows
     ? Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE))
     : totalPages;
 
