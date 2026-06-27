@@ -15,6 +15,7 @@ export const ROUTES = {
   profileAllocation: "/profile/allocation",
   reports: "/reports",
   developer: "/developer",
+  ai: "/ai",
 } as const;
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];
