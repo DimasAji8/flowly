@@ -29,16 +29,16 @@ function DeveloperSideNav() {
   return (
     <aside
       aria-label="Developer"
-      className="hidden lg:flex lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:flex-col lg:border-r lg:border-slate-800 lg:px-5 lg:py-6 bg-slate-950 text-slate-100"
+      className="hidden lg:flex lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:flex-col lg:border-r lg:border-border-subtle lg:px-5 lg:py-6 bg-card text-foreground"
     >
       {/* Brand */}
       <div className="mb-8 px-2 flex items-center gap-2.5">
-        <span className="grid size-9 place-items-center rounded-xl bg-accent text-white shadow-md shadow-accent/25">
+        <span className="grid size-9 place-items-center rounded-xl bg-accent-soft text-accent">
           <Shield className="size-5" strokeWidth={2} />
         </span>
         <div className="flex flex-col">
-          <span className="text-sm font-bold tracking-tight text-white leading-none">Teman Kas</span>
-          <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase mt-0.5">Dev Console</span>
+          <span className="text-sm font-bold tracking-tight text-foreground leading-none">Teman Kas</span>
+          <span className="text-[10px] font-semibold tracking-wider text-muted uppercase mt-0.5">Dev Console</span>
         </div>
       </div>
 
@@ -59,8 +59,8 @@ function DeveloperSideNav() {
                   className={[
                     "flex h-11 items-center gap-3 rounded-xl px-3 text-[15px] font-semibold transition-all duration-150 active:scale-[0.98]",
                     isActive
-                      ? "bg-accent text-white shadow-sm shadow-accent/10"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-white",
+                      ? "bg-accent-soft text-accent"
+                      : "text-secondary hover:bg-card-subtle hover:text-foreground",
                   ].join(" ")}
                 >
                   <Icon className="size-5" strokeWidth={isActive ? 2.5 : 2} aria-hidden />
@@ -73,20 +73,20 @@ function DeveloperSideNav() {
       </nav>
 
       {/* Developer Profile & Logout */}
-      <div className="flex flex-col gap-3 border-t border-slate-800 pt-4 mt-auto">
-        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 border border-slate-800/80 bg-slate-900/40">
-          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-sm font-bold text-white select-none">
+      <div className="flex flex-col gap-3 border-t border-border-subtle pt-4 mt-auto">
+        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 border border-border-subtle bg-card-subtle/50">
+          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-bold text-accent select-none">
             {user?.name ? user.name.charAt(0).toUpperCase() : "D"}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="truncate text-sm font-bold text-slate-100">{user?.name ?? "Developer"}</span>
+            <span className="truncate text-sm font-bold text-foreground">{user?.name ?? "Developer"}</span>
             <span className="truncate text-[10px] font-bold text-accent uppercase tracking-wide">Developer Mode</span>
           </div>
         </div>
         <button
           type="button"
           onClick={handleLogout}
-          className="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-[15px] font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 active:scale-[0.98] transition-all duration-150"
+          className="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-[15px] font-semibold text-red-500 hover:bg-red-500/10 active:scale-[0.98] transition-all duration-150"
         >
           <LogOut className="size-5" strokeWidth={2} aria-hidden />
           Logout
