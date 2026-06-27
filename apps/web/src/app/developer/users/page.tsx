@@ -14,6 +14,7 @@ import {
   type DeveloperStats,
 } from "@/services/developer.service";
 import { formatRelativeTime } from "@/utils/format-date";
+import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
 
@@ -78,15 +79,29 @@ export default function DeveloperUsersPage() {
     setRefreshing(false);
   };
 
-  const executeMockAction = () => {
+  const executeUserAction = async () => {
     if (!actionTarget || !actionType) return;
     setActionLoading(true);
-    setTimeout(() => {
-      setActionLoading(false);
+    try {
+      if (actionType === "delete") {
+        await developerService.deleteUser(actionTarget.id);
+      } else if (actionType === "suspend") {
+        await developerService.toggleUserSuspension(actionTarget.id);
+      } else if (actionType === "role") {
+        const newRole = actionTarget.role === "developer" ? "user" : "developer";
+        await developerService.updateUserRole(actionTarget.id, newRole);
+      }
+      
+      // Refresh the page data
+      await fetchUsers(page);
+      
       setActionTarget(null);
       setActionType(null);
-      alert(`Simulasi Aksi Berhasil: ${actionType.toUpperCase()} untuk user "${actionTarget.name}"`);
-    }, 800);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal mengeksekusi aksi");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const filteredUsers = useMemo(() => {
@@ -136,8 +151,13 @@ export default function DeveloperUsersPage() {
               {u.name.charAt(0).toUpperCase()}
             </span>
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold text-foreground truncate">
+              <span className="text-sm font-bold text-foreground truncate max-w-[150px] md:max-w-[200px] inline-flex items-center gap-1.5">
                 {u.name}
+                {u.isSuspended && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-red-500/10 text-[9px] font-extrabold text-red-600 uppercase tracking-wide border border-red-200/20">
+                    Suspended
+                  </span>
+                )}
               </span>
               <span className="text-[10px] font-medium text-muted truncate mt-0.5 md:hidden">
                 {u.email}
@@ -228,8 +248,13 @@ export default function DeveloperUsersPage() {
                 setActionTarget(u);
                 setActionType("suspend");
               }}
-              className="p-1.5 rounded-lg text-muted hover:text-amber-600 hover:bg-amber-50 transition-colors"
-              title="Suspend User"
+              className={cn(
+                "p-1.5 rounded-lg transition-colors",
+                u.isSuspended
+                  ? "text-red-500 hover:text-red-600 hover:bg-red-50"
+                  : "text-muted hover:text-amber-600 hover:bg-amber-50"
+              )}
+              title={u.isSuspended ? "Aktifkan User" : "Suspend User"}
             >
               <Ban className="size-3.5" />
             </button>
@@ -383,21 +408,25 @@ export default function DeveloperUsersPage() {
           setActionTarget(null);
           setActionType(null);
         }}
-        onConfirm={executeMockAction}
+        onConfirm={executeUserAction}
         title={
           actionType === "role"
             ? "Ubah Role Pengguna"
             : actionType === "suspend"
-              ? "Tangguhkan Pengguna"
+              ? (actionTarget?.isSuspended ? "Aktifkan Pengguna" : "Tangguhkan Pengguna")
               : "Hapus Pengguna"
         }
         description={
           actionTarget
-            ? `Apakah Anda yakin ingin melakukan aksi "${actionType?.toUpperCase()}" untuk user "${actionTarget.name}" (${actionTarget.email})?`
+            ? `Apakah Anda yakin ingin melakukan aksi "${
+                actionType === "suspend"
+                  ? (actionTarget.isSuspended ? "AKTIFKAN" : "TANGGUHKAN")
+                  : actionType?.toUpperCase()
+              }" untuk user "${actionTarget.name}" (${actionTarget.email})?`
             : ""
         }
         confirmLabel="Konfirmasi"
-        confirmVariant={actionType === "delete" ? "danger" : "primary"}
+        confirmVariant={actionType === "delete" || (actionType === "suspend" && !actionTarget?.isSuspended) ? "danger" : "primary"}
         loading={actionLoading}
       />
     </div>

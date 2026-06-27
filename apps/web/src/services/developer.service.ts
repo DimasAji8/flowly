@@ -54,6 +54,7 @@ export interface DeveloperUser {
   email: string;
   gender: string | null;
   role: string;
+  isSuspended: boolean;
   createdAt: string;
   lastSeenAt: string | null;
   ownedWorkspaces: number;
@@ -118,5 +119,17 @@ export const developerService = {
 
   getHealth() {
     return apiClient.get<DeveloperHealth>("/developer/health", { auth: true });
+  },
+
+  updateUserRole(id: string, role: string) {
+    return apiClient.patch<any>(`/developer/users/${id}/role`, { role }, { auth: true });
+  },
+
+  toggleUserSuspension(id: string) {
+    return apiClient.patch<any>(`/developer/users/${id}/suspend`, {}, { auth: true });
+  },
+
+  deleteUser(id: string) {
+    return apiClient.delete<any>(`/developer/users/${id}`, { auth: true });
   },
 };
