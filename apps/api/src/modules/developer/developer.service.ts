@@ -440,6 +440,13 @@ export class DeveloperService {
       throw new BadRequestException('Developer tidak dapat dihapus');
     }
 
-    return this.prisma.user.delete({ where: { id } });
+    return this.prisma.$transaction(async (tx) => {
+      // Hapus transaksi yang dibuat oleh user ini terlebih dahulu karena hubungan Restrict
+      await tx.transaction.deleteMany({
+        where: { userId: id },
+      });
+
+      return tx.user.delete({ where: { id } });
+    });
   }
 }
