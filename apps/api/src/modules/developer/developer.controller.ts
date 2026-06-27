@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Query, Param, Body, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -76,5 +76,26 @@ export class DeveloperController {
   @ApiResponse({ status: 200, description: 'Status database & uptime' })
   health() {
     return this.developerService.getHealth();
+  }
+
+  @Patch('users/:id/role')
+  @ApiOperation({ summary: 'Ubah role pengguna (user/developer)' })
+  @ApiResponse({ status: 200, description: 'Role user berhasil diupdate' })
+  updateRole(@Param('id') id: string, @Body('role') body: { role: string }) {
+    return this.developerService.updateUserRole(id, body.role);
+  }
+
+  @Patch('users/:id/suspend')
+  @ApiOperation({ summary: 'Tangguhkan atau aktifkan kembali pengguna' })
+  @ApiResponse({ status: 200, description: 'Status penangguhan user berhasil diubah' })
+  toggleSuspension(@Param('id') id: string) {
+    return this.developerService.toggleUserSuspension(id);
+  }
+
+  @Delete('users/:id')
+  @ApiOperation({ summary: 'Hapus pengguna' })
+  @ApiResponse({ status: 200, description: 'User berhasil dihapus' })
+  deleteUser(@Param('id') id: string) {
+    return this.developerService.deleteUser(id);
   }
 }

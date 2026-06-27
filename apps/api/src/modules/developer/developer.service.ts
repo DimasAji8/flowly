@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../common/dto/pagination.query';
 import {
@@ -235,6 +235,7 @@ export class DeveloperService {
       email: string;
       gender: string | null;
       role: string;
+      isSuspended: boolean;
       createdAt: Date;
       updatedAt: Date;
       lastSeenAt: Date | null;
@@ -257,6 +258,7 @@ export class DeveloperService {
           email: true,
           gender: true,
           role: true,
+          isSuspended: true,
           createdAt: true,
           updatedAt: true,
           lastSeenAt: true,
@@ -278,6 +280,7 @@ export class DeveloperService {
       email: u.email,
       gender: u.gender,
       role: u.role,
+      isSuspended: u.isSuspended,
       createdAt: u.createdAt,
       updatedAt: u.updatedAt,
       lastSeenAt: u.lastSeenAt,
@@ -404,5 +407,39 @@ export class DeveloperService {
       nodeVersion: process.version,
       platform: process.platform,
     };
+  }
+
+  async updateUserRole(id: string, role: string) {
+    if (role !== 'user' && role !== 'developer') {
+      throw new BadRequestException('Role tidak valid');
+    }
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User tidak ditemukan');
+    
+    return this.prisma.user.update({
+      where: { id },
+      data: { role: role as any },
+    });
+  }
+
+  async toggleUserSuspension(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User tidak ditemukan');
+    
+    return this.prisma.user.update({
+      where: { id },
+      data: { isSuspended: !user.isSuspended },
+    });
+  }
+
+  async deleteUser(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User tidak ditemukan');
+    
+    if (user.role === 'developer') {
+      throw new BadRequestException('Developer tidak dapat dihapus');
+    }
+
+    return this.prisma.user.delete({ where: { id } });
   }
 }
