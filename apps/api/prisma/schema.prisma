@@ -63,6 +63,7 @@ model User {
   password               String
   gender                 Gender?
   role                   UserRole  @default(user)
+  isSuspended            Boolean   @default(false) @map("is_suspended")
   resetPasswordToken     String?   @map("reset_password_token")
   resetPasswordExpiresAt DateTime? @map("reset_password_expires_at")
   lastSeenAt             DateTime? @map("last_seen_at")
