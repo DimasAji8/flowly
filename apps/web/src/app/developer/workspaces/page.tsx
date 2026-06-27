@@ -379,26 +379,24 @@ export default function DeveloperWorkspacesPage() {
         </div>
 
         {/* Table wrapper */}
-        <div className="bg-card rounded-2xl border border-border-subtle shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] overflow-hidden">
-          <DataTable
-            data={filteredRows}
-            columns={columns}
-            keyExtractor={(ws) => ws.id}
-            pagination={{
-              page,
-              pageSize: PAGE_SIZE,
-              total: displayTotal,
-              totalPages: displayTotalPages,
-            }}
-            onPageChange={setPage}
-            emptyTitle={searchQuery ? "Workspace tidak ditemukan" : "Belum ada workspace"}
-            emptyDescription={
-              searchQuery
-                ? "Tidak ada workspace yang cocok dengan kriteria pencarian Anda."
-                : "Belum ada workspace yang terdaftar."
-            }
-          />
-        </div>
+        <DataTable
+          data={filteredRows}
+          columns={columns}
+          keyExtractor={(ws) => ws.id}
+          pagination={{
+            page,
+            pageSize: PAGE_SIZE,
+            total: displayTotal,
+            totalPages: displayTotalPages,
+          }}
+          onPageChange={setPage}
+          emptyTitle={searchQuery ? "Workspace tidak ditemukan" : "Belum ada workspace"}
+          emptyDescription={
+            searchQuery
+              ? "Tidak ada workspace yang cocok dengan kriteria pencarian Anda."
+              : "Belum ada workspace yang terdaftar."
+          }
+        />
       </div>
 
       {/* Quick Action Confirmation Modal */}

@@ -416,26 +416,24 @@ export default function DeveloperReviewsPage() {
         </div>
 
         {/* Table wrapper */}
-        <div className="bg-card rounded-2xl border border-border-subtle shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] overflow-hidden">
-          <DataTable
-            data={filteredReviews}
-            columns={columns}
-            keyExtractor={(r) => r.id}
-            pagination={{
-              page,
-              pageSize: PAGE_SIZE,
-              total: displayTotal,
-              totalPages: displayTotalPages,
-            }}
-            onPageChange={setPage}
-            emptyTitle={ratingFilter !== "all" ? "Ulasan tidak ditemukan" : "Belum ada review"}
-            emptyDescription={
-              ratingFilter !== "all"
-                ? "Tidak ada testimoni dengan rating tersebut."
-                : "Belum ada testimoni yang masuk."
-            }
-          />
-        </div>
+        <DataTable
+          data={filteredReviews}
+          columns={columns}
+          keyExtractor={(r) => r.id}
+          pagination={{
+            page,
+            pageSize: PAGE_SIZE,
+            total: displayTotal,
+            totalPages: displayTotalPages,
+          }}
+          onPageChange={setPage}
+          emptyTitle={ratingFilter !== "all" ? "Ulasan tidak ditemukan" : "Belum ada review"}
+          emptyDescription={
+            ratingFilter !== "all"
+              ? "Tidak ada testimoni dengan rating tersebut."
+              : "Belum ada testimoni yang masuk."
+          }
+        />
       </div>
 
       {/* Delete confirmation */}

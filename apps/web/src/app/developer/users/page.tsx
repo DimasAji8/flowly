@@ -357,27 +357,24 @@ export default function DeveloperUsersPage() {
         </div>
       </div>
 
-      {/* Main Table Wrapper */}
-      <div className="bg-card rounded-2xl border border-border-subtle shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] overflow-hidden">
-        <DataTable
-          data={filteredUsers}
-          columns={columns}
-          keyExtractor={(u) => u.id}
-          pagination={{
-            page,
-            pageSize: PAGE_SIZE,
-            total: displayTotal,
-            totalPages: displayTotalPages,
-          }}
-          onPageChange={setPage}
-          emptyTitle={searchQuery || roleFilter !== "all" ? "User tidak ditemukan" : "Belum ada user"}
-          emptyDescription={
-            searchQuery || roleFilter !== "all"
-              ? "Tidak ada pengguna yang cocok dengan kriteria pencarian Anda."
-              : "Belum ada pengguna yang terdaftar."
-          }
-        />
-      </div>
+      <DataTable
+        data={filteredUsers}
+        columns={columns}
+        keyExtractor={(u) => u.id}
+        pagination={{
+          page,
+          pageSize: PAGE_SIZE,
+          total: displayTotal,
+          totalPages: displayTotalPages,
+        }}
+        onPageChange={setPage}
+        emptyTitle={searchQuery || roleFilter !== "all" ? "User tidak ditemukan" : "Belum ada user"}
+        emptyDescription={
+          searchQuery || roleFilter !== "all"
+            ? "Tidak ada pengguna yang cocok dengan kriteria pencarian Anda."
+            : "Belum ada pengguna yang terdaftar."
+        }
+      />
 
       {/* Action Modal (Confirmation) */}
       <ConfirmModal
