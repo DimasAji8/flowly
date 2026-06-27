@@ -288,12 +288,12 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
     }
   }
 
-  async getInsights(workspaceId: string) {
+  async getInsights(workspaceId: string, force = false) {
     const now = Date.now();
     const cached = this.insightsCache.get(workspaceId);
 
-    // Cache valid selama 6 jam
-    if (cached && now - cached.timestamp < 6 * 60 * 60 * 1000) {
+    // Cache valid selama 6 jam (kecuali dipaksa force refresh)
+    if (!force && cached && now - cached.timestamp < 6 * 60 * 60 * 1000) {
       return cached.data;
     }
 

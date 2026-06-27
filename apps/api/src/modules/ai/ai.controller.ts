@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Post,
   Get,
+  Query,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -107,7 +108,17 @@ export class AiController {
     description: 'Daftar analisis finansial berhasil dibuat',
     type: [AiInsightResponseDto],
   })
-  async getInsights(@CurrentWorkspace() ws: WorkspaceContext) {
-    return this.aiService.getInsights(ws.id);
+  @ApiQuery({
+    name: 'force',
+    required: false,
+    description: 'Paksa kalkulasi ulang tanpa cache',
+    type: Boolean,
+  })
+  async getInsights(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @Query('force') force?: string,
+  ) {
+    const isForce = force === 'true';
+    return this.aiService.getInsights(ws.id, isForce);
   }
 }
