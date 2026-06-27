@@ -18,6 +18,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { Select } from "@/components/ui/select";
 import { reviewService, type Review } from "@/services/review.service";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
@@ -41,7 +42,7 @@ export default function DeveloperReviewsPage() {
       setTotalPages(res.totalPages);
       setPage(res.page);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat review");
+      setError(err instanceof Error ? err.message : "Gagal memuat testimoni");
       setReviews([]);
     }
   }, []);
@@ -66,8 +67,11 @@ export default function DeveloperReviewsPage() {
             )
           : prev,
       );
+      toast.success(
+        `Status ulasan berhasil diubah menjadi ${updated.isShown ? "DITAMPILKAN" : "DISEMBUNYIKAN"}`
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengubah status");
+      toast.error(err instanceof Error ? err.message : "Gagal mengubah status ulasan");
     }
   };
 
@@ -76,10 +80,11 @@ export default function DeveloperReviewsPage() {
     setDeleteLoading(true);
     try {
       await reviewService.remove(deleteTarget.id);
+      toast.success(`Ulasan dari "${deleteTarget.name}" berhasil dihapus`);
       setDeleteTarget(null);
       await fetchReviews(page);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menghapus review");
+      toast.error(err instanceof Error ? err.message : "Gagal menghapus ulasan");
     } finally {
       setDeleteLoading(false);
     }

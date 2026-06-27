@@ -24,6 +24,8 @@ import {
   developerService,
   type DeveloperWorkspaceStats,
 } from "@/services/developer.service";
+import { formatRelativeTime } from "@/utils/format-date";
+import { toast } from "sonner";
 
 type WorkspaceRow = DeveloperWorkspaceStats["data"][number];
 
@@ -66,25 +68,23 @@ export default function DeveloperWorkspacesPage() {
     try {
       const res = await developerService.getWorkspaceStats(
         targetPage,
-        PAGE_SIZE,
+        PAGE_SIZE
       );
-      const {
-        data: list,
-        total: t,
-        totalPages: tp,
-        page: p,
-        pageSize: _ps,
-        ...rest
-      } = res;
-      setRows(list);
-      setSummary({ ...rest, total: t, totalPages: tp, page: p, pageSize: _ps });
-      setTotal(t);
-      setTotalPages(tp);
-      setPage(p);
+      setRows(res.data);
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
+      setPage(res.page);
+      setSummary({
+        total: res.total,
+        totalMembers: res.totalMembers,
+        avgMembersPerWorkspace: res.avgMembersPerWorkspace,
+        totalSavingsGoals: res.totalSavingsGoals,
+        page: res.page,
+        pageSize: res.pageSize,
+        totalPages: res.totalPages,
+      });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Gagal memuat data workspace",
-      );
+      setError(err instanceof Error ? err.message : "Gagal memuat data");
       setRows([]);
     }
   }, []);
@@ -106,7 +106,7 @@ export default function DeveloperWorkspacesPage() {
       setActionLoading(false);
       setActionTarget(null);
       setActionType(null);
-      alert(`Aksi Berhasil: ${actionType.toUpperCase()} untuk workspace "${actionTarget.name}"`);
+      toast.success(`Aksi Berhasil: ${actionType.toUpperCase()} untuk workspace "${actionTarget.name}"`);
     }, 800);
   };
 

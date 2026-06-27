@@ -15,19 +15,17 @@ import {
 } from "@/services/developer.service";
 import { formatRelativeTime } from "@/utils/format-date";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
 // Dynamic avatar styling based on user name character sum
-const getAvatarBg = (name: string) => {
+const getAvatarColor = (name: string) => {
   const colors = [
-    "bg-red-500/10 text-red-500 border-red-200/50",
-    "bg-blue-500/10 text-blue-500 border-blue-200/50",
-    "bg-emerald-500/10 text-emerald-500 border-emerald-200/50",
-    "bg-amber-500/10 text-amber-500 border-amber-200/50",
+    "bg-indigo-500/10 text-indigo-500 border-indigo-200/50",
     "bg-violet-500/10 text-violet-500 border-violet-200/50",
-    "bg-pink-500/10 text-pink-500 border-pink-200/50",
     "bg-teal-500/10 text-teal-500 border-teal-200/50",
+    "bg-rose-500/10 text-rose-500 border-rose-200/50",
     "bg-sky-500/10 text-sky-500 border-sky-200/50"
   ];
   let sum = 0;
@@ -46,7 +44,7 @@ export default function DeveloperUsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "developer" | "user">("all");
 
-  // Mock Modal States for Demo / Action Operations
+  // Moderation / Action states
   const [actionTarget, setActionTarget] = useState<DeveloperUser | null>(null);
   const [actionType, setActionType] = useState<"role" | "suspend" | "delete" | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -85,11 +83,16 @@ export default function DeveloperUsersPage() {
     try {
       if (actionType === "delete") {
         await developerService.deleteUser(actionTarget.id);
+        toast.success(`Pengguna "${actionTarget.name}" berhasil dihapus`);
       } else if (actionType === "suspend") {
         await developerService.toggleUserSuspension(actionTarget.id);
+        toast.success(
+          `Pengguna "${actionTarget.name}" berhasil ${actionTarget.isSuspended ? "diaktifkan" : "ditangguhkan"}`
+        );
       } else if (actionType === "role") {
         const newRole = actionTarget.role === "developer" ? "user" : "developer";
         await developerService.updateUserRole(actionTarget.id, newRole);
+        toast.success(`Role pengguna "${actionTarget.name}" berhasil diubah menjadi ${newRole.toUpperCase()}`);
       }
       
       // Refresh the page data
@@ -98,7 +101,7 @@ export default function DeveloperUsersPage() {
       setActionTarget(null);
       setActionType(null);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal mengeksekusi aksi");
+      toast.error(err instanceof Error ? err.message : "Gagal mengeksekusi aksi");
     } finally {
       setActionLoading(false);
     }
@@ -147,7 +150,7 @@ export default function DeveloperUsersPage() {
         header: "Pengguna",
         render: (u) => (
           <div className="flex items-center gap-3 min-w-0">
-            <span className={`grid size-8 shrink-0 place-items-center rounded-full border text-xs font-bold select-none ${getAvatarBg(u.name)}`}>
+            <span className={cn("grid size-8 shrink-0 place-items-center rounded-full border text-xs font-bold select-none", getAvatarColor(u.name))}>
               {u.name.charAt(0).toUpperCase()}
             </span>
             <div className="flex flex-col min-w-0">
