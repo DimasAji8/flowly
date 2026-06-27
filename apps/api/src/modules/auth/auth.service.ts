@@ -135,7 +135,7 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.password);
     if (!valid) throw new UnauthorizedException('Email atau password salah');
 
-    if (user.isSuspended) throw new UnauthorizedException('Akun Anda ditangguhkan');
+    if (user.isSuspended) throw new UnauthorizedException('Akun Anda ditangguhkan, silakan hubungi administrator untuk membuka');
 
     const workspaceId = await this.getPrimaryWorkspaceId(user.id);
     const tokens = await this.signTokens(user);
