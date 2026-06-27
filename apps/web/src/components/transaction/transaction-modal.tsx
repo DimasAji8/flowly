@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ArrowDownCircle, ArrowUpCircle, Sparkles, Camera } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Sparkles, Camera, Image } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
   const [aiValues, setAiValues] = useState<Partial<CreateTransactionFormValues> | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const handleClose = () => {
     setSelectedType(null);
@@ -37,6 +38,7 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
     setAiText("");
     setScanLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
     onClose();
   };
 
@@ -112,11 +114,16 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
     } finally {
       setScanLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
     }
   };
 
-  const handleTriggerScan = () => {
+  const handleTriggerGallery = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleTriggerCamera = () => {
+    cameraInputRef.current?.click();
   };
 
   // Edit mode → langsung ke form
@@ -232,23 +239,38 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
 
           <div className="relative my-1 flex py-1 items-center">
             <div className="grow border-t border-border-subtle"></div>
-            <span className="mx-3 text-[10px] font-medium uppercase tracking-wider text-muted select-none">Atau</span>
+            <span className="mx-3 text-[10px] font-medium uppercase tracking-wider text-muted select-none">Fitur Cerdas AI</span>
             <div className="grow border-t border-border-subtle"></div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleTriggerScan}
-            className="flex items-center gap-4 rounded-xl border border-border-subtle bg-card-subtle px-5 py-4 text-left transition-colors hover:border-accent hover:bg-accent/5"
-          >
-            <Camera className="size-8 shrink-0 text-accent" strokeWidth={1.5} />
-            <div>
-              <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                Scan Struk dengan AI <span className="text-[9px] bg-accent/10 text-accent px-1.5 py-0.5 rounded-full font-medium tracking-wide">BARU</span>
-              </p>
-              <p className="text-xs text-muted">Ambil foto struk belanja, AI akan mengisi formulir otomatis.</p>
-            </div>
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={handleTriggerCamera}
+              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border-subtle bg-card-subtle px-3 py-4 text-center transition-colors hover:border-accent hover:bg-accent/5 group"
+            >
+              <Camera className="size-6 text-accent transition-transform group-hover:scale-110" strokeWidth={1.5} />
+              <div>
+                <p className="text-xs font-semibold text-foreground flex items-center justify-center gap-1">
+                  Kamera Struk <span className="text-[8px] bg-accent/10 text-accent px-1.5 py-0.5 rounded-full font-medium">AI</span>
+                </p>
+                <p className="text-[10px] text-muted mt-0.5">Ambil foto langsung</p>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={handleTriggerGallery}
+              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border-subtle bg-card-subtle px-3 py-4 text-center transition-colors hover:border-accent hover:bg-accent/5 group"
+            >
+              <Image className="size-6 text-accent transition-transform group-hover:scale-110" strokeWidth={1.5} />
+              <div>
+                <p className="text-xs font-semibold text-foreground flex items-center justify-center gap-1">
+                  Pilih Galeri <span className="text-[8px] bg-accent/10 text-accent px-1.5 py-0.5 rounded-full font-medium">AI</span>
+                </p>
+                <p className="text-[10px] text-muted mt-0.5">Upload gambar/file</p>
+              </div>
+            </button>
+          </div>
 
           <button
             type="button"
@@ -290,6 +312,14 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
         ref={fileInputRef}
         onChange={handleFileChange}
         accept="image/*"
+        className="hidden"
+      />
+      <input
+        type="file"
+        ref={cameraInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        capture="environment"
         className="hidden"
       />
     </Modal>
