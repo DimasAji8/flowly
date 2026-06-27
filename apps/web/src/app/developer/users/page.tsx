@@ -1,21 +1,42 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Users, RefreshCw, Search } from "lucide-react";
+import { Users, RefreshCw, Search, Shield, UserPlus, UserCheck, Trash2, ShieldAlert, Ban, Edit2 } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
   developerService,
   type DeveloperUser,
+  type DeveloperStats,
 } from "@/services/developer.service";
 import { formatRelativeTime } from "@/utils/format-date";
 
 const PAGE_SIZE = 10;
 
+// Dynamic avatar styling based on user name character sum
+const getAvatarBg = (name: string) => {
+  const colors = [
+    "bg-red-500/10 text-red-500 border-red-200/50",
+    "bg-blue-500/10 text-blue-500 border-blue-200/50",
+    "bg-emerald-500/10 text-emerald-500 border-emerald-200/50",
+    "bg-amber-500/10 text-amber-500 border-amber-200/50",
+    "bg-violet-500/10 text-violet-500 border-violet-200/50",
+    "bg-pink-500/10 text-pink-500 border-pink-200/50",
+    "bg-teal-500/10 text-teal-500 border-teal-200/50",
+    "bg-sky-500/10 text-sky-500 border-sky-200/50"
+  ];
+  let sum = 0;
+  for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i);
+  return colors[sum % colors.length];
+};
+
 export default function DeveloperUsersPage() {
   const [users, setUsers] = useState<DeveloperUser[] | null>(null);
+  const [stats, setStats] = useState<DeveloperStats | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -23,6 +44,50 @@ export default function DeveloperUsersPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "developer" | "user">("all");
+
+  // Mock Modal States for Demo / Action Operations
+  const [actionTarget, setActionTarget] = useState<DeveloperUser | null>(null);
+  const [actionType, setActionType] = useState<"role" | "suspend" | "delete" | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const fetchUsers = useCallback(async (targetPage: number) => {
+    setError(null);
+    try {
+      const [res, s] = await Promise.all([
+        developerService.listUsers(targetPage, PAGE_SIZE),
+        developerService.getStats()
+      ]);
+      setUsers(res.data);
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
+      setPage(res.page);
+      setStats(s);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal memuat data users");
+      setUsers([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers(page);
+  }, [page, fetchUsers]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchUsers(page);
+    setRefreshing(false);
+  };
+
+  const executeMockAction = () => {
+    if (!actionTarget || !actionType) return;
+    setActionLoading(true);
+    setTimeout(() => {
+      setActionLoading(false);
+      setActionTarget(null);
+      setActionType(null);
+      alert(`Simulasi Aksi Berhasil: ${actionType.toUpperCase()} untuk user "${actionTarget.name}"`);
+    }, 800);
+  };
 
   const filteredUsers = useMemo(() => {
     if (!users) return null;
@@ -43,30 +108,20 @@ export default function DeveloperUsersPage() {
     ? Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE))
     : totalPages;
 
-  const fetchUsers = useCallback(async (targetPage: number) => {
-    setError(null);
-    try {
-      const res = await developerService.listUsers(targetPage, PAGE_SIZE);
-      setUsers(res.data);
-      setTotal(res.total);
-      setTotalPages(res.totalPages);
-      setPage(res.page);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat data users");
-      setUsers([]);
-    }
-  }, []);
+  // Compute Quick Stats
+  const newUsersThisMonth = useMemo(() => {
+    if (!users) return 0;
+    const now = new Date();
+    return users.filter((u) => {
+      const d = new Date(u.createdAt);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).length;
+  }, [users]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchUsers(page);
-  }, [page, fetchUsers]);
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchUsers(page);
-    setRefreshing(false);
-  };
+  const developerCount = useMemo(() => {
+    if (!users) return 0;
+    return users.filter((u) => u.role === "developer").length;
+  }, [users]);
 
   const columns: DataTableColumn<DeveloperUser>[] = useMemo(
     () => [
@@ -75,19 +130,17 @@ export default function DeveloperUsersPage() {
         header: "Pengguna",
         render: (u) => (
           <div className="flex items-center gap-3 min-w-0">
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent select-none">
+            <span className={`grid size-8 shrink-0 place-items-center rounded-full border text-xs font-bold select-none ${getAvatarBg(u.name)}`}>
               {u.name.charAt(0).toUpperCase()}
             </span>
-            <span className="flex items-center gap-2 min-w-0">
-              <span className="text-sm font-medium text-foreground truncate">
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-bold text-foreground truncate">
                 {u.name}
               </span>
-              {u.role === "developer" && (
-                <Chip tone="accent" size="sm">
-                  DEV
-                </Chip>
-              )}
-            </span>
+              <span className="text-[10px] font-medium text-muted truncate mt-0.5 md:hidden">
+                {u.email}
+              </span>
+            </div>
           </div>
         ),
       },
@@ -96,7 +149,7 @@ export default function DeveloperUsersPage() {
         header: "Email",
         hideOnMobile: true,
         render: (u) => (
-          <span className="text-sm text-muted truncate block max-w-[260px]">
+          <span className="text-sm text-secondary font-medium truncate block max-w-[220px]">
             {u.email}
           </span>
         ),
@@ -121,7 +174,7 @@ export default function DeveloperUsersPage() {
         header: "Transaksi",
         align: "right",
         render: (u) => (
-          <span className="text-sm font-medium text-foreground tabular-nums">
+          <span className="text-sm font-bold text-foreground tabular-nums">
             {u.transactions.toLocaleString("id-ID")}
           </span>
         ),
@@ -131,7 +184,7 @@ export default function DeveloperUsersPage() {
         header: "Terakhir Dilihat",
         hideOnMobile: true,
         render: (u) => (
-          <span className="text-xs text-muted">
+          <span className="text-xs text-muted font-medium">
             {formatRelativeTime(u.lastSeenAt)}
           </span>
         ),
@@ -141,13 +194,55 @@ export default function DeveloperUsersPage() {
         header: "Tgl Daftar",
         align: "right",
         render: (u) => (
-          <span className="text-xs text-muted">
+          <span className="text-xs text-muted font-medium">
             {new Date(u.createdAt).toLocaleDateString("id-ID", {
               day: "numeric",
               month: "short",
               year: "numeric",
             })}
           </span>
+        ),
+      },
+      {
+        key: "actions",
+        header: "Aksi",
+        align: "right",
+        render: (u) => (
+          <div className="inline-flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                setActionTarget(u);
+                setActionType("role");
+              }}
+              className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-accent-soft/30 transition-colors"
+              title="Edit Role"
+            >
+              <Edit2 className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActionTarget(u);
+                setActionType("suspend");
+              }}
+              className="p-1.5 rounded-lg text-muted hover:text-amber-600 hover:bg-amber-50 transition-colors"
+              title="Suspend User"
+            >
+              <Ban className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActionTarget(u);
+                setActionType("delete");
+              }}
+              className="p-1.5 rounded-lg text-muted hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              title="Hapus User"
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          </div>
         ),
       },
     ],
@@ -170,25 +265,25 @@ export default function DeveloperUsersPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-8">
+    <div className="flex flex-col gap-6 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
-            <Users className="size-4.5" strokeWidth={2} />
+      <div className="flex items-center justify-between border-b border-border-subtle/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent shadow-xs">
+            <Users className="size-5" strokeWidth={2} />
           </span>
           <div>
-            <h1 className="text-lg font-semibold tracking-tight text-foreground">
-              Users
+            <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+              Kelola Pengguna
             </h1>
-            <p className="text-xs text-muted">{displayTotal} total pengguna</p>
+            <p className="text-xs text-muted font-medium">Monitoring aktivitas user dan konfigurasi role</p>
           </div>
         </div>
         <button
           type="button"
           onClick={handleRefresh}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium text-accent hover:bg-accent-soft transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold bg-card border border-border-subtle hover:bg-card-subtle text-foreground active:scale-[0.98] transition-all disabled:opacity-50"
         >
           <RefreshCw
             className={`size-3.5 ${refreshing ? "animate-spin" : ""}`}
@@ -197,8 +292,48 @@ export default function DeveloperUsersPage() {
         </button>
       </div>
 
+      {/* ── Quick Stats Grid ───────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <Card padding="md" className="flex items-center gap-3.5 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl hover:translate-y-[-1px] transition-all duration-300">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-500">
+            <Users className="size-4.5" />
+          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Total User</span>
+            <span className="text-base font-extrabold text-foreground tabular-nums mt-0.5">{stats?.users ?? total}</span>
+          </div>
+        </Card>
+        <Card padding="md" className="flex items-center gap-3.5 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl hover:translate-y-[-1px] transition-all duration-300">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-500">
+            <UserCheck className="size-4.5" />
+          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] text-muted font-bold uppercase tracking-wider">User Aktif (30d)</span>
+            <span className="text-base font-extrabold text-foreground tabular-nums mt-0.5">{stats?.activeUsers30d ?? 0}</span>
+          </div>
+        </Card>
+        <Card padding="md" className="flex items-center gap-3.5 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl hover:translate-y-[-1px] transition-all duration-300">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-amber-500/10 text-amber-500">
+            <UserPlus className="size-4.5" />
+          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Baru Bulan Ini</span>
+            <span className="text-base font-extrabold text-foreground tabular-nums mt-0.5">{newUsersThisMonth}</span>
+          </div>
+        </Card>
+        <Card padding="md" className="flex items-center gap-3.5 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl hover:translate-y-[-1px] transition-all duration-300">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-violet-500/10 text-violet-500">
+            <Shield className="size-4.5" />
+          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Developers</span>
+            <span className="text-base font-extrabold text-foreground tabular-nums mt-0.5">{developerCount}</span>
+          </div>
+        </Card>
+      </div>
+
       {/* Search & Filter */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center bg-card p-4 rounded-xl border border-border-subtle shadow-xs">
+      <div className="flex flex-col gap-3.5 md:flex-row md:items-center bg-card p-4 rounded-2xl border border-border-subtle shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
         <div className="flex-1">
           <Input
             placeholder="Cari nama atau email..."
@@ -213,30 +348,58 @@ export default function DeveloperUsersPage() {
             onChange={(e) => setRoleFilter(e.target.value as any)}
             options={[
               { value: "all", label: "Semua Role" },
-              { value: "developer", label: "Developer" },
-              { value: "user", label: "User" },
+              { value: "developer", label: "Developer Only" },
+              { value: "user", label: "User Only" },
             ]}
           />
         </div>
       </div>
 
-      <DataTable
-        data={filteredUsers}
-        columns={columns}
-        keyExtractor={(u) => u.id}
-        pagination={{
-          page,
-          pageSize: PAGE_SIZE,
-          total: displayTotal,
-          totalPages: displayTotalPages,
+      {/* Main Table Wrapper */}
+      <div className="bg-card rounded-2xl border border-border-subtle shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] overflow-hidden">
+        <DataTable
+          data={filteredUsers}
+          columns={columns}
+          keyExtractor={(u) => u.id}
+          pagination={{
+            page,
+            pageSize: PAGE_SIZE,
+            total: displayTotal,
+            totalPages: displayTotalPages,
+          }}
+          onPageChange={setPage}
+          emptyTitle={searchQuery || roleFilter !== "all" ? "User tidak ditemukan" : "Belum ada user"}
+          emptyDescription={
+            searchQuery || roleFilter !== "all"
+              ? "Tidak ada pengguna yang cocok dengan kriteria pencarian Anda."
+              : "Belum ada pengguna yang terdaftar."
+          }
+        />
+      </div>
+
+      {/* Action Modal (Confirmation) */}
+      <ConfirmModal
+        open={!!actionTarget}
+        onClose={() => {
+          setActionTarget(null);
+          setActionType(null);
         }}
-        onPageChange={setPage}
-        emptyTitle={searchQuery || roleFilter !== "all" ? "User tidak ditemukan" : "Belum ada user"}
-        emptyDescription={
-          searchQuery || roleFilter !== "all"
-            ? "Tidak ada pengguna yang cocok dengan kriteria pencarian Anda."
-            : "Belum ada pengguna yang terdaftar."
+        onConfirm={executeMockAction}
+        title={
+          actionType === "role"
+            ? "Ubah Role Pengguna"
+            : actionType === "suspend"
+              ? "Tangguhkan Pengguna"
+              : "Hapus Pengguna"
         }
+        description={
+          actionTarget
+            ? `Apakah Anda yakin ingin melakukan aksi "${actionType?.toUpperCase()}" untuk user "${actionTarget.name}" (${actionTarget.email})?`
+            : ""
+        }
+        confirmLabel="Konfirmasi"
+        confirmVariant={actionType === "delete" ? "danger" : "primary"}
+        loading={actionLoading}
       />
     </div>
   );
