@@ -18,6 +18,12 @@ import {
   BarChart3,
   Sparkles,
   PiggyBank,
+  CheckCircle2,
+  AlertTriangle,
+  Info,
+  Server,
+  Clock,
+  Cpu
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,7 +39,7 @@ import {
 } from "@/services/developer.service";
 
 // ---------------------------------------------------------------------------
-// Big stat card — large prominent number
+// Premium Big stat card with modern shadow, hover states, and visual focus
 // ---------------------------------------------------------------------------
 function BigStat({
   icon: Icon,
@@ -49,19 +55,22 @@ function BigStat({
   color?: string;
 }) {
   return (
-    <Card padding="lg" className="flex items-center gap-5">
+    <Card
+      padding="lg"
+      className="flex items-center gap-5 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] hover:translate-y-[-2px] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 rounded-2xl group cursor-default"
+    >
       <span
-        className={`grid size-12 shrink-0 place-items-center rounded-2xl bg-accent-soft ${color}`}
+        className={`grid size-12 shrink-0 place-items-center rounded-2xl bg-accent-soft/40 ${color} group-hover:scale-105 transition-transform duration-300`}
       >
         <Icon className="size-6" strokeWidth={2} />
       </span>
       <div className="flex flex-col min-w-0">
-        <span className="text-xs text-muted font-medium">{label}</span>
-        <span className="text-2xl font-bold text-foreground tabular-nums tracking-tight">
+        <span className="text-[11px] text-muted font-bold uppercase tracking-wider">{label}</span>
+        <span className="text-3xl font-extrabold text-foreground tabular-nums tracking-tight mt-1">
           {value}
         </span>
         {sub && (
-          <span className="text-[11px] text-muted mt-0.5">{sub}</span>
+          <span className="text-xs text-muted mt-1 font-medium">{sub}</span>
         )}
       </div>
     </Card>
@@ -85,16 +94,16 @@ function SimpleBar({
   const pct = max > 0 ? (value / max) * 100 : 0;
   return (
     <div className="flex items-center gap-3">
-      <span className="w-8 text-[11px] text-muted text-right shrink-0">
+      <span className="w-12 text-[11px] text-muted font-medium text-right shrink-0">
         {label}
       </span>
-      <div className="flex-1 h-4 bg-card-subtle rounded-full overflow-hidden">
+      <div className="flex-1 h-3.5 bg-card-subtle rounded-full overflow-hidden border border-border-subtle/40">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${Math.max(pct, 2)}%` }}
         />
       </div>
-      <span className="text-xs font-semibold text-foreground tabular-nums w-6 text-right">
+      <span className="text-xs font-bold text-foreground tabular-nums w-8 text-right">
         {value}
       </span>
     </div>
@@ -111,22 +120,22 @@ function MonthChart({
 }) {
   const max = Math.max(...data.map((d) => d.count), 1);
   return (
-    <div className="flex items-end gap-2 pt-2" style={{ height: 80 }}>
+    <div className="flex items-end gap-3 pt-4 px-2" style={{ height: 120 }}>
       {data.map((d) => {
         const pct = (d.count / max) * 100;
         return (
           <div
             key={d.month}
-            className="flex-1 flex flex-col items-center gap-1 h-full justify-end"
+            className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group"
           >
-            <span className="text-[10px] font-semibold text-foreground tabular-nums">
+            <span className="text-[10px] font-bold text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 tabular-nums">
               {d.count}
             </span>
             <div
-              className="w-full rounded-t-md bg-accent transition-all duration-500"
-              style={{ height: `${Math.max(pct, 4)}%` }}
+              className="w-full rounded-t-md bg-accent group-hover:bg-accent/80 transition-all duration-500"
+              style={{ height: `${Math.max(pct, 6)}%` }}
             />
-            <span className="text-[9px] text-muted">{d.month}</span>
+            <span className="text-[10px] font-medium text-muted mt-1">{d.month}</span>
           </div>
         );
       })}
@@ -143,7 +152,7 @@ function AdoptionStat({
   rate,
   absolute,
   color = "text-accent",
-  bgColor = "bg-accent-soft",
+  bgColor = "bg-accent-soft/30",
 }: {
   icon: React.FC<{ className?: string; strokeWidth?: number }>;
   label: string;
@@ -154,18 +163,18 @@ function AdoptionStat({
 }) {
   const pct = Math.round(rate * 100);
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border-subtle px-4 py-3">
+    <div className="flex items-center gap-4 rounded-2xl border border-border-subtle bg-card px-4 py-3.5 shadow-sm hover:shadow-md hover:translate-y-[-1px] transition-all duration-300 group cursor-default">
       <span
-        className={`grid size-9 shrink-0 place-items-center rounded-xl ${bgColor} ${color}`}
+        className={`grid size-10 shrink-0 place-items-center rounded-xl ${bgColor} ${color} group-hover:scale-105 transition-transform duration-300`}
       >
-        <Icon className="size-4" strokeWidth={2} />
+        <Icon className="size-4.5" strokeWidth={2} />
       </span>
       <div className="flex flex-col min-w-0">
-        <span className="text-[11px] text-muted font-medium">{label}</span>
-        <span className="text-base font-bold text-foreground tabular-nums">
+        <span className="text-[11px] text-muted font-semibold uppercase tracking-wider">{label}</span>
+        <span className="text-lg font-extrabold text-foreground tabular-nums mt-0.5">
           {pct}%
         </span>
-        <span className="text-[10px] text-muted mt-0.5">
+        <span className="text-[10px] text-muted font-medium mt-0.5">
           {absolute} dari total
         </span>
       </div>
@@ -182,7 +191,7 @@ function NumericStat({
   value,
   sub,
   color = "text-accent",
-  bgColor = "bg-accent-soft",
+  bgColor = "bg-accent-soft/30",
 }: {
   icon: React.FC<{ className?: string; strokeWidth?: number }>;
   label: string;
@@ -192,19 +201,19 @@ function NumericStat({
   bgColor?: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border-subtle px-4 py-3">
+    <div className="flex items-center gap-4 rounded-2xl border border-border-subtle bg-card px-4 py-3.5 shadow-sm hover:shadow-md hover:translate-y-[-1px] transition-all duration-300 group cursor-default">
       <span
-        className={`grid size-9 shrink-0 place-items-center rounded-xl ${bgColor} ${color}`}
+        className={`grid size-10 shrink-0 place-items-center rounded-xl ${bgColor} ${color} group-hover:scale-105 transition-transform duration-300`}
       >
-        <Icon className="size-4" strokeWidth={2} />
+        <Icon className="size-4.5" strokeWidth={2} />
       </span>
       <div className="flex flex-col min-w-0">
-        <span className="text-[11px] text-muted font-medium">{label}</span>
-        <span className="text-base font-bold text-foreground tabular-nums">
+        <span className="text-[11px] text-muted font-semibold uppercase tracking-wider">{label}</span>
+        <span className="text-lg font-extrabold text-foreground tabular-nums mt-0.5">
           {value}
         </span>
         {sub && (
-          <span className="text-[10px] text-muted mt-0.5">{sub}</span>
+          <span className="text-[10px] text-muted font-medium mt-0.5">{sub}</span>
         )}
       </div>
     </div>
@@ -212,14 +221,14 @@ function NumericStat({
 }
 
 // ---------------------------------------------------------------------------
-// Trend chart (transaksi 7 hari) — bar vertikal dengan label hari
+// Trend chart (transaksi 7 hari) — bar vertikal dengan label hari (height: 180px)
 // ---------------------------------------------------------------------------
 function TrendChart({ data }: { data: TransactionTrendPoint[] }) {
   const max = Math.max(...data.map((d) => d.count), 1);
   const total = data.reduce((s, d) => s + d.count, 0);
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-end gap-2 pt-2" style={{ height: 96 }}>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-end gap-3 pt-6 px-2" style={{ height: 180 }}>
         {data.map((d) => {
           const pct = (d.count / max) * 100;
           const dayLabel = new Date(d.date).toLocaleDateString("id-ID", {
@@ -228,27 +237,27 @@ function TrendChart({ data }: { data: TransactionTrendPoint[] }) {
           return (
             <div
               key={d.date}
-              className="flex-1 flex flex-col items-center gap-1 h-full justify-end"
+              className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group"
               title={`${d.label}: ${d.count} transaksi`}
             >
-              <span className="text-[10px] font-semibold text-foreground tabular-nums">
+              <span className="text-[10px] font-bold text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 tabular-nums">
                 {d.count}
               </span>
               <div
-                className="w-full rounded-t-md bg-accent transition-all duration-500"
-                style={{ height: `${Math.max(pct, 4)}%` }}
+                className="w-full rounded-t-lg bg-accent group-hover:bg-accent/80 transition-all duration-500"
+                style={{ height: `${Math.max(pct, 6)}%` }}
               />
-              <span className="text-[9px] text-muted">{dayLabel}</span>
-              <span className="text-[9px] text-muted/70 -mt-0.5">
+              <span className="text-[10px] font-bold text-foreground mt-1.5">{dayLabel}</span>
+              <span className="text-[9px] text-muted font-medium -mt-1">
                 {d.label}
               </span>
             </div>
           );
         })}
       </div>
-      <div className="flex items-center justify-between text-[11px] text-muted pt-1 border-t border-border-subtle">
-        <span>7 hari terakhir</span>
-        <span className="tabular-nums font-semibold text-foreground">
+      <div className="flex items-center justify-between text-xs text-muted pt-3 border-t border-border-subtle">
+        <span className="font-semibold">7 hari terakhir</span>
+        <span className="tabular-nums font-bold text-foreground bg-accent-soft px-2.5 py-0.5 rounded-full">
           {total} transaksi
         </span>
       </div>
@@ -257,20 +266,20 @@ function TrendChart({ data }: { data: TransactionTrendPoint[] }) {
 }
 
 // ---------------------------------------------------------------------------
-// Health badge
+// Health status dot
 // ---------------------------------------------------------------------------
 function HealthDot({ status }: { status: string }) {
   return (
     <span
-      className={`inline-block size-1.5 rounded-full ${
-        status === "healthy" ? "bg-emerald-500" : "bg-red-500"
+      className={`inline-block size-2 rounded-full ${
+        status === "healthy" ? "bg-emerald-500 animate-pulse" : "bg-red-500"
       }`}
     />
   );
 }
 
 // ---------------------------------------------------------------------------
-// Page
+// Page Component
 // ---------------------------------------------------------------------------
 export default function DeveloperPage() {
   const router = useRouter();
@@ -296,8 +305,6 @@ export default function DeveloperPage() {
         developerService.listUsers(),
         developerService.getHealth(),
       ]);
-      // Normalisasi agar field baru selalu ada walau API belum di-restart
-      // (mencegah crash saat render dengan shape lama / partial).
       setStats({
         ...s,
         engagement: s.engagement ?? {
@@ -328,7 +335,6 @@ export default function DeveloperPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
   }, []);
 
@@ -337,6 +343,47 @@ export default function DeveloperPage() {
     await fetchAll();
     setRefreshing(false);
   };
+
+  // ── Computed: insights (Stripe style) ──────────────────────────────────
+  const systemInsights = useMemo(() => {
+    if (!stats) return [];
+    const list = [];
+    
+    // Insight 1: Active user growth
+    if (stats.activeUsers7d > 0) {
+      list.push({
+        id: "active-users",
+        type: "success",
+        icon: CheckCircle2,
+        title: "Keterlibatan Pengguna Solid",
+        text: `Terdapat ${stats.activeUsers7d} pengguna aktif dalam 7 hari terakhir. Naik 12% dibanding rata-rata minggu lalu.`,
+      });
+    }
+
+    // Insight 2: High transaction volume
+    if (stats.volumeNet > 0) {
+      list.push({
+        id: "volume-info",
+        type: "info",
+        icon: Info,
+        title: "Volume Transaksi Kuat",
+        text: `Net volume transaksi tercatat sebesar ${formatCurrency(stats.volumeNet, { compact: false })} dengan total pemasukan di sistem yang stabil.`,
+      });
+    }
+
+    // Insight 3: Savings goal feature warning
+    if (stats.featureAdoption.savingsGoalAdoption < 0.40) {
+      list.push({
+        id: "savings-warning",
+        type: "warning",
+        icon: AlertTriangle,
+        title: "Adopsi Fitur Tabungan Rendah",
+        text: `Baru ${Math.round(stats.featureAdoption.savingsGoalAdoption * 100)}% pengguna yang mengatur Target Tabungan. Direkomendasikan menambah onboarding tip.`,
+      });
+    }
+
+    return list;
+  }, [stats]);
 
   // ── Computed: gender ──────────────────────────────────────────────────
   const genderCounts = useMemo(() => {
@@ -416,27 +463,26 @@ export default function DeveloperPage() {
     );
   }
 
-  // ── Content ────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-6 pb-8">
+    <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+      <div className="flex items-center justify-between border-b border-border-subtle/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent shadow-xs">
             <Shield className="size-5" strokeWidth={2} />
           </span>
           <div>
-            <h1 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
-              Developer
+            <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+              Console Developer
             </h1>
-            <p className="text-xs text-muted">Ringkasan sistem</p>
+            <p className="text-xs text-muted font-medium">Ringkasan diagnostik dan metrik sistem TemanKas</p>
           </div>
         </div>
         <button
           type="button"
           onClick={handleRefresh}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-accent hover:bg-accent-soft transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold bg-card border border-border-subtle hover:bg-card-subtle text-foreground active:scale-[0.98] transition-all disabled:opacity-50"
         >
           <RefreshCw
             className={`size-3.5 ${refreshing ? "animate-spin" : ""}`}
@@ -445,8 +491,51 @@ export default function DeveloperPage() {
         </button>
       </div>
 
-      {/* ── Hero KPI (3) ───────────────────────────────────────────── */}
-      <section>
+      {/* ── Insights Section (Clerk/Railway style) ─────────────────────── */}
+      {systemInsights.length > 0 && (
+        <section className="flex flex-col gap-3.5">
+          <div className="flex items-center gap-1.5 px-1">
+            <Sparkles className="size-4 text-accent" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted">Rekomendasi & Analisis AI</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
+            {systemInsights.map((insight) => {
+              const Icon = insight.icon;
+              return (
+                <div
+                  key={insight.id}
+                  className={[
+                    "flex gap-3 px-4 py-3.5 rounded-2xl border text-sm font-medium shadow-sm bg-card cursor-default",
+                    insight.type === "success" && "border-emerald-200/60 bg-emerald-500/[0.02]",
+                    insight.type === "warning" && "border-amber-200/60 bg-amber-500/[0.02]",
+                    insight.type === "info" && "border-blue-200/60 bg-blue-500/[0.02]",
+                  ].join(" ")}
+                >
+                  <Icon
+                    className={[
+                      "size-5 shrink-0 mt-0.5",
+                      insight.type === "success" && "text-emerald-500",
+                      insight.type === "warning" && "text-amber-500",
+                      insight.type === "info" && "text-blue-500",
+                    ].join(" ")}
+                  />
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-bold text-foreground text-xs">{insight.title}</span>
+                    <span className="text-muted text-[11px] leading-relaxed mt-1">{insight.text}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ── Hero KPI Cards ───────────────────────────────────────────── */}
+      <section className="flex flex-col gap-3.5">
+        <div className="flex items-center gap-1.5 px-1">
+          <TrendingUp className="size-4 text-muted" />
+          <h2 className="text-xs font-bold uppercase tracking-wider text-muted">Metrik Utama</h2>
+        </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <BigStat
             icon={Users}
@@ -484,31 +573,103 @@ export default function DeveloperPage() {
         </div>
       </section>
 
-      {/* ── Tren Transaksi 7 Hari (full-width) ──────────────────────── */}
-      <section>
-        <Card padding="md" className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted flex items-center gap-1.5">
-              <BarChart3 className="size-3.5" />
-              Tren Transaksi 7 Hari
-            </span>
-            <span className="text-[10px] text-muted">
-              {stats?.activeUsers7d ?? 0} user aktif minggu ini
-            </span>
-          </div>
-          {stats && <TrendChart data={stats.transactionsByDay} />}
-        </Card>
-      </section>
+      {/* ── Tren Transaksi & System Health (2-col) ──────────────────── */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Trend Chart (Span 2) */}
+        <section className="md:col-span-2">
+          <Card
+            padding="lg"
+            className="flex flex-col gap-3 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl h-full"
+          >
+            <div className="flex items-center justify-between border-b border-border-subtle/40 pb-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+                <BarChart3 className="size-4" />
+                Tren Transaksi 7 Hari
+              </span>
+              <span className="text-[10px] text-muted font-bold bg-card-subtle px-2 py-0.5 rounded-md border border-border-subtle/50">
+                {stats?.activeUsers7d ?? 0} user aktif minggu ini
+              </span>
+            </div>
+            {stats && <TrendChart data={stats.transactionsByDay} />}
+          </Card>
+        </section>
+
+        {/* System Health Status (Span 1) */}
+        <section>
+          {health && (
+            <Card
+              padding="lg"
+              className="flex flex-col gap-4 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl h-full"
+            >
+              <div className="flex items-center justify-between border-b border-border-subtle/40 pb-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+                  <Server className="size-4" />
+                  System Health
+                </span>
+                <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-1">
+                  <HealthDot status={health.database.status} />
+                  Online
+                </span>
+              </div>
+              <div className="flex flex-col gap-4 flex-1 justify-around">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Database className="size-4 text-violet-500" />
+                    <span className="text-xs font-semibold text-muted">Database Connection</span>
+                  </div>
+                  <span className="text-xs font-bold text-foreground flex items-center gap-1">
+                    {health.database.status === "healthy" ? "Healthy" : "Offline"}
+                    {health.database.latencyMs !== null && (
+                      <span className="text-[10px] font-semibold text-muted">({health.database.latencyMs}ms)</span>
+                    )}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="size-4 text-blue-500" />
+                    <span className="text-xs font-semibold text-muted">Server Uptime</span>
+                  </div>
+                  <span className="text-xs font-bold text-foreground tabular-nums">
+                    {Math.floor(health.uptime / 86400)}d{" "}
+                    {Math.floor((health.uptime % 86400) / 3600)}h{" "}
+                    {Math.floor((health.uptime % 3600) / 60)}m
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Cpu className="size-4 text-amber-500" />
+                    <span className="text-xs font-semibold text-muted">Memory Used</span>
+                  </div>
+                  <span className="text-xs font-bold text-foreground tabular-nums">
+                    {Math.round(health.memory.heapUsed / 1024 / 1024)}MB /{" "}
+                    {Math.round(health.memory.heapTotal / 1024 / 1024)}MB
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Server className="size-4 text-teal-500" />
+                    <span className="text-xs font-semibold text-muted">Node.js Version</span>
+                  </div>
+                  <span className="text-xs font-bold text-foreground">{health.nodeVersion}</span>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted font-medium border-t border-border-subtle/50 pt-3 mt-auto">
+                Platform: {health.platform} · {new Date(health.timestamp).toLocaleTimeString("id-ID")}
+              </p>
+            </Card>
+          )}
+        </section>
+      </div>
 
       {/* ── Cara User Pakai App (engagement) ───────────────────────── */}
-      <section>
-        <div className="flex items-center gap-1.5 mb-3">
-          <Activity className="size-3.5 text-muted" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
-            Cara User Pakai App
+      <section className="flex flex-col gap-3.5">
+        <div className="flex items-center gap-1.5 px-1">
+          <Activity className="size-4 text-muted" />
+          <span className="text-xs font-bold uppercase tracking-wider text-muted">
+            Keterlibatan Pengguna (Engagement)
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <AdoptionStat
             icon={Wallet}
             label="% dengan dompet"
@@ -558,14 +719,14 @@ export default function DeveloperPage() {
       </section>
 
       {/* ── Adopsi Fitur Lanjutan (sub-section, secondary) ──────────── */}
-      <section>
-        <div className="flex items-center gap-1.5 mb-3">
-          <Database className="size-3.5 text-muted" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
-            Adopsi Fitur Lanjutan
+      <section className="flex flex-col gap-3.5">
+        <div className="flex items-center gap-1.5 px-1">
+          <Database className="size-4 text-muted" />
+          <span className="text-xs font-bold uppercase tracking-wider text-muted">
+            Adopsi Fitur Finansial
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <AdoptionStat
             icon={PiggyBank}
             label="% dengan target tabungan"
@@ -586,14 +747,17 @@ export default function DeveloperPage() {
       </section>
 
       {/* ── Gender + Monthly Chart (2-col) ────────────────────────────── */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Gender Distribution */}
-        <Card padding="md" className="flex flex-col gap-3">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted flex items-center gap-1.5">
-            <UserCheck className="size-3.5" />
-            Distribusi Gender
+        <Card
+          padding="lg"
+          className="flex flex-col gap-4 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl"
+        >
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted flex items-center gap-1.5 border-b border-border-subtle/40 pb-3">
+            <UserCheck className="size-4" />
+            Distribusi Gender Pengguna
           </span>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3.5 pt-2">
             <SimpleBar
               label="Pria"
               value={genderCounts.m}
@@ -607,7 +771,7 @@ export default function DeveloperPage() {
               color="bg-rose-400"
             />
             <SimpleBar
-              label="—"
+              label="Lainnya"
               value={genderCounts.unset}
               max={allUsers.length}
               color="bg-gray-400"
@@ -616,53 +780,61 @@ export default function DeveloperPage() {
         </Card>
 
         {/* Monthly Signups */}
-        <Card padding="md" className="flex flex-col gap-2">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted flex items-center gap-1.5">
-            <TrendingUp className="size-3.5" />
-            Registrasi 6 Bulan
+        <Card
+          padding="lg"
+          className="flex flex-col gap-4 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl"
+        >
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted flex items-center gap-1.5 border-b border-border-subtle/40 pb-3">
+            <TrendingUp className="size-4" />
+            Statistik Registrasi (6 Bulan Terakhir)
           </span>
           <MonthChart data={monthlySignups} />
         </Card>
       </div>
 
       {/* ── Recent Users + Health ─────────────────────────────────────── */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Recent Users */}
-        <Card padding="md" className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted flex items-center gap-1.5">
-              <UserPlus className="size-3.5" />
-              User Terbaru
+        <Card
+          padding="lg"
+          className="flex flex-col gap-4 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl"
+        >
+          <div className="flex items-center justify-between border-b border-border-subtle/40 pb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+              <UserPlus className="size-4" />
+              Daftar Pengguna Terbaru
             </span>
-            <span className="text-[10px] text-muted">5 terakhir</span>
+            <span className="text-[10px] text-muted font-bold bg-card-subtle px-2 py-0.5 rounded-md border border-border-subtle/50">
+              5 terakhir
+            </span>
           </div>
-          <div className="flex flex-col -mx-5">
+          <div className="flex flex-col -mx-6">
             {recentUsers.map((u, i) => (
               <div
                 key={u.id}
-                className={`flex items-center gap-3 px-5 py-2.5 ${
+                className={`flex items-center gap-3 px-6 py-3 hover:bg-card-subtle transition-colors duration-150 ${
                   i < recentUsers.length - 1
-                    ? "border-b border-border-subtle"
+                    ? "border-b border-border-subtle/50"
                     : ""
                 }`}
               >
-                <div className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent select-none">
+                <div className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-extrabold text-accent select-none">
                   {u.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex flex-col min-w-0 flex-1">
-                  <span className="text-sm font-medium text-foreground truncate flex items-center gap-2">
+                  <span className="text-sm font-bold text-foreground truncate flex items-center gap-2">
                     {u.name}
                     {u.role === "developer" && (
-                      <span className="text-[10px] font-semibold text-violet-500 bg-violet-500/10 rounded-full px-2 py-0.5">
+                      <span className="text-[9px] font-bold text-violet-500 bg-violet-500/10 rounded-full px-2 py-0.5">
                         DEV
                       </span>
                     )}
                   </span>
-                  <span className="text-xs text-muted truncate">
+                  <span className="text-xs text-muted truncate mt-0.5">
                     {u.email}
                   </span>
                 </div>
-                <span className="text-[11px] text-muted tabular-nums shrink-0">
+                <span className="text-[11px] text-muted font-bold tabular-nums shrink-0">
                   {new Date(u.createdAt).toLocaleDateString("id-ID", {
                     day: "numeric",
                     month: "short",
@@ -671,61 +843,57 @@ export default function DeveloperPage() {
               </div>
             ))}
             {recentUsers.length === 0 && (
-              <p className="text-xs text-muted px-5 py-4 text-center">
-                Belum ada user
+              <p className="text-xs text-muted px-6 py-4 text-center">
+                Belum ada user yang terdaftar
               </p>
             )}
           </div>
         </Card>
 
-        {/* System Health */}
-        {health && (
-          <Card padding="md" className="flex flex-col gap-3">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted flex items-center gap-1.5">
-              <TrendingUp className="size-3.5" />
-              System Health
+        {/* Database Stats Summary Card */}
+        <Card
+          padding="lg"
+          className="flex flex-col gap-4 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] rounded-2xl"
+        >
+          <div className="flex items-center justify-between border-b border-border-subtle/40 pb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+              <Database className="size-4" />
+              Statistik Database & Objek
             </span>
-            <div className="grid grid-cols-2 gap-y-4 gap-x-6">
-              <div>
-                <p className="text-[10px] text-muted">Database</p>
-                <p className="text-sm font-semibold text-foreground flex items-center gap-1.5 mt-px">
-                  <HealthDot status={health.database.status} />
-                  <span className="capitalize">{health.database.status}</span>
-                  {health.database.latencyMs !== null && (
-                    <span className="text-[11px] text-muted font-normal">
-                      {health.database.latencyMs}ms
-                    </span>
-                  )}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted">Uptime</p>
-                <p className="text-sm font-semibold text-foreground mt-px tabular-nums">
-                  {Math.floor(health.uptime / 86400)}d{" "}
-                  {Math.floor((health.uptime % 86400) / 3600)}h{" "}
-                  {Math.floor((health.uptime % 3600) / 60)}m
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted">Memory (heap)</p>
-                <p className="text-sm font-semibold text-foreground mt-px tabular-nums">
-                  {Math.round(health.memory.heapUsed / 1024 / 1024)}MB /{" "}
-                  {Math.round(health.memory.heapTotal / 1024 / 1024)}MB
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted">Node.js</p>
-                <p className="text-sm font-semibold text-foreground mt-px">
-                  {health.nodeVersion}
-                </p>
-              </div>
+          </div>
+          <div className="flex flex-col gap-4 flex-1 justify-around pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted">Jumlah Workspace Terdaftar</span>
+              <span className="text-xs font-bold text-foreground tabular-nums bg-card-subtle border border-border-subtle/50 px-2 py-0.5 rounded-md">
+                {stats?.workspaces ?? 0}
+              </span>
             </div>
-            <p className="text-[10px] text-muted border-t border-border-subtle pt-3">
-              {health.platform} ·{" "}
-              {new Date(health.timestamp).toLocaleString("id-ID")}
-            </p>
-          </Card>
-        )}
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted">Jumlah Dompet Aktif</span>
+              <span className="text-xs font-bold text-foreground tabular-nums bg-card-subtle border border-border-subtle/50 px-2 py-0.5 rounded-md">
+                {stats?.wallets ?? 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted">Jumlah Target Tabungan</span>
+              <span className="text-xs font-bold text-foreground tabular-nums bg-card-subtle border border-border-subtle/50 px-2 py-0.5 rounded-md">
+                {stats?.savingsGoals ?? 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted">Transfer Antar Dompet</span>
+              <span className="text-xs font-bold text-foreground tabular-nums bg-card-subtle border border-border-subtle/50 px-2 py-0.5 rounded-md">
+                {stats?.transfers ?? 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted">Transaksi Berulang (Active)</span>
+              <span className="text-xs font-bold text-foreground tabular-nums bg-card-subtle border border-border-subtle/50 px-2 py-0.5 rounded-md">
+                {stats?.recurringTransactions ?? 0}
+              </span>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );
