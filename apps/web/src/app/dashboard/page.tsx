@@ -7,7 +7,6 @@ import { QuickActions } from "@/components/dashboard/quick-actions";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
-import { AiInsights } from "@/components/dashboard/ai-insights";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { ROUTES } from "@/constants/routes";
@@ -165,7 +164,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {!loading && <AiInsights />}
+
 
       <QuickActions />
 
