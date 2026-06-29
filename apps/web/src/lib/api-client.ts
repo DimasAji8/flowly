@@ -83,7 +83,7 @@ async function rawFetch<T>(
     headers,
     body: opts.body
       ? isFormData
-        ? (opts.body as any)
+        ? (opts.body as FormData)
         : JSON.stringify(opts.body)
       : undefined,
     signal: opts.signal,
