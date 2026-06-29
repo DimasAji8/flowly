@@ -11,4 +11,3 @@ import { AiModule } from '../ai/ai.module';
   exports: [TransactionsService],
 })
 export class TransactionsModule {}
-
