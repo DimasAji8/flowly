@@ -34,13 +34,13 @@ export default function DeveloperReviewsPage() {
   const [ratingFilter, setRatingFilter] = useState<"all" | "5" | "4" | "3" | "2" | "1">("all");
 
   const fetchReviews = useCallback(async (targetPage: number) => {
-    setError(null);
     try {
       const res = await reviewService.findAll(targetPage, PAGE_SIZE);
       setReviews(res.data);
       setTotal(res.total);
       setTotalPages(res.totalPages);
       setPage(res.page);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memuat testimoni");
       setReviews([]);
@@ -48,6 +48,7 @@ export default function DeveloperReviewsPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchReviews(page);
   }, [page, fetchReviews]);
 
@@ -407,7 +408,7 @@ export default function DeveloperReviewsPage() {
           <div className="w-full md:w-56">
             <Select
               value={ratingFilter}
-              onChange={(e) => setRatingFilter(e.target.value as any)}
+              onChange={(e) => setRatingFilter(e.target.value as "all" | "5" | "4" | "3" | "2" | "1")}
               options={[
                 { value: "all", label: "Semua Rating" },
                 { value: "5", label: "5 Bintang (★★★★★)" },

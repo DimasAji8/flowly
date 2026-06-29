@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Activity,
   RefreshCw,
-  Server,
   Database,
   Clock,
   Cpu,
   Globe,
   CheckCircle2,
   AlertCircle,
-  TrendingUp,
-  Terminal,
-  Layers
+  Terminal
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
@@ -23,15 +20,7 @@ import {
   type DeveloperHealth,
 } from "@/services/developer.service";
 
-function HealthDot({ status }: { status: string }) {
-  return (
-    <span
-      className={`inline-block size-2.5 rounded-full ${
-        status === "healthy" ? "bg-emerald-500 animate-pulse" : "bg-red-500"
-      }`}
-    />
-  );
-}
+
 
 export default function DeveloperHealthPage() {
   const [health, setHealth] = useState<DeveloperHealth | null>(null);
@@ -39,11 +28,11 @@ export default function DeveloperHealthPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchHealth = async () => {
-    setError(null);
+  const fetchHealth = useCallback(async () => {
     try {
       const data = await developerService.getHealth();
       setHealth(data);
+      setError(null);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Gagal memuat data health",
@@ -51,11 +40,12 @@ export default function DeveloperHealthPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchHealth();
-  }, []);
+  }, [fetchHealth]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

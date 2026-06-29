@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Users,
@@ -297,8 +297,7 @@ export default function DeveloperPage() {
     }
   }, [user, router]);
 
-  const fetchAll = async () => {
-    setError(null);
+  const fetchAll = useCallback(async () => {
     try {
       const [s, u, h] = await Promise.all([
         developerService.getStats(),
@@ -325,6 +324,7 @@ export default function DeveloperPage() {
       });
       setAllUsers(u.data);
       setHealth(h);
+      setError(null);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Gagal memuat data developer",
@@ -332,11 +332,12 @@ export default function DeveloperPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
-  }, []);
+  }, [fetchAll]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
