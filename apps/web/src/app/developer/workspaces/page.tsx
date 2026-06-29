@@ -11,8 +11,6 @@ import {
   Activity,
   Trash2,
   Settings,
-  ShieldCheck,
-  Zap,
   Clock
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -24,7 +22,6 @@ import {
   developerService,
   type DeveloperWorkspaceStats,
 } from "@/services/developer.service";
-import { formatRelativeTime } from "@/utils/format-date";
 import { toast } from "sonner";
 
 type WorkspaceRow = DeveloperWorkspaceStats["data"][number];
@@ -64,7 +61,6 @@ export default function DeveloperWorkspacesPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchData = useCallback(async (targetPage: number) => {
-    setError(null);
     try {
       const res = await developerService.getWorkspaceStats(
         targetPage,
@@ -83,6 +79,7 @@ export default function DeveloperWorkspacesPage() {
         pageSize: res.pageSize,
         totalPages: res.totalPages,
       });
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memuat data");
       setRows([]);
@@ -90,6 +87,7 @@ export default function DeveloperWorkspacesPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData(page);
   }, [page, fetchData]);
 

@@ -26,7 +26,12 @@ export default function AiAnalysisPage() {
   const [insights, setInsights] = useState<FinancialInsight[]>([]);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
-  const [lastRun, setLastRun] = useState<string | null>(null);
+  const [lastRun, setLastRun] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(STORAGE_LAST_RUN);
+    }
+    return null;
+  });
 
   const fetchInsights = useCallback(async (force = false) => {
     if (force) {
@@ -61,10 +66,7 @@ export default function AiAnalysisPage() {
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_LAST_RUN);
-    if (saved) {
-      setLastRun(saved);
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchInsights(false);
   }, [fetchInsights]);
 

@@ -91,7 +91,7 @@ export default function SavingsGoalsPage() {
     }
     fetchInitial();
     return () => { cancelled = true; };
-  }, []);
+  }, [fetchWallets]);
 
   // Refresh data saat transaksi ditambah/diubah/dihapus dari halaman lain
   useEffect(() => {

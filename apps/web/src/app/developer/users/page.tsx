@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Users, RefreshCw, Search, Shield, UserPlus, UserCheck, Trash2, ShieldAlert, Ban, Edit2 } from "lucide-react";
+import { Users, RefreshCw, Search, Shield, UserPlus, UserCheck, Trash2, Ban, Edit2 } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,7 +50,6 @@ export default function DeveloperUsersPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchUsers = useCallback(async (targetPage: number) => {
-    setError(null);
     try {
       const [res, s] = await Promise.all([
         developerService.listUsers(targetPage, PAGE_SIZE),
@@ -61,6 +60,7 @@ export default function DeveloperUsersPage() {
       setTotalPages(res.totalPages);
       setPage(res.page);
       setStats(s);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memuat data users");
       setUsers([]);
@@ -68,6 +68,7 @@ export default function DeveloperUsersPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchUsers(page);
   }, [page, fetchUsers]);
 
@@ -375,7 +376,7 @@ export default function DeveloperUsersPage() {
         <div className="w-full md:w-56">
           <Select
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value as any)}
+            onChange={(e) => setRoleFilter(e.target.value as "all" | "developer" | "user")}
             options={[
               { value: "all", label: "Semua Role" },
               { value: "developer", label: "Developer Only" },
