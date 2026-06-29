@@ -17,19 +17,21 @@ const DISMISS_KEY = "temankas:dismissed-insights";
 export function AiInsights() {
   const [insights, setInsights] = useState<FinancialInsight[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dismissed, setDismissed] = useState<string[]>([]);
-
-  useEffect(() => {
-    // Muat dismissed ID dari localStorage
-    const saved = localStorage.getItem(DISMISS_KEY);
-    if (saved) {
-      try {
-        setDismissed(JSON.parse(saved));
-      } catch {
-        // Abaikan jika error
+  const [dismissed, setDismissed] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(DISMISS_KEY);
+      if (saved) {
+        try {
+          return JSON.parse(saved) as string[];
+        } catch {
+          return [];
+        }
       }
     }
+    return [];
+  });
 
+  useEffect(() => {
     aiService
       .getInsights()
       .then((data) => {
