@@ -22,7 +22,8 @@ export class AiInsightResponseDto {
 
   @ApiProperty({
     description: 'Deskripsi analisis finansial dan solusi praktis',
-    example: 'Bulan ini pengeluaran jajan kopi kamu naik 40%. Menguranginya bisa membantu mempercepat target tabungan liburanmu.',
+    example:
+      'Bulan ini pengeluaran jajan kopi kamu naik 40%. Menguranginya bisa membantu mempercepat target tabungan liburanmu.',
   })
   description!: string;
 

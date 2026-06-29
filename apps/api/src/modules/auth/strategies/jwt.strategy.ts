@@ -32,7 +32,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: JwtPayload): Promise<AuthUser> {
     const user = await this.usersService.findById(payload.sub);
     if (!user) throw new UnauthorizedException('User no longer exists');
-    if (user.isSuspended) throw new UnauthorizedException('Akun Anda ditangguhkan, silakan hubungi administrator untuk membuka');
+    if (user.isSuspended)
+      throw new UnauthorizedException(
+        'Akun Anda ditangguhkan, silakan hubungi administrator untuk membuka',
+      );
 
     // Fire-and-forget: throttled update lastSeenAt untuk analytics (DAU/WAU/MAU).
     // Tidak await agar tidak menambah latency request.

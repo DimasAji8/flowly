@@ -15,21 +15,24 @@ export class AiParsedTransactionResponseDto {
   amount!: number;
 
   @ApiProperty({
-    description: 'ID Kategori yang disarankan oleh AI berdasarkan database kategori workspace',
+    description:
+      'ID Kategori yang disarankan oleh AI berdasarkan database kategori workspace',
     example: '123e4567-e89b-12d3-a456-426614174000',
     nullable: true,
   })
   categoryId!: string | null;
 
   @ApiProperty({
-    description: 'ID Dompet yang disarankan oleh AI berdasarkan database dompet workspace',
+    description:
+      'ID Dompet yang disarankan oleh AI berdasarkan database dompet workspace',
     example: '123e4567-e89b-12d3-a456-426614174001',
     nullable: true,
   })
   walletId!: string | null;
 
   @ApiProperty({
-    description: 'Catatan ringkasan detail transaksi atau daftar item dari struk belanja',
+    description:
+      'Catatan ringkasan detail transaksi atau daftar item dari struk belanja',
     example: 'Belanja Di Indomaret:\n- Kopi Kapal Api\n- Roti Sobek',
   })
   note!: string;
