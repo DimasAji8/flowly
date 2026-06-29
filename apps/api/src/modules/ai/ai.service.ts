@@ -1,7 +1,11 @@
-import { Injectable, InternalServerErrorException, BadRequestException, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  BadRequestException,
+  HttpException,
+} from '@nestjs/common';
 import { GoogleGenAI, Type } from '@google/genai';
 import { PrismaService } from '../../prisma/prisma.service';
-
 
 interface ParsedResponse {
   type?: 'income' | 'expense';
@@ -10,6 +14,25 @@ interface ParsedResponse {
   walletName?: string;
   note?: string;
   date?: string;
+}
+
+interface ParsedReceiptResponse {
+  isReceipt: boolean;
+  amount: number;
+  merchant: string;
+  note?: string;
+  date?: string;
+  categoryName?: string;
+  walletName?: string;
+}
+
+export interface FinancialInsight {
+  id: string;
+  type: 'warning' | 'success' | 'info';
+  title: string;
+  description: string;
+  actionLabel?: string | null;
+  actionUrl?: string | null;
 }
 
 @Injectable()
@@ -147,7 +170,10 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`;
     }
   }
 
-  private insightsCache = new Map<string, { timestamp: number; data: any }>();
+  private insightsCache = new Map<
+    string,
+    { timestamp: number; data: FinancialInsight[] }
+  >();
 
   invalidateInsightsCache(workspaceId: string) {
     this.insightsCache.delete(workspaceId);
@@ -180,23 +206,28 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`;
       properties: {
         isReceipt: {
           type: Type.BOOLEAN,
-          description: 'Apakah gambar ini benar-benar struk, nota, atau invoice belanja? Set true jika ya, dan false jika gambar wajah/profil, selfie, pemandangan, atau benda acak lain yang bukan bukti belanja.',
+          description:
+            'Apakah gambar ini benar-benar struk, nota, atau invoice belanja? Set true jika ya, dan false jika gambar wajah/profil, selfie, pemandangan, atau benda acak lain yang bukan bukti belanja.',
         },
         amount: {
           type: Type.INTEGER,
-          description: 'Total nominal belanja (angka saja tanpa titik/koma desimal). Jika bukan struk, isi 0.',
+          description:
+            'Total nominal belanja (angka saja tanpa titik/koma desimal). Jika bukan struk, isi 0.',
         },
         merchant: {
           type: Type.STRING,
-          description: 'Nama merchant/toko tempat pembelian secara singkat. Jika bukan struk, isi "Tidak Diketahui".',
+          description:
+            'Nama merchant/toko tempat pembelian secara singkat. Jika bukan struk, isi "Tidak Diketahui".',
         },
         note: {
           type: Type.STRING,
-          description: 'Daftar item belanjaan utama yang dipisahkan oleh baris baru dan diawali tanda hubung (format: "- Item 1\\n- Item 2"). Gunakan huruf kapital di awal setiap item. Jika bukan struk, isi "".',
+          description:
+            'Daftar item belanjaan utama yang dipisahkan oleh baris baru dan diawali tanda hubung (format: "- Item 1\\n- Item 2"). Gunakan huruf kapital di awal setiap item. Jika bukan struk, isi "".',
         },
         date: {
           type: Type.STRING,
-          description: 'Tanggal transaksi dalam format YYYY-MM-DD. Jika bukan struk, isi hari ini.',
+          description:
+            'Tanggal transaksi dalam format YYYY-MM-DD. Jika bukan struk, isi hari ini.',
         },
         categoryName: {
           type: Type.STRING,
@@ -248,10 +279,12 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
         throw new Error('Empty response from Gemini API');
       }
 
-      const parsed = JSON.parse(response.text);
+      const parsed = JSON.parse(response.text) as ParsedReceiptResponse;
 
       if (parsed.isReceipt === false) {
-        throw new BadRequestException('Gambar yang diunggah tidak terdeteksi sebagai struk belanja.');
+        throw new BadRequestException(
+          'Gambar yang diunggah tidak terdeteksi sebagai struk belanja.',
+        );
       }
 
       const matchedCategory = categories.find(
@@ -288,12 +321,15 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
     }
   }
 
-  async getInsights(workspaceId: string) {
+  async getInsights(
+    workspaceId: string,
+    force = false,
+  ): Promise<FinancialInsight[]> {
     const now = Date.now();
     const cached = this.insightsCache.get(workspaceId);
 
-    // Cache valid selama 6 jam
-    if (cached && now - cached.timestamp < 6 * 60 * 60 * 1000) {
+    // Cache valid selama 6 jam (kecuali dipaksa force refresh)
+    if (!force && cached && now - cached.timestamp < 6 * 60 * 60 * 1000) {
       return cached.data;
     }
 
@@ -302,7 +338,9 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
     return data;
   }
 
-  private async generateInsights(workspaceId: string) {
+  private async generateInsights(
+    workspaceId: string,
+  ): Promise<FinancialInsight[]> {
     if (
       !process.env.GEMINI_API_KEY ||
       process.env.GEMINI_API_KEY === 'your_gemini_api_key_here'
@@ -331,7 +369,8 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
     // Agregasikan pengeluaran & pemasukan
     let totalIncome = 0;
     let totalExpense = 0;
-    const categorySpending: Record<string, { total: number; group?: string }> = {};
+    const categorySpending: Record<string, { total: number; group?: string }> =
+      {};
 
     transactions.forEach((tx) => {
       const amt = Number(tx.amount);
@@ -341,7 +380,10 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
         totalExpense += amt;
         const catName = tx.category?.name || 'Lainnya';
         if (!categorySpending[catName]) {
-          categorySpending[catName] = { total: 0, group: tx.category?.group || undefined };
+          categorySpending[catName] = {
+            total: 0,
+            group: tx.category?.group || undefined,
+          };
         }
         categorySpending[catName].total += amt;
       }
@@ -364,7 +406,8 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
     transactions.forEach((tx) => {
       if (tx.type === 'expense') {
         const dateStr = tx.transactionDate.toISOString().slice(0, 10);
-        dailySpending[dateStr] = (dailySpending[dateStr] || 0) + Number(tx.amount);
+        dailySpending[dateStr] =
+          (dailySpending[dateStr] || 0) + Number(tx.amount);
       }
     });
 
@@ -391,7 +434,8 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
           },
           actionUrl: {
             type: Type.STRING,
-            description: 'Link tujuan halaman (opsional, contoh "/reports", "/wallets", "/savings-goals")',
+            description:
+              'Link tujuan halaman (opsional, contoh "/reports", "/wallets", "/savings-goals")',
           },
         },
         required: ['id', 'type', 'title', 'description'],
@@ -436,8 +480,8 @@ Data Keuangan Pengguna (30 hari terakhir):
 
       if (!response.text) return [];
 
-      return JSON.parse(response.text);
-    } catch (error) {
+      return JSON.parse(response.text) as FinancialInsight[];
+    } catch {
       // Return empty array jika AI gagal/error agar dashboard tidak rusak
       return [];
     }
@@ -451,4 +495,3 @@ function toTitleCase(str: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
-
