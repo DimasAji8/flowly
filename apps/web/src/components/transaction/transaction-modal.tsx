@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ArrowDownCircle, ArrowUpCircle, Sparkles, Camera, Image } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Sparkles, Camera, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
@@ -109,8 +109,9 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
         setSelectedType(res.type);
         toast.success("Struk berhasil di-scan!");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Gagal men-scan struk belanja");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Gagal men-scan struk belanja";
+      toast.error(message);
     } finally {
       setScanLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -262,7 +263,7 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
               onClick={handleTriggerGallery}
               className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border-subtle bg-card-subtle px-3 py-4 text-center transition-colors hover:border-accent hover:bg-accent/5 group"
             >
-              <Image className="size-6 text-accent transition-transform group-hover:scale-110" strokeWidth={1.5} />
+              <ImageIcon className="size-6 text-accent transition-transform group-hover:scale-110" strokeWidth={1.5} />
               <div>
                 <p className="text-xs font-semibold text-foreground flex items-center justify-center gap-1">
                   Pilih Galeri <span className="text-[8px] bg-accent/10 text-accent px-1.5 py-0.5 rounded-full font-medium">AI</span>

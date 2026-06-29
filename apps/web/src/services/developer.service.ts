@@ -122,14 +122,14 @@ export const developerService = {
   },
 
   updateUserRole(id: string, role: string) {
-    return apiClient.patch<any>(`/developer/users/${id}/role`, { role }, { auth: true });
+    return apiClient.patch<unknown>(`/developer/users/${id}/role`, { role }, { auth: true });
   },
 
   toggleUserSuspension(id: string) {
-    return apiClient.patch<any>(`/developer/users/${id}/suspend`, {}, { auth: true });
+    return apiClient.patch<unknown>(`/developer/users/${id}/suspend`, {}, { auth: true });
   },
 
   deleteUser(id: string) {
-    return apiClient.delete<any>(`/developer/users/${id}`, { auth: true });
+    return apiClient.delete<unknown>(`/developer/users/${id}`, { auth: true });
   },
 };
