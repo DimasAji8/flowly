@@ -22,7 +22,6 @@ export class TransactionsService {
     private readonly aiService: AiService,
   ) {}
 
-
   async list(workspaceId: string, query: ListTransactionsQuery) {
     const where: Prisma.TransactionWhereInput = {
       workspaceId,

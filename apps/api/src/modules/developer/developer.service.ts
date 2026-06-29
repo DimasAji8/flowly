@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../common/dto/pagination.query';
 import {
@@ -415,17 +419,17 @@ export class DeveloperService {
     }
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User tidak ditemukan');
-    
+
     return this.prisma.user.update({
       where: { id },
-      data: { role: role as any },
+      data: { role: role },
     });
   }
 
   async toggleUserSuspension(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User tidak ditemukan');
-    
+
     return this.prisma.user.update({
       where: { id },
       data: { isSuspended: !user.isSuspended },
@@ -435,7 +439,7 @@ export class DeveloperService {
   async deleteUser(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User tidak ditemukan');
-    
+
     if (user.role === 'developer') {
       throw new BadRequestException('Developer tidak dapat dihapus');
     }

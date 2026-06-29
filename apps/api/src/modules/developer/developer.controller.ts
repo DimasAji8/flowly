@@ -1,4 +1,13 @@
-import { Controller, Get, Patch, Delete, Query, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Delete,
+  Query,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -87,7 +96,10 @@ export class DeveloperController {
 
   @Patch('users/:id/suspend')
   @ApiOperation({ summary: 'Tangguhkan atau aktifkan kembali pengguna' })
-  @ApiResponse({ status: 200, description: 'Status penangguhan user berhasil diubah' })
+  @ApiResponse({
+    status: 200,
+    description: 'Status penangguhan user berhasil diubah',
+  })
   toggleSuspension(@Param('id') id: string) {
     return this.developerService.toggleUserSuspension(id);
   }
