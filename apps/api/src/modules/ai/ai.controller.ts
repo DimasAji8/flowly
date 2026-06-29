@@ -19,11 +19,12 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
-import { AiService } from './ai.service';
+import { AiService, FinancialInsight } from './ai.service';
 import { ParseTransactionDto } from './dto/parse-transaction.dto';
 import { AiParsedTransactionResponseDto } from './dto/ai-parsed-transaction-response.dto';
 import { AiInsightResponseDto } from './dto/ai-insight-response.dto';
@@ -68,7 +69,8 @@ export class AiController {
         file: {
           type: 'string',
           format: 'binary',
-          description: 'Berkas gambar struk belanja (png, jpeg, webp) - max 4MB',
+          description:
+            'Berkas gambar struk belanja (png, jpeg, webp) - max 4MB',
         },
       },
     },
@@ -100,8 +102,7 @@ export class AiController {
 
   @Get('insights')
   @ApiOperation({
-    summary:
-      'Mendapatkan analisis finansial proaktif untuk workspace aktif',
+    summary: 'Mendapatkan analisis finansial proaktif untuk workspace aktif',
   })
   @ApiResponse({
     status: 200,
@@ -117,7 +118,7 @@ export class AiController {
   async getInsights(
     @CurrentWorkspace() ws: WorkspaceContext,
     @Query('force') force?: string,
-  ) {
+  ): Promise<FinancialInsight[]> {
     const isForce = force === 'true';
     return this.aiService.getInsights(ws.id, isForce);
   }
