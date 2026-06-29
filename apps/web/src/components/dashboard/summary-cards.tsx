@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { formatCurrency } from "@/utils/format-currency";
 
@@ -17,23 +17,20 @@ const STORAGE_KEY_TAB = "teman-kas.hero-tab";
 
 export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
   const isLowBalance = totalBalance !== undefined && totalBalance < 500_000;
-  const [hidden, setHidden] = useState(true);
-  const [activeTab, setActiveTab] = useState<HeroTab>("assets");
-
-  // Load preferences from localStorage
-  useEffect(() => {
-    const storedHidden = localStorage.getItem(STORAGE_KEY_HIDDEN);
-    if (storedHidden !== null) {
-      // setState di effect disengaja: localStorage hanya tersedia di klien (pasca-mount).
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHidden(storedHidden === "true");
+  const [hidden, setHidden] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const storedHidden = localStorage.getItem(STORAGE_KEY_HIDDEN);
+      if (storedHidden !== null) return storedHidden === "true";
     }
-    const storedTab = localStorage.getItem(STORAGE_KEY_TAB);
-    if (storedTab === "assets" || storedTab === "monthly") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveTab(storedTab);
+    return true;
+  });
+  const [activeTab, setActiveTab] = useState<HeroTab>(() => {
+    if (typeof window !== "undefined") {
+      const storedTab = localStorage.getItem(STORAGE_KEY_TAB);
+      if (storedTab === "assets" || storedTab === "monthly") return storedTab;
     }
-  }, []);
+    return "assets";
+  });
 
   const toggleHidden = () => {
     setHidden((h) => {
