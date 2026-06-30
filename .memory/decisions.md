@@ -124,3 +124,70 @@ semua halaman harus refresh tanpa manual reload. Pattern:
 - **Wiring di `wallets/page.tsx`**: ActionMenu untuk wallet dengan `w.type !== "cash"` dapat `onWithdraw={() => { setWithdrawFromId(w.id); setWithdrawOpen(true); }}`. State `withdrawOpen` + `withdrawFromId` + `<WithdrawalModal />` di-render di bawah `<TransferModal />`. KEY MODAL WAJIB PREFIX unik (`transfer-` vs `withdraw-`) — pola key `${open}-${id}` saja menghasilkan duplicate key `false-` saat kedua modal tertutup.
 - **Date**: hardcoded `isoToday()` (sama dengan `TransferModal` existing). Bisa di-extend ke date picker di masa depan.
 - **Tunai source**: dompet `type === "cash"` tidak menampilkan opsi Tarik Tunai (logic di parent wallets page: `w.type !== "cash"`). Tidak ada validasi tambahan — `transfersService` sudah throw "Saldo tidak cukup" jika amount > balance.
+
+## AI Receipt Scanner: Separate Camera and Gallery triggers (2026-06-27)
+- **Problem**: A single hidden file input with `accept="image/*"` did not open the camera directly on mobile, and adding `capture="environment"` bypassed the gallery, preventing users from selecting screenshots or saved receipts.
+- **Solution**: Split the trigger into two dedicated buttons: "Kamera Struk" and "Pilih Galeri".
+  - "Kamera Struk" triggers a hidden input with `capture="environment"` to open the native mobile camera app.
+  - "Pilih Galeri" triggers a standard hidden input (`accept="image/*"` without `capture`) to open the file manager/gallery.
+- **Benefits**: Provides direct camera scanning on mobile, keeps file selection intact, and automatically falls back to standard file selection on desktop.
+- **Swagger Documentation**: Added `@ApiBody` to the `POST /ai/scan-receipt` endpoint in NestJS to allow interactive testing of receipt uploads directly in Swagger UI, and created dedicated response DTOs (`AiParsedTransactionResponseDto`, `AiInsightResponseDto`) to formalize return schemas.
+
+## Developer Shell Refactor for Mobile Compatibility (2026-06-27)
+- **Problem**: The developer console (`/developer/*`) was not responsive or usable on mobile because the navigation sidebar was hidden (`hidden lg:flex`) with no mobile alternative (burger/bottom nav).
+- **Solution**: Refactored `DeveloperShell` to introduce a dedicated `DeveloperBottomNav` on mobile screens (`lg:hidden`). Also redesigned `DeveloperMobileHeader` with balanced layout (brand on the left, logout on the right), and cleaned up the desktop sidebar spacing and profile area at the bottom.
+- **Layout**: Removed awkward floating box borders (`lg:rounded-t-2xl`, `lg:border-x`) on desktop full-width dashboard container to align with standard clean dashboard aesthetics.
+
+## Developer Mode Complete UI/UX Redesign (2026-06-27)
+- **Dashboard (`/developer`)**: Implemented Vercel/Stripe-like visual depth (subtle shadows `0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06)`), a new automated AI insights recommendation banner, a larger 180px transaction trend chart with group hover triggers, and structured system health status cards.
+- **Users (`/developer/users`)**: Added a quick stats summary bar (total users, active users, registrations, and developers counts). Implemented automated color-coded avatars based on user name characters, and moderation action menus (edit role, suspend, delete).
+- **Workspaces (`/developer/workspaces`)**: Replaced standard table with card/table hybrid showing owners, health status, members, and transactions. Added quick actions.
+- **Reviews (`/developer/reviews`)**: Refactored to a complete moderation dashboard with positive sentiment ratios, rating average calculations, rating chips, and visibility filters.
+- **Health (`/developer/health`)**: Refactored to a Grafana/Better Stack monitoring layout, including a glowing Operational status banner, memory allocation progress indicators, latency KPIs, and active system logs.
+
+## Developer Mode Sidebar Dark Slate & Pagination Bug Fixes (2026-06-27)
+- **Sidebar Background**: Differentiated the Developer Console sidebar from the main user sidebar by styling it with a premium dark slate color scheme (`bg-slate-950 text-slate-100` and `border-slate-800`). This matches the developer-oriented consoles of modern SaaS platforms (like Railway/GitLab/Supabase) and contrasts cleanly with the light gray background of the page.
+- **Pagination Bug Fix**: Solved the issue where navigating to other pages in the paginated lists (Users, Workspaces, Reviews) caused the pagination buttons to disappear. The cause was that the client-side pagination total and totalPages stats were calculated from the local search filter result, which on subsequent pages only represents that page's chunk size (e.g. 2 items instead of the database total of 12). Restricted client-side overrides to only apply when an active search query or status filter is present, ensuring standard pagination uses the database totals.
+
+## Developer Shell Full Width & Pagination Layout Fixes (2026-06-27)
+- **Full Width Restoration**: Removed the `max-w-7xl` and `mx-auto` constraint from `developer-shell.tsx` main container so that the console workspace stretches 100% full-width on desktop screens as requested.
+- **Pagination Clipping Fix**: Removed redundant outer card wrappers around `<DataTable>` in `users/page.tsx`, `workspaces/page.tsx`, and `reviews/page.tsx`. This prevents the pagination footer from getting trapped at the bottom edges of the card and clipped/cut off by the wrapper's `overflow-hidden` border-radius bounds. Paginators now render cleanly below the table card on the page background.
+
+## Developer Sidebar Reverted to Premium White Theme (2026-06-27)
+- **Background Color**: Reverted the Developer Mode sidebar from dark slate to a clean, solid white theme (`bg-card` and `border-r border-border-subtle`). This satisfies the requirement of differentiating it from the gray page background (`#eff4fb`) while maintaining visual alignment with TemanKas's core brand identity.
+
+## User Suspension Login Error Message Update (2026-06-27)
+- **Error Message**: Updated the suspension error message returned by NestJS during login attempts or API request authorization to: `Akun Anda ditangguhkan, silakan hubungi administrator untuk membuka`. This guides users on the action to take when their account is locked.
+
+## User Deletion Relational Integrity Fix (2026-06-27)
+- **Constraint Violation**: Resolved the `PrismaClientKnownRequestError` with code `P2003` (Foreign key constraint violated on `transactions_user_id_fkey`) when deleting users.
+- **Solution**: Wrapped the delete operation inside a database transaction (`this.prisma.$transaction`), explicitly deleting all transactions made by the target user (`tx.transaction.deleteMany({ where: { userId } })`) before deleting the user. This satisfies the Restrict foreign key constraint and allows clean deletions.
+
+## Replaced Browser Alerts with Sonner Toast Notifications (2026-06-27)
+- **Problem**: Browser `alert(...)` calls were used in developer pages, which are disruptive, block the main execution thread, and look unpolished.
+- **Solution**: Replaced all native browser alerts with `sonner` toast notifications (`toast.success` and `toast.error`). Applied this to:
+  - User moderation actions (`users/page.tsx`)
+  - Workspace management actions (`workspaces/page.tsx`)
+  - Review visibility toggles and deletions (`reviews/page.tsx`)
+
+## Dedicated AI Analytics Page & Dashboard Speed Fix (2026-06-27)
+- **Problem**: In-line AI Insights on the main dashboard blocked or shifted layout content due to real-time Gemini API latency (3-5s), making the initial dashboard feel slow.
+- **Solution**: Moved AI Insights out of the main dashboard (`dashboard/page.tsx`) and into a dedicated **"Analisis AI"** menu page (`/ai`). Added `Sparkles` navigation link in `side-nav.tsx`.
+- **Backend Optimization**: Implemented a `force` query parameter in `AiController` and `AiService` (`/ai/insights?force=true`), allowing the user to bypass the 6-hour cache on-demand and regenerate financial recommendations.
+- **UI Design**: Added a financial health score indicator (0-100 gauge), a manual "Mulai Analisis Keuangan" action button with visual loading spinners, and skeleton state shimmers for loading.
+
+## AI Rate Limiting (2026-06-30)
+- **Problem**: Real-time LLM requests (Gemini API) can be expensive and prone to spamming/abuse if rate limits are not enforced.
+- **Solution**: Installed `@nestjs/throttler` and implemented a custom `AiThrottlerGuard` that limits requests based on **User ID** (extracted from JWT) rather than IP address.
+- **Limits**:
+  - `POST /ai/parse-transaction`: 20 requests/minute.
+  - `POST /ai/scan-receipt`: 10 requests/minute (heavy vision-based model).
+  - `GET /ai/insights`: 5 requests/minute (cached for 6 hours).
+
+## Client-Side Image Compression for Camera Captures (2026-06-30)
+- **Problem**: Native mobile cameras capture high-resolution photos that exceed the NestJS backend upload limit of 4MB, causing file size validation errors (`MaxFileSizeValidator` failed).
+- **Solution**: Implemented client-side image compression in `apps/web/src/utils/image.ts` using HTML Canvas. Any image file exceeding 1.5MB is resized to a maximum of 1600px width/height and compressed to 80% quality as a JPEG, which consistently stays well below the 4MB limit while preserving OCR text quality. Integrated it transparently inside `handleFileChange` in `transaction-modal.tsx`.
+
+## Gemini API Key in Github Secrets (2026-06-30)
+- **Problem**: Nesting `GEMINI_API_KEY` inside the `API_ENV_PROD` environment block in GitHub secrets is error-prone and hard to maintain.
+- **Solution**: Modified `.github/workflows/deploy.yml` to read `GEMINI_API_KEY` as a dedicated, standalone GitHub Secret (`secrets.GEMINI_API_KEY`) and append it directly to `.env.production` during the build and deploy steps.

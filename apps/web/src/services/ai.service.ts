@@ -44,9 +44,10 @@ export const aiService = {
     );
   },
 
-  getInsights() {
+  getInsights(force = false) {
+    const qs = force ? "?force=true" : "";
     return apiClient.get<FinancialInsight[]>(
-      "/ai/insights",
+      `/ai/insights${qs}`,
       {
         auth: true,
         workspaceScoped: true,

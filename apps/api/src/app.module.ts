@@ -1,4 +1,5 @@
 import { Module, OnModuleInit, Logger } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -23,6 +24,13 @@ import { AiModule } from './modules/ai/ai.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot([
+      {
+        // Config default global — endpoint AI override lewat @Throttle()
+        ttl: 60_000, // 1 menit (dalam ms)
+        limit: 100,
+      },
+    ]),
     PrismaModule,
     UsersModule,
     AuthModule,
