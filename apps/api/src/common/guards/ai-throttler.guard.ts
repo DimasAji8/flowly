@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { AuthUser } from '../types/auth';
 
@@ -10,10 +10,10 @@ import type { AuthUser } from '../types/auth';
  */
 @Injectable()
 export class AiThrottlerGuard extends ThrottlerGuard {
-  protected async getTracker(req: Record<string, unknown>): Promise<string> {
+  protected getTracker(req: Record<string, unknown>): Promise<string> {
     const user = req['user'] as AuthUser | undefined;
     // Fallback ke IP jika user belum ter-resolve (seharusnya tidak terjadi karena JwtAuthGuard duluan)
-    return user?.id ?? (req['ip'] as string) ?? 'anonymous';
+    return Promise.resolve(user?.id ?? (req['ip'] as string) ?? 'anonymous');
   }
 
   protected async throwThrottlingException(): Promise<void> {
