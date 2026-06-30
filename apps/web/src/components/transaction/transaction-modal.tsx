@@ -9,6 +9,7 @@ import { TransactionForm } from "@/components/forms/transaction-form";
 import { transactionsService } from "@/services/transactions.service";
 import { aiService } from "@/services/ai.service";
 import { useWalletStore } from "@/store/wallets.store";
+import { compressImage } from "@/utils/image";
 import type { CreateTransactionFormValues } from "@/lib/transaction-schemas";
 import type { Transaction, TransactionType } from "@/types/finance";
 
@@ -91,11 +92,12 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    let file = e.target.files?.[0];
     if (!file) return;
 
     setScanLoading(true);
     try {
+      file = await compressImage(file);
       const res = await aiService.scanReceipt(file);
       if (res) {
         setAiValues({
