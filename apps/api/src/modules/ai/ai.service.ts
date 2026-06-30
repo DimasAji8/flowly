@@ -5,6 +5,8 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { GoogleGenAI, Type } from '@google/genai';
+import * as fs from 'fs';
+import * as path from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
 
 interface ParsedResponse {
@@ -170,13 +172,54 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`;
     }
   }
 
-  private insightsCache = new Map<
-    string,
-    { timestamp: number; data: FinancialInsight[] }
-  >();
+  private getCacheFilePath(workspaceId: string): string {
+    const cacheDir = path.join(process.cwd(), '.cache', 'ai-insights');
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
+    }
+    return path.join(cacheDir, `${workspaceId}.json`);
+  }
+
+  private getCachedInsights(
+    workspaceId: string,
+  ): { timestamp: number; data: FinancialInsight[] } | null {
+    try {
+      const filePath = this.getCacheFilePath(workspaceId);
+      if (fs.existsSync(filePath)) {
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        return JSON.parse(fileContent) as {
+          timestamp: number;
+          data: FinancialInsight[];
+        };
+      }
+    } catch {
+      // Ignore reading errors
+    }
+    return null;
+  }
+
+  private setCachedInsights(workspaceId: string, data: FinancialInsight[]) {
+    try {
+      const filePath = this.getCacheFilePath(workspaceId);
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({ timestamp: Date.now(), data }),
+        'utf-8',
+      );
+    } catch {
+      // Ignore writing errors
+    }
+  }
 
   invalidateInsightsCache(workspaceId: string) {
-    this.insightsCache.delete(workspaceId);
+    try {
+      const filePath = this.getCacheFilePath(workspaceId);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch {
+      // Ignore deletion errors
+    }
   }
 
   async scanReceipt(workspaceId: string, file: Express.Multer.File) {
@@ -326,15 +369,20 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`,
     force = false,
   ): Promise<FinancialInsight[]> {
     const now = Date.now();
-    const cached = this.insightsCache.get(workspaceId);
+    const cached = this.getCachedInsights(workspaceId);
 
     // Cache valid selama 6 jam (kecuali dipaksa force refresh)
     if (!force && cached && now - cached.timestamp < 6 * 60 * 60 * 1000) {
       return cached.data;
     }
 
+    // Jika tidak dipaksa (force=false) dan tidak ada cache, kembalikan kosong secara instan untuk menghindari loading awal yang lama
+    if (!force && !cached) {
+      return [];
+    }
+
     const data = await this.generateInsights(workspaceId);
-    this.insightsCache.set(workspaceId, { timestamp: now, data });
+    this.setCachedInsights(workspaceId, data);
     return data;
   }
 
