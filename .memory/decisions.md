@@ -176,12 +176,18 @@ semua halaman harus refresh tanpa manual reload. Pattern:
 - **Backend Optimization**: Implemented a `force` query parameter in `AiController` and `AiService` (`/ai/insights?force=true`), allowing the user to bypass the 6-hour cache on-demand and regenerate financial recommendations.
 - **UI Design**: Added a financial health score indicator (0-100 gauge), a manual "Mulai Analisis Keuangan" action button with visual loading spinners, and skeleton state shimmers for loading.
 
+## AI Rate Limiting (2026-06-30)
+- **Problem**: Real-time LLM requests (Gemini API) can be expensive and prone to spamming/abuse if rate limits are not enforced.
+- **Solution**: Installed `@nestjs/throttler` and implemented a custom `AiThrottlerGuard` that limits requests based on **User ID** (extracted from JWT) rather than IP address.
+- **Limits**:
+  - `POST /ai/parse-transaction`: 20 requests/minute.
+  - `POST /ai/scan-receipt`: 10 requests/minute (heavy vision-based model).
+  - `GET /ai/insights`: 5 requests/minute (cached for 6 hours).
 
+## Client-Side Image Compression for Camera Captures (2026-06-30)
+- **Problem**: Native mobile cameras capture high-resolution photos that exceed the NestJS backend upload limit of 4MB, causing file size validation errors (`MaxFileSizeValidator` failed).
+- **Solution**: Implemented client-side image compression in `apps/web/src/utils/image.ts` using HTML Canvas. Any image file exceeding 1.5MB is resized to a maximum of 1600px width/height and compressed to 80% quality as a JPEG, which consistently stays well below the 4MB limit while preserving OCR text quality. Integrated it transparently inside `handleFileChange` in `transaction-modal.tsx`.
 
-
-
-
-
-
-
-
+## Gemini API Key in Github Secrets (2026-06-30)
+- **Problem**: Nesting `GEMINI_API_KEY` inside the `API_ENV_PROD` environment block in GitHub secrets is error-prone and hard to maintain.
+- **Solution**: Modified `.github/workflows/deploy.yml` to read `GEMINI_API_KEY` as a dedicated, standalone GitHub Secret (`secrets.GEMINI_API_KEY`) and append it directly to `.env.production` during the build and deploy steps.
