@@ -3,13 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
-  Sparkles,
   AlertTriangle,
   CheckCircle2,
   Info,
-  TrendingUp,
-  Brain,
-  ShieldCheck,
   ArrowRight
 } from "lucide-react";
 import { toast } from "sonner";
@@ -96,15 +92,10 @@ export default function AiAnalysisPage() {
   return (
     <div className="flex flex-col gap-6 flowly-enter pb-12 w-full">
       {/* Header */}
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center gap-2">
-          <span className="grid size-8 place-items-center rounded-xl bg-accent-soft text-accent">
-            <Sparkles className="size-4.5" />
-          </span>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
-            TemanKas AI
-          </h1>
-        </div>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-xl font-bold tracking-tight text-foreground">
+          TemanKas AI
+        </h1>
         <p className="text-xs text-secondary leading-relaxed">
           Gunakan kecerdasan buatan untuk mengulas pola pengeluaran Anda, melacak target tabungan, dan mendeteksi anomali anggaran secara otomatis.
         </p>
@@ -112,27 +103,22 @@ export default function AiAnalysisPage() {
 
       {/* Hero Analysis Control Panel */}
       <Card 
-        className="relative overflow-hidden p-5 flex flex-col gap-4 bg-card"
+        className="p-5 flex flex-col gap-4 bg-card"
         style={{ boxShadow: "var(--shadow-card)" }}
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-start gap-3.5">
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
-              <Brain className={cn("size-5", analyzing && "animate-pulse")} />
-            </span>
-            <div className="flex flex-col min-w-0">
-              <h3 className="text-sm font-bold text-foreground">
-                Asisten Analisis Finansial Cerdas
-              </h3>
-              <p className="text-[11px] text-secondary mt-1 leading-relaxed">
-                Teknologi AI memindai 30 hari riwayat transaksi, alokasi kategori budget (Needs, Wants, Savings), dan keselarasan tabungan Anda untuk menghasilkan insight finansial.
-              </p>
-              {lastRun && (
-                <span className="text-[9px] font-bold text-accent uppercase tracking-wider mt-2">
-                  Terakhir Diperbarui: Hari ini pukul {lastRun}
-                </span>
-              )}
-            </div>
+          <div className="flex flex-col min-w-0">
+            <h3 className="text-sm font-bold text-foreground">
+              Asisten Analisis Finansial Cerdas
+            </h3>
+            <p className="text-[11px] text-secondary mt-1.5 leading-relaxed">
+              Teknologi AI memindai 30 hari riwayat transaksi, alokasi kategori budget (Needs, Wants, Savings), dan keselarasan tabungan Anda untuk menghasilkan insight finansial.
+            </p>
+            {lastRun && (
+              <span className="text-[9px] font-bold text-accent uppercase tracking-wider mt-2.5">
+                Terakhir Diperbarui: Hari ini pukul {lastRun}
+              </span>
+            )}
           </div>
 
           <Button
@@ -140,7 +126,6 @@ export default function AiAnalysisPage() {
             isLoading={analyzing}
             disabled={loading}
             className="w-full"
-            leftIcon={!analyzing && <Sparkles className="size-4" />}
           >
             {analyzing ? "Menganalisis data..." : "Mulai Analisis Keuangan"}
           </Button>
@@ -162,9 +147,6 @@ export default function AiAnalysisPage() {
           className="flex flex-col items-center justify-center text-center p-8 border border-border-subtle bg-card"
           style={{ boxShadow: "var(--shadow-card)" }}
         >
-          <span className="grid size-12 place-items-center rounded-full bg-accent-soft text-accent mb-4">
-            <Brain className="size-6" />
-          </span>
           <h4 className="text-sm font-bold text-foreground">
             Mulai Analisis Keuangan Anda
           </h4>
@@ -174,8 +156,7 @@ export default function AiAnalysisPage() {
           <Button
             onClick={handleStartAnalysis}
             isLoading={analyzing}
-            className="mt-5 px-6"
-            leftIcon={<Sparkles className="size-4" />}
+            className="mt-4 px-6"
           >
             Mulai Sekarang
           </Button>
@@ -252,9 +233,6 @@ export default function AiAnalysisPage() {
 
           {insights.length === 0 ? (
             <Card className="flex flex-col items-center justify-center text-center p-8 border-dashed border-border-subtle bg-card">
-              <span className="grid size-10 place-items-center rounded-full bg-emerald-500/10 text-emerald-600 mb-3">
-                <ShieldCheck className="size-5" />
-              </span>
               <h4 className="text-xs font-bold text-foreground">
                 Keuangan Anda Berada di Jalur yang Tepat!
               </h4>
@@ -274,18 +252,13 @@ export default function AiAnalysisPage() {
 
       {/* Quick AI Tip card */}
       {!loading && !analyzing && insights.length > 0 && (
-        <Card className="p-4 border border-border-subtle bg-card-subtle flex gap-3.5">
-          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
-            <TrendingUp className="size-4.5" />
-          </span>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-accent leading-none">
-              Tip Asisten Keuangan
-            </h4>
-            <p className="text-[11px] text-secondary mt-1.5 leading-relaxed">
-              Jaga pengeluaran non-pokok (Wants) Anda di bawah 30% dari total pendapatan bersih bulanan untuk memastikan target tabungan masa depan tercapai tanpa kendala likuiditas.
-            </p>
-          </div>
+        <Card className="p-4 border border-border-subtle bg-card-subtle">
+          <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-accent leading-none">
+            Tip Asisten Keuangan
+          </h4>
+          <p className="text-[11px] text-secondary mt-1.5 leading-relaxed">
+            Jaga pengeluaran non-pokok (Wants) Anda di bawah 30% dari total pendapatan bersih bulanan untuk memastikan target tabungan masa depan tercapai tanpa kendala likuiditas.
+          </p>
         </Card>
       )}
     </div>
