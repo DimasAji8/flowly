@@ -24,12 +24,14 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AiService, FinancialInsight } from './ai.service';
 import { ParseTransactionDto } from './dto/parse-transaction.dto';
 import { AiParsedTransactionResponseDto } from './dto/ai-parsed-transaction-response.dto';
 import { AiInsightResponseDto } from './dto/ai-insight-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
+import { AiThrottlerGuard } from '../../common/guards/ai-throttler.guard';
 import { CurrentWorkspace } from '../../common/decorators/current-workspace.decorator';
 import type { WorkspaceContext } from '../../common/types/workspace';
 
@@ -37,10 +39,12 @@ import type { WorkspaceContext } from '../../common/types/workspace';
 @ApiBearerAuth('access-token')
 @ApiSecurity('workspace-id')
 @Controller('ai')
-@UseGuards(JwtAuthGuard, WorkspaceGuard)
+@UseGuards(JwtAuthGuard, WorkspaceGuard, AiThrottlerGuard)
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
+  // 20 request per menit per user
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @Post('parse-transaction')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -59,6 +63,8 @@ export class AiController {
     return this.aiService.parseTransactionText(ws.id, dto.text);
   }
 
+  // 10 request per menit per user (lebih ketat, pakai vision AI)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post('scan-receipt')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -100,6 +106,8 @@ export class AiController {
     return this.aiService.scanReceipt(ws.id, file);
   }
 
+  // 5 request per menit per user (hasil di-cache 6 jam di sisi server)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Get('insights')
   @ApiOperation({
     summary: 'Mendapatkan analisis finansial proaktif untuk workspace aktif',
