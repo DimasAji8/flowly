@@ -46,12 +46,18 @@ jobs:
           DEV_ACCOUNT: ${{ secrets.DEV_ACCOUNT }}
           API_ENV_PROD: ${{ secrets.API_ENV_PROD }}
           WEB_ENV_PROD: ${{ secrets.WEB_ENV_PROD }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           printf '%s\n' \
             "NODE_ENV=production" \
             "PORT=3333" \
             "$API_ENV_PROD" \
             > "$BUILD_DIR/apps/api/.env.production"
+
+          # Gemini API Key
+          if [[ -n "$GEMINI_API_KEY" ]]; then
+            echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> "$BUILD_DIR/apps/api/.env.production"
+          fi
 
           # B2B API Key (untuk integrasi developer mobile)
           if [[ -n "$B2B_CONFIG" ]]; then
