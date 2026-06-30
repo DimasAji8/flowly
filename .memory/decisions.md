@@ -191,3 +191,11 @@ semua halaman harus refresh tanpa manual reload. Pattern:
 ## Gemini API Key in Github Secrets (2026-06-30)
 - **Problem**: Nesting `GEMINI_API_KEY` inside the `API_ENV_PROD` environment block in GitHub secrets is error-prone and hard to maintain.
 - **Solution**: Modified `.github/workflows/deploy.yml` to read `GEMINI_API_KEY` as a dedicated, standalone GitHub Secret (`secrets.GEMINI_API_KEY`) and append it directly to `.env.production` during the build and deploy steps.
+
+## AI Page Performance & Symmetrical Design (2026-06-30)
+- **Problem**: The AI analysis page initially loaded very slowly (3-5s spinner) due to synchronous in-memory LLM cache generation, had an asymmetrical circle progress alignment, and had a flashy "AI slop" violet marketing design that did not fit the calm brand aesthetic of Teman Kas.
+- **Solution**:
+  - **Performance**: Changed backend `GET /ai/insights` to return `[]` instantly when not cached, and implemented a file-based persistent cache under `.cache/ai-insights/` to survive server restarts. In the frontend, if no cache exists, we show a clean, instant-loading onboarding card instead of a blocking skeleton spinner.
+  - **Design**: Replaced the flashy violet theme/gradients and neon icons with Teman Kas's native blue brand accent colors and clean Card layout styles.
+  - **Circle Symmetry**: Replaced the raw HTML SVG progress with a mathematically centered `viewBox="0 0 100 100"` configuration, using absolute flex centering for the inside score label to guarantee perfect symmetry.
+
