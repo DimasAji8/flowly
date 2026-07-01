@@ -1,4 +1,4 @@
-import { SavingsGoal } from '@prisma/client';
+import { SavingsGoal, SavingsGoalContribution } from '@prisma/client';
 
 export interface SerializedSavingsGoal {
   id: string;
@@ -25,5 +25,23 @@ export function serializeSavingsGoal(goal: SavingsGoal): SerializedSavingsGoal {
     isPaused: goal.isPaused,
     createdAt: goal.createdAt,
     updatedAt: goal.updatedAt,
+  };
+}
+
+export interface SerializedSavingsGoalContribution {
+  id: string;
+  savingsGoalId: string;
+  amount: string;
+  createdAt: Date;
+}
+
+export function serializeSavingsGoalContribution(
+  contribution: SavingsGoalContribution,
+): SerializedSavingsGoalContribution {
+  return {
+    id: contribution.id,
+    savingsGoalId: contribution.savingsGoalId,
+    amount: contribution.amount.toString(),
+    createdAt: contribution.createdAt,
   };
 }

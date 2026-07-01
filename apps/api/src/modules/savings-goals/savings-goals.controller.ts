@@ -22,6 +22,7 @@ import {
 import { SavingsGoalsService } from './savings-goals.service';
 import { CreateSavingsGoalDto } from './dto/create-savings-goal.dto';
 import { UpdateSavingsGoalDto } from './dto/update-savings-goal.dto';
+import { CreateContributionDto } from './dto/create-contribution.dto';
 import { ListSavingsGoalsQuery } from './dto/list-savings-goals.query';
 import { SavingsGoalResponse } from './dto/savings-goal-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -93,5 +94,29 @@ export class SavingsGoalsController {
   @ApiResponse({ status: 204, description: 'Berhasil dihapus' })
   remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
+  }
+
+  @Post(':id/contributions')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Tambah setoran ke target tabungan' })
+  @ApiParam({ name: 'id', description: 'ID target tabungan' })
+  @ApiResponse({ status: 201, type: SavingsGoalResponse })
+  addContribution(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @Param('id') id: string,
+    @Body() dto: CreateContributionDto,
+  ) {
+    return this.service.addContribution(ws.id, id, dto);
+  }
+
+  @Get(':id/contributions')
+  @ApiOperation({ summary: 'Daftar riwayat setoran target tabungan' })
+  @ApiParam({ name: 'id', description: 'ID target tabungan' })
+  @ApiResponse({ status: 200, isArray: true })
+  listContributions(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @Param('id') id: string,
+  ) {
+    return this.service.listContributions(ws.id, id);
   }
 }
