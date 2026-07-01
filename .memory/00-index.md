@@ -52,11 +52,11 @@ calm & personal (bukan ERP/dashboard analytics).
 
 | File | Isi | Kapan baca |
 |------|-----|------------|
-| **`dashboard-redesign-plan.md`** | Rencana redesign dashboard fase 2 + status | Task di halaman **dashboard** |
 | **`developer-ui-plan.md`** | Rencana revamp halaman developer (table + pagination) | Task di halaman **`/developer/*`** |
 | **`landing-improvement-plan.md`** | Rencana improvement landing page (SELESAI ✅) | Task di halaman **landing** |
 | **`seo-setup.md`** | Implementasi SEO (SELESAI ✅) | Task SEO, metadata, structured data |
 | **`ai-features-plan.md`** | Rencana detail fitur AI lanjutan (Receipt OCR & Insights) | Task AI Scanner dan Proactive Insights |
+| **`whatsapp-integration-plan.md`** | Rencana integrasi WhatsApp bot gratis berbasis Baileys | Rencana fitur integrasi WhatsApp |
 
 ---
 
@@ -64,15 +64,16 @@ calm & personal (bukan ERP/dashboard analytics).
 
 ### ⏳ Aktif (belum selesai)
 
-1. **Dashboard Fase 2** — quick stats berwarna, kartu status cepat, terapkan pola "calm tapi hidup" ke halaman lain
-   → Baca: `dashboard-redesign-plan.md`
-2. **Riwayat setoran savings goal** — butuh skema backend baru (tabel kontribusi)
+1. **Riwayat setoran savings goal** — butuh skema backend baru (tabel kontribusi)
    → Baca: `database.md` + `api.md`
-3. **Ganti Password (dalam app)** — endpoint `PATCH /auth/change-password` + UI di Profil
-   → Baca: `api.md` (bagian "Ganti Password")
+2. **Integrasi WhatsApp** — integrasi bot WhatsApp gratis & ringan menggunakan Baileys
+   → Baca: `whatsapp-integration-plan.md`
 
 ### ✅ Selesai (referensi saja, jangan kerja ulang)
 
+- Dashboard Fase 2 (Immersive header, floating balance card, toggle assets/monthly)
+- Wallet balance adjustment (Sesuaikan saldo dompet melalui ActionMenu dengan penyesuaian otomatis di background)
+- Ganti Password dalam app (UI di Profil + backend endpoint POST /auth/change-password)
 - AI Receipt Scanner & Proactive Insights (Scan struk belanja & analisis pengeluaran AI proaktif di Dashboard)
 - Integrasi AI Frontend & Backend (Kolom input cepat AI untuk memicu parser AI)
 - Onboarding Tour (Dashboard, Wallet, Calendar pages dengan Driver.js & fix bug klik menu)
