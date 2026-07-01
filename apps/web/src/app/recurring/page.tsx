@@ -17,6 +17,7 @@ import { recurringService } from "@/services/recurring.service";
 import type { RecurringTransaction, TransactionType } from "@/types/finance";
 import { formatAmount } from "@/utils/format-currency";
 import { formatDateMedium } from "@/utils/format-date";
+import { useCategoryStore } from "@/store/categories.store";
 
 const FREQ_LABEL: Record<RecurringTransaction["frequency"], string> = {
   daily: "Harian",
@@ -43,6 +44,11 @@ export default function RecurringListPage() {
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<TransactionType | "all">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const { categories, fetch: fetchCategories } = useCategoryStore();
+
+  useEffect(() => {
+    void fetchCategories();
+  }, [fetchCategories]);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,12 +173,13 @@ export default function RecurringListPage() {
                 ? "var(--color-success)"
                 : "var(--color-danger)";
               const date = r.nextRunAt.slice(0, 10);
+              const cat = categories.find((c) => c.id === r.categoryId);
               return (
                 <li key={r.id} className="flex items-center gap-3 px-5 py-4">
                   <div className="flex flex-1 flex-col min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                       <span className="truncate text-sm font-medium text-foreground max-w-[140px] sm:max-w-none">
-                        {r.note?.trim() || `${FREQ_LABEL[r.frequency]} ${r.type}`}
+                        {r.note?.trim() || cat?.name || `${FREQ_LABEL[r.frequency]} ${r.type}`}
                       </span>
                       <Chip
                         tone={isIncome ? "success" : "danger"}
