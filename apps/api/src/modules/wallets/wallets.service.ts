@@ -116,9 +116,14 @@ export class WalletsService {
           name: 'Koreksi Saldo',
           type,
           color: '#6E6E73',
-          icon: '⚙️',
+          icon: '⚖️',
           group: type === 'expense' ? 'wants' : null,
         },
+      });
+    } else if (category.icon === '⚙️') {
+      category = await this.prisma.category.update({
+        where: { id: category.id },
+        data: { icon: '⚖️' },
       });
     }
 
