@@ -79,4 +79,70 @@ export class WalletsService {
       throw e;
     }
   }
+
+  async adjustBalance(
+    workspaceId: string,
+    id: string,
+    userId: string,
+    dto: { balance: number },
+  ): Promise<SerializedWallet> {
+    // 1. Ambil data wallet saat ini
+    const wallet = await this.prisma.wallet.findFirst({
+      where: { id, workspaceId },
+    });
+    if (!wallet) throw new NotFoundException('Dompet tidak ditemukan');
+
+    const oldBalance = wallet.balance;
+    const newBalance = new Prisma.Decimal(dto.balance);
+    const diff = newBalance.minus(oldBalance);
+
+    // Jika tidak ada perubahan, langsung kembalikan dompet
+    if (diff.isZero()) {
+      return serializeWallet(wallet);
+    }
+
+    const isIncome = diff.greaterThan(0);
+    const type = isIncome ? 'income' : 'expense';
+
+    // 2. Cari atau buat kategori sistem untuk penyesuaian/koreksi saldo
+    let category = await this.prisma.category.findFirst({
+      where: { workspaceId, name: 'Koreksi Saldo', type },
+    });
+
+    if (!category) {
+      category = await this.prisma.category.create({
+        data: {
+          workspaceId,
+          name: 'Koreksi Saldo',
+          type,
+          color: '#6E6E73',
+          icon: '⚙️',
+          group: type === 'expense' ? 'wants' : null,
+        },
+      });
+    }
+
+    // 3. Buat transaksi koreksi & update saldo wallet dalam transaksi database atomik
+    const updatedWallet = await this.prisma.$transaction(async (tx) => {
+      await tx.transaction.create({
+        data: {
+          workspaceId,
+          walletId: id,
+          categoryId: category.id,
+          userId,
+          type,
+          amount: diff.abs(),
+          note: `Koreksi Saldo: ${wallet.name}`,
+          transactionDate: new Date(),
+        },
+      });
+
+      return tx.wallet.update({
+        where: { id },
+        data: { balance: newBalance },
+      });
+    });
+
+    return serializeWallet(updatedWallet);
+  }
 }

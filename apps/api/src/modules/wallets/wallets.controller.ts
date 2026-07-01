@@ -21,11 +21,14 @@ import {
 import { WalletsService } from './wallets.service';
 import { CreateWalletDto } from './dto/create-wallet.dto';
 import { UpdateWalletDto } from './dto/update-wallet.dto';
+import { AdjustWalletDto } from './dto/adjust-wallet.dto';
 import { WalletResponse } from './dto/wallet-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
 import { CurrentWorkspace } from '../../common/decorators/current-workspace.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { WorkspaceContext } from '../../common/types/workspace';
+import type { AuthUser } from '../../common/types/auth';
 
 @ApiTags('wallets')
 @ApiBearerAuth('access-token')
@@ -98,5 +101,20 @@ export class WalletsController {
   })
   remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.walletsService.remove(ws.id, id);
+  }
+
+  @Post(':id/adjust')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Sesuaikan saldo dompet' })
+  @ApiParam({ name: 'id', description: 'ID wallet' })
+  @ApiResponse({ status: 200, type: WalletResponse })
+  @ApiResponse({ status: 404, description: 'Wallet tidak ditemukan' })
+  adjust(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() dto: AdjustWalletDto,
+  ) {
+    return this.walletsService.adjustBalance(ws.id, id, user.id, dto);
   }
 }

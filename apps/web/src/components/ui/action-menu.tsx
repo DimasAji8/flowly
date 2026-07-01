@@ -9,11 +9,13 @@ interface ActionMenuProps {
   onTransfer?: () => void;
   onWithdraw?: () => void;
   onTogglePause?: () => void;
+  onAdjust?: () => void;
   isPaused?: boolean;
   editLabel?: string;
   deleteLabel?: string;
   transferLabel?: string;
   withdrawLabel?: string;
+  adjustLabel?: string;
 }
 
 export function ActionMenu({
@@ -22,11 +24,13 @@ export function ActionMenu({
   onTransfer,
   onWithdraw,
   onTogglePause,
+  onAdjust,
   isPaused = false,
   editLabel = "Edit",
   deleteLabel = "Hapus",
   transferLabel = "Transfer",
   withdrawLabel = "Tarik Tunai",
+  adjustLabel = "Sesuaikan Saldo",
 }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -84,6 +88,18 @@ export function ActionMenu({
             >
               <Banknote className="size-3.5 text-muted" aria-hidden />
               {withdrawLabel}
+            </button>
+          )}
+          {onAdjust && (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); onAdjust(); }}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-card-subtle"
+            >
+              <svg className="size-3.5 text-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              {adjustLabel}
             </button>
           )}
           {onTogglePause && (
