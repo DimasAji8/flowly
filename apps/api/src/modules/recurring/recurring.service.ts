@@ -59,7 +59,21 @@ export class RecurringService {
         isActive: dto.isActive ?? true,
       },
     });
-    return serializeRecurring(created);
+
+    // Jalankan check job segera agar jika tanggal mulai adalah hari ini / masa lalu, 
+    // transaksi langsung terbentuk dan tanggal berikutnya bergeser maju.
+    try {
+      await this.runDueJobs();
+    } catch (e) {
+      this.logger.error(`Gagal menjalankan due jobs saat pembuatan recurring: ${(e as Error).message}`);
+    }
+
+    // Ambil data terbaru dari DB setelah proses due jobs di atas
+    const latest = await this.prisma.recurringTransaction.findUnique({
+      where: { id: created.id },
+    });
+
+    return serializeRecurring(latest || created);
   }
 
   async update(workspaceId: string, id: string, dto: UpdateRecurringDto) {
@@ -93,7 +107,20 @@ export class RecurringService {
         ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
       },
     });
-    return serializeRecurring(updated);
+
+    // Jalankan check job segera agar jika ada perubahan tanggal/status aktif yang due langsung dieksekusi
+    try {
+      await this.runDueJobs();
+    } catch (e) {
+      this.logger.error(`Gagal menjalankan due jobs setelah update recurring: ${(e as Error).message}`);
+    }
+
+    // Ambil data terbaru dari DB setelah proses due jobs di atas
+    const latest = await this.prisma.recurringTransaction.findUnique({
+      where: { id: updated.id },
+    });
+
+    return serializeRecurring(latest || updated);
   }
 
   async remove(workspaceId: string, id: string): Promise<void> {
