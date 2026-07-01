@@ -30,21 +30,24 @@ const MONTHS_SHORT_ID = [
 
 /** "2026-05-22" → "22 Mei 2026" */
 export function formatDateLong(dateString: string): string {
-  const [y, m, d] = dateString.split("-").map(Number);
+  const cleanDate = dateString.slice(0, 10);
+  const [y, m, d] = cleanDate.split("-").map(Number);
   if (!y || !m || !d) return dateString;
   return `${d} ${MONTHS_ID[m - 1]} ${y}`;
 }
 
 /** "2026-05-22" → "22 Mei" */
 export function formatDateShort(dateString: string): string {
-  const [, m, d] = dateString.split("-").map(Number);
+  const cleanDate = dateString.slice(0, 10);
+  const [, m, d] = cleanDate.split("-").map(Number);
   if (!m || !d) return dateString;
   return `${d} ${MONTHS_SHORT_ID[m - 1]}`;
 }
 
 /** "2026-05-22" → "22 Mei 2026" */
 export function formatDateMedium(dateString: string): string {
-  const [y, m, d] = dateString.split("-").map(Number);
+  const cleanDate = dateString.slice(0, 10);
+  const [y, m, d] = cleanDate.split("-").map(Number);
   if (!y || !m || !d) return dateString;
   return `${d} ${MONTHS_SHORT_ID[m - 1]} ${y}`;
 }
