@@ -16,6 +16,7 @@ import { ApiError } from "@/lib/api-client";
 import { recurringService } from "@/services/recurring.service";
 import type { RecurringTransaction, TransactionType } from "@/types/finance";
 import { formatAmount } from "@/utils/format-currency";
+import { formatDateMedium } from "@/utils/format-date";
 
 const FREQ_LABEL: Record<RecurringTransaction["frequency"], string> = {
   daily: "Harian",
@@ -168,28 +169,29 @@ export default function RecurringListPage() {
               const date = r.nextRunAt.slice(0, 10);
               return (
                 <li key={r.id} className="flex items-center gap-3 px-5 py-4">
-                  <div className="flex flex-1 flex-col">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-foreground">
+                  <div className="flex flex-1 flex-col min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                      <span className="truncate text-sm font-medium text-foreground max-w-[140px] sm:max-w-none">
                         {r.note?.trim() || `${FREQ_LABEL[r.frequency]} ${r.type}`}
                       </span>
                       <Chip
                         tone={isIncome ? "success" : "danger"}
                         size="sm"
+                        className="shrink-0"
                       >
                         {r.type}
                       </Chip>
-                      <Chip tone="neutral" size="sm">
+                      <Chip tone="neutral" size="sm" className="shrink-0">
                         {FREQ_LABEL[r.frequency]}
                       </Chip>
                     </div>
-                    <span className="text-xs text-muted">
-                      Jadwal berikutnya: {date}
+                    <span className="text-xs text-muted mt-0.5 truncate">
+                      Berikutnya: {formatDateMedium(date)}
                     </span>
                   </div>
 
                   <span
-                    className="text-sm font-semibold tabular-nums"
+                    className="text-sm font-semibold tabular-nums shrink-0"
                     style={{ color }}
                   >
                     {sign} {formatAmount(r.amount)}

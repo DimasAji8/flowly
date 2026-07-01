@@ -218,7 +218,7 @@ export default function WalletsPage() {
                       <span className="text-sm font-semibold text-foreground truncate">{w.name}</span>
                       <span className="text-[11px] uppercase tracking-wide text-muted">{WALLET_TYPE_LABEL[w.type]}</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0">
                       <span className="text-sm font-semibold tabular-nums text-foreground text-right">
                         {formatCurrency(w.balance)}
                       </span>
