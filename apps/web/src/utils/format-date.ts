@@ -42,6 +42,13 @@ export function formatDateShort(dateString: string): string {
   return `${d} ${MONTHS_SHORT_ID[m - 1]}`;
 }
 
+/** "2026-05-22" → "22 Mei 2026" */
+export function formatDateMedium(dateString: string): string {
+  const [y, m, d] = dateString.split("-").map(Number);
+  if (!y || !m || !d) return dateString;
+  return `${d} ${MONTHS_SHORT_ID[m - 1]} ${y}`;
+}
+
 /** Untuk header bulan: tahun & bulan (1..12) → "Mei 2026" */
 export function formatMonthYear(year: number, month: number): string {
   return `${MONTHS_ID[month - 1] ?? ""} ${year}`;
