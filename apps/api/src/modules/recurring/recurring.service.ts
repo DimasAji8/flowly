@@ -60,12 +60,14 @@ export class RecurringService {
       },
     });
 
-    // Jalankan check job segera agar jika tanggal mulai adalah hari ini / masa lalu, 
+    // Jalankan check job segera agar jika tanggal mulai adalah hari ini / masa lalu,
     // transaksi langsung terbentuk dan tanggal berikutnya bergeser maju.
     try {
       await this.runDueJobs();
     } catch (e) {
-      this.logger.error(`Gagal menjalankan due jobs saat pembuatan recurring: ${(e as Error).message}`);
+      this.logger.error(
+        `Gagal menjalankan due jobs saat pembuatan recurring: ${(e as Error).message}`,
+      );
     }
 
     // Ambil data terbaru dari DB setelah proses due jobs di atas
@@ -112,7 +114,9 @@ export class RecurringService {
     try {
       await this.runDueJobs();
     } catch (e) {
-      this.logger.error(`Gagal menjalankan due jobs setelah update recurring: ${(e as Error).message}`);
+      this.logger.error(
+        `Gagal menjalankan due jobs setelah update recurring: ${(e as Error).message}`,
+      );
     }
 
     // Ambil data terbaru dari DB setelah proses due jobs di atas

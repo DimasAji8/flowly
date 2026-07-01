@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { SavingsGoal } from "@/types/finance";
+import type { SavingsGoal, SavingsGoalContribution } from "@/types/finance";
 
 export interface CreateSavingsGoalPayload {
   name: string;
@@ -44,6 +44,20 @@ export const savingsGoalsService = {
 
   remove(id: string) {
     return apiClient.delete<void>(`/savings-goals/${id}`, {
+      auth: true,
+      workspaceScoped: true,
+    });
+  },
+
+  addContribution(id: string, amount: number) {
+    return apiClient.post<SavingsGoal>(`/savings-goals/${id}/contributions`, { amount }, {
+      auth: true,
+      workspaceScoped: true,
+    });
+  },
+
+  listContributions(id: string) {
+    return apiClient.get<SavingsGoalContribution[]>(`/savings-goals/${id}/contributions`, {
       auth: true,
       workspaceScoped: true,
     });

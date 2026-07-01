@@ -63,6 +63,7 @@ model User {
   password               String
   gender                 Gender?
   role                   UserRole  @default(user)
+  whatsappNumber         String?   @unique @map("whatsapp_number")
   isSuspended            Boolean   @default(false) @map("is_suspended")
   resetPasswordToken     String?   @map("reset_password_token")
   resetPasswordExpiresAt DateTime? @map("reset_password_expires_at")
@@ -191,12 +192,25 @@ model SavingsGoal {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
-  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  linkedWallet Wallet?   @relation(fields: [linkedWalletId], references: [id], onDelete: SetNull)
+  workspace     Workspace                 @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  linkedWallet  Wallet?                   @relation(fields: [linkedWalletId], references: [id], onDelete: SetNull)
+  contributions SavingsGoalContribution[]
 
   @@index([workspaceId])
   @@index([workspaceId, targetDate])
   @@map("savings_goals")
+}
+
+model SavingsGoalContribution {
+  id            String      @id @default(cuid())
+  savingsGoalId String      @map("savings_goal_id")
+  amount        Decimal     @map("amount") @db.Decimal(18, 2)
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  savingsGoal SavingsGoal @relation(fields: [savingsGoalId], references: [id], onDelete: Cascade)
+
+  @@index([savingsGoalId])
+  @@map("savings_goal_contributions")
 }
 
 // =====================================================

@@ -54,9 +54,7 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
     const contribution = parseRupiah(amountDisplay);
     try {
       setLoading(true);
-      await savingsGoalsService.update(goal.id, {
-        currentAmount: Number(goal.currentAmount) + contribution,
-      });
+      await savingsGoalsService.addContribution(goal.id, contribution);
       toast.success("Setoran tabungan ditambahkan");
       // Dispatch event agar semua halaman refresh data
       window.dispatchEvent(new Event("flowly:transaction-added"));

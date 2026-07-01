@@ -7,9 +7,12 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSavingsGoalDto } from './dto/create-savings-goal.dto';
 import { UpdateSavingsGoalDto } from './dto/update-savings-goal.dto';
+import { CreateContributionDto } from './dto/create-contribution.dto';
 import {
   serializeSavingsGoal,
   SerializedSavingsGoal,
+  serializeSavingsGoalContribution,
+  SerializedSavingsGoalContribution,
 } from './savings-goals.serializer';
 
 @Injectable()
@@ -106,6 +109,48 @@ export class SavingsGoalsService {
   async remove(workspaceId: string, id: string): Promise<void> {
     await this.findById(workspaceId, id);
     await this.prisma.savingsGoal.delete({ where: { id } });
+  }
+
+  async addContribution(
+    workspaceId: string,
+    id: string,
+    dto: CreateContributionDto,
+  ): Promise<SerializedSavingsGoal> {
+    await this.findById(workspaceId, id);
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      await tx.savingsGoalContribution.create({
+        data: {
+          savingsGoalId: id,
+          amount: new Prisma.Decimal(dto.amount),
+        },
+      });
+
+      return tx.savingsGoal.update({
+        where: { id },
+        data: {
+          currentAmount: {
+            increment: new Prisma.Decimal(dto.amount),
+          },
+        },
+      });
+    });
+
+    return serializeSavingsGoal(updated);
+  }
+
+  async listContributions(
+    workspaceId: string,
+    id: string,
+  ): Promise<SerializedSavingsGoalContribution[]> {
+    await this.findById(workspaceId, id);
+
+    const items = await this.prisma.savingsGoalContribution.findMany({
+      where: { savingsGoalId: id },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return items.map(serializeSavingsGoalContribution);
   }
 
   private async assertLinkedWallet(

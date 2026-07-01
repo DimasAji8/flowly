@@ -64,13 +64,12 @@ calm & personal (bukan ERP/dashboard analytics).
 
 ### ⏳ Aktif (belum selesai)
 
-1. **Riwayat setoran savings goal** — butuh skema backend baru (tabel kontribusi)
-   → Baca: `database.md` + `api.md`
-2. **Integrasi WhatsApp** — integrasi bot WhatsApp gratis & ringan menggunakan Baileys
+1. **Integrasi WhatsApp** — integrasi bot WhatsApp gratis & ringan menggunakan Baileys
    → Baca: `whatsapp-integration-plan.md`
 
 ### ✅ Selesai (referensi saja, jangan kerja ulang)
 
+- Riwayat setoran savings goal (skema backend + tabel kontribusi + riwayat setoran di UI)
 - Dashboard Fase 2 (Immersive header, floating balance card, toggle assets/monthly)
 - Wallet balance adjustment (Sesuaikan saldo dompet melalui ActionMenu dengan penyesuaian otomatis di background)
 - Ganti Password dalam app (UI di Profil + backend endpoint POST /auth/change-password)
