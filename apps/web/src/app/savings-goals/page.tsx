@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Plus, Wallet as WalletIcon } from "lucide-react";
 import { toast } from "sonner";
 import { SavingsGoalContributionModal } from "@/components/savings-goals/savings-goal-contribution-modal";
+import { SavingsGoalHistoryModal } from "@/components/savings-goals/savings-goal-history-modal";
 import { ActionMenu } from "@/components/ui/action-menu";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,7 @@ export default function SavingsGoalsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
   const [contributionGoal, setContributionGoal] = useState<SavingsGoal | undefined>();
+  const [historyGoal, setHistoryGoal] = useState<SavingsGoal | undefined>();
   const [confirmDeleteGoal, setConfirmDeleteGoal] = useState<SavingsGoal | null>(null);
   const [confirmPauseGoal, setConfirmPauseGoal] = useState<SavingsGoal | null>(null);
 
@@ -263,9 +265,18 @@ export default function SavingsGoalsPage() {
                   </div>
                 </div>
 
-                {/* ── CTA ── */}
-                {status !== "completed" && (
-                  <div className="flex justify-end">
+                {/* ── CTA & Expand ── */}
+                <div className="flex items-center justify-between mt-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-secondary hover:text-foreground px-2 h-8"
+                    onClick={() => setHistoryGoal(goal)}
+                  >
+                    Lihat Riwayat
+                  </Button>
+                  {status !== "completed" && (
                     <Button
                       type="button"
                       size="sm"
@@ -273,8 +284,8 @@ export default function SavingsGoalsPage() {
                     >
                        Tambah Setoran
                     </Button>
-                  </div>
-                )}
+                  )}
+                </div>
               </li>
             );
           })}
@@ -295,6 +306,12 @@ export default function SavingsGoalsPage() {
         goal={contributionGoal}
         onClose={() => setContributionGoal(undefined)}
         onSuccess={reload}
+      />
+
+      <SavingsGoalHistoryModal
+        open={Boolean(historyGoal)}
+        goal={historyGoal}
+        onClose={() => setHistoryGoal(undefined)}
       />
 
       <ConfirmModal

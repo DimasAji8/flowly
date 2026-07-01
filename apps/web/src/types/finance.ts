@@ -111,3 +111,10 @@ export interface SavingsGoal {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface SavingsGoalContribution {
+  id: string;
+  savingsGoalId: string;
+  amount: string;
+  createdAt: string;
+}
