@@ -29,4 +29,11 @@ export const walletsService = {
       workspaceScoped: true,
     });
   },
+
+  adjust(id: string, balance: number) {
+    return apiClient.post<Wallet>(`/wallets/${id}/adjust`, { balance }, {
+      auth: true,
+      workspaceScoped: true,
+    });
+  },
 };

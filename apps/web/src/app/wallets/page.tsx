@@ -102,6 +102,10 @@ export default function WalletsPage() {
   const [withdrawFromId, setWithdrawFromId] = useState<string | undefined>();
   const [confirmWallet, setConfirmWallet] = useState<{ id: string; name: string } | null>(null);
 
+  const [adjustWallet, setAdjustWallet] = useState<Wallet | null>(null);
+  const [adjustBalanceDisplay, setAdjustBalanceDisplay] = useState("");
+  const [adjusting, setAdjusting] = useState(false);
+
   useEffect(() => {
     void fetchWallets();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -173,6 +177,25 @@ export default function WalletsPage() {
     }
   };
 
+  const handleAdjustWallet = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adjustWallet) return;
+    const newBalance = parseRupiah(adjustBalanceDisplay);
+    try {
+      setAdjusting(true);
+      await walletsService.adjust(adjustWallet.id, newBalance);
+      setAdjustWallet(null);
+      setAdjustBalanceDisplay("");
+      toast.success("Saldo dompet disesuaikan");
+      reload();
+      window.dispatchEvent(new Event("flowly:transaction-added"));
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Gagal menyesuaikan saldo");
+    } finally {
+      setAdjusting(false);
+    }
+  };
+
   const grouped = WALLET_TYPE_ORDER
     .map((type) => ({ type, items: wallets.filter((w) => w.type === type) }))
     .filter((g) => g.items.length > 0);
@@ -227,6 +250,10 @@ export default function WalletsPage() {
                         onEdit={() => openEdit(w)}
                         onTransfer={wallets.length >= 2 ? () => { setTransferFromId(w.id); setTransferOpen(true); } : undefined}
                         onDelete={() => setConfirmWallet({ id: w.id, name: w.name })}
+                        onAdjust={() => {
+                          setAdjustWallet(w);
+                          setAdjustBalanceDisplay(formatRupiah(String(Math.round(Number(w.balance)))));
+                        }}
                       />
                     </div>
                   </div>
@@ -244,6 +271,41 @@ export default function WalletsPage() {
         Lihat riwayat transfer
         <ArrowRight className="size-4 text-muted" aria-hidden />
       </Link>
+
+      {/* Modal sesuaikan saldo dompet */}
+      <Modal open={Boolean(adjustWallet)} onClose={() => { setAdjustWallet(null); setAdjustBalanceDisplay(""); }} title={`Sesuaikan Saldo: ${adjustWallet?.name}`}>
+        <form onSubmit={handleAdjustWallet} className="flex flex-col gap-4">
+          <p className="text-xs text-secondary leading-relaxed">
+            Masukkan jumlah saldo riil dompet saat ini. Sistem akan otomatis menghitung selisih dan mencatat transaksi koreksi di riwayat keuangan.
+          </p>
+          <div className="rounded-xl bg-card-subtle border border-border-subtle p-3 text-xs text-muted">
+            <div className="flex justify-between">
+              <span>Saldo sistem saat ini:</span>
+              <span className="font-semibold text-foreground">
+                {adjustWallet ? formatCurrency(adjustWallet.balance) : "0"}
+              </span>
+            </div>
+          </div>
+          <Input
+            label="Saldo sebenarnya"
+            inputMode="numeric"
+            placeholder="0"
+            leftAdornment={<span className="font-medium">Rp</span>}
+            value={adjustBalanceDisplay}
+            onChange={(e) => setAdjustBalanceDisplay(formatRupiah(e.target.value))}
+            autoFocus
+            required
+          />
+          <div className="flex items-center gap-3 pt-1">
+            <Button type="button" variant="secondary" className="flex-1" onClick={() => setAdjustWallet(null)}>
+              Batal
+            </Button>
+            <Button type="submit" isLoading={adjusting} className="flex-1">
+              Sesuaikan
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Modal tambah dompet */}
       <Modal open={addOpen} onClose={() => { setAddOpen(false); setNewName(""); setNewBalanceDisplay(""); setNewType("cash"); }} title="Tambah dompet">
