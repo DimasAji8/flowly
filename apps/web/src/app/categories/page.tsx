@@ -217,21 +217,27 @@ function CategorySection({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState("");
+  const [editGroup, setEditGroup] = useState<"needs" | "wants" | "savings" | null>(null);
   const [saving, setSaving] = useState(false);
 
   const startEdit = (c: Category) => {
     setEditingId(c.id);
     setEditName(c.name);
     setEditIcon(c.icon);
+    setEditGroup(c.group);
   };
 
   const cancelEdit = () => setEditingId(null);
 
-  const saveEdit = async (id: string) => {
+  const saveEdit = async (id: string, type: TransactionType) => {
     if (!editName.trim()) return;
     setSaving(true);
     try {
-      await categoriesService.update(id, { name: editName.trim(), icon: editIcon });
+      await categoriesService.update(id, {
+        name: editName.trim(),
+        icon: editIcon,
+        group: type === "expense" ? (editGroup ?? "needs") : undefined,
+      });
       toast.success("Kategori diperbarui");
       setEditingId(null);
       onReload();
@@ -267,11 +273,35 @@ function CategorySection({
                         onChange={(e) => setEditName(e.target.value)}
                         placeholder="Nama kategori"
                         maxLength={60}
+                        label="Nama"
                       />
-                      {/* Emoji Picker */}
-                      <EmojiPicker value={editIcon} onChange={setEditIcon} />
-                      <div className="flex gap-2">
-                        <Button size="sm" isLoading={saving} onClick={() => saveEdit(c.id)}>Simpan</Button>
+                      
+                      {c.type === "expense" && (
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">
+                            Grup <span className="ml-1 normal-case font-normal text-muted">— untuk insight keuangan</span>
+                          </label>
+                          <div role="radiogroup" className="grid grid-cols-3 gap-2">
+                            {GROUP_OPTIONS.map((g) => (
+                              <button key={g.value} type="button" role="radio" aria-checked={editGroup === g.value}
+                                onClick={() => setEditGroup(g.value)}
+                                className={["rounded-xl border px-3 py-2 text-left transition-colors", editGroup === g.value ? "border-accent bg-accent-soft" : "border-border-subtle bg-card-subtle hover:border-border"].join(" ")}
+                              >
+                                <p className={["text-xs font-semibold", editGroup === g.value ? "text-accent" : "text-foreground"].join(" ")}>{g.label}</p>
+                                <p className="text-[10px] text-muted leading-tight">{g.desc}</p>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary">Ikon</label>
+                        <EmojiPicker value={editIcon} onChange={setEditIcon} />
+                      </div>
+
+                      <div className="flex gap-2 pt-1">
+                        <Button size="sm" isLoading={saving} onClick={() => saveEdit(c.id, c.type)}>Simpan</Button>
                         <Button size="sm" variant="ghost" onClick={cancelEdit}>Batal</Button>
                       </div>
                     </div>
@@ -280,7 +310,16 @@ function CategorySection({
                       <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-xl bg-card-subtle text-lg">
                         {c.icon}
                       </span>
-                      <span className="flex-1 text-sm font-medium text-foreground">{c.name}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">{c.name}</p>
+                        {c.type === "expense" && c.group && (
+                          <p className="text-[11px] text-muted">
+                            {c.group === "needs" && "Needs (Kebutuhan)"}
+                            {c.group === "wants" && "Wants (Keinginan)"}
+                            {c.group === "savings" && "Savings (Tabungan)"}
+                          </p>
+                        )}
+                      </div>
                       <ActionMenu
                         onEdit={() => startEdit(c)}
                         onDelete={() => onDelete(c.id, c.name)}
