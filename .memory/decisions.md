@@ -199,3 +199,9 @@ semua halaman harus refresh tanpa manual reload. Pattern:
   - **Design**: Replaced the flashy violet theme/gradients and neon icons with Teman Kas's native blue brand accent colors and clean Card layout styles.
   - **Circle Symmetry**: Replaced the raw HTML SVG progress with a mathematically centered `viewBox="0 0 100 100"` configuration, using absolute flex centering for the inside score label to guarantee perfect symmetry.
 
+## Category Group Editing & Quick Actions Dashboard Layout (2026-07-02)
+- **Category Edit**: Added support for updating category groups (Needs, Wants, Savings) when editing expense categories, showing the active group indicator below the category name in the list.
+- **Dashboard Quick Actions**: Added "Analisis AI" menu with Sparkles icon to the mobile quick menu. Styled as a compact 3x2 grid on mobile (`gap-y-1.5`, `py-1.5`) and a 1x6 grid on desktop to ensure high information density and no horizontal overflow issues.
+- **AI Page Cleanups**: Removed the redundant "Hero Analysis Control Panel" card when results exist, added a small "Analisis Ulang" button next to the title, moved the update timestamp into the score card, and replaced layout skeleton loaders with an animated glowing "AI Thinking" card during execution to improve user perception.
+
+

@@ -69,6 +69,7 @@ calm & personal (bukan ERP/dashboard analytics).
 
 ### ✅ Selesai (referensi saja, jangan kerja ulang)
 
+- Edit grup kategori, visual indicator grup kategori di list, penambahan menu Analisis AI di Quick Actions dasbor dengan layout grid 3x2 compact, serta refaktorisasi UI dan pemutakhiran loader AI Thinking di halaman Analisis AI.
 - Riwayat setoran savings goal (skema backend + tabel kontribusi + riwayat setoran di UI)
 - Dashboard Fase 2 (Immersive header, floating balance card, toggle assets/monthly)
 - Wallet balance adjustment (Sesuaikan saldo dompet melalui ActionMenu dengan penyesuaian otomatis di background)

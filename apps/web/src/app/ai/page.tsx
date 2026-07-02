@@ -6,7 +6,8 @@ import {
   AlertTriangle,
   CheckCircle2,
   Info,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -92,53 +93,58 @@ export default function AiAnalysisPage() {
   return (
     <div className="flex flex-col gap-6 flowly-enter pb-12 w-full">
       {/* Header */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-bold tracking-tight text-foreground">
-          TemanKas AI
-        </h1>
-        <p className="text-xs text-secondary leading-relaxed">
-          Gunakan kecerdasan buatan untuk mengulas pola pengeluaran Anda, melacak target tabungan, dan mendeteksi anomali anggaran secara otomatis.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
+            TemanKas AI
+          </h1>
+          <p className="text-xs text-secondary leading-relaxed">
+            Gunakan kecerdasan buatan untuk mengulas pola pengeluaran Anda, melacak target tabungan, dan mendeteksi anomali anggaran secara otomatis.
+          </p>
+        </div>
+        {!loading && !analyzing && score !== null && (
+          <Button
+            size="sm"
+            onClick={handleStartAnalysis}
+            className="w-full sm:w-auto mt-1 sm:mt-0 shrink-0"
+            leftIcon={<Sparkles className="size-3.5" />}
+          >
+            Analisis Ulang
+          </Button>
+        )}
       </div>
 
-      {/* Hero Analysis Control Panel */}
-      <Card 
-        className="p-5 flex flex-col gap-4 bg-card"
-        style={{ boxShadow: "var(--shadow-card)" }}
-      >
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col min-w-0">
-            <h3 className="text-sm font-bold text-foreground">
-              Asisten Analisis Finansial Cerdas
-            </h3>
-            <p className="text-[11px] text-secondary mt-1.5 leading-relaxed">
-              Teknologi AI memindai 30 hari riwayat transaksi, alokasi kategori budget (Needs, Wants, Savings), dan keselarasan tabungan Anda untuk menghasilkan insight finansial.
-            </p>
-            {lastRun && (
-              <span className="text-[9px] font-bold text-accent uppercase tracking-wider mt-2.5">
-                Terakhir Diperbarui: Hari ini pukul {lastRun}
-              </span>
-            )}
-          </div>
-
-          <Button
-            onClick={handleStartAnalysis}
-            isLoading={analyzing}
-            disabled={loading}
-            className="w-full"
-          >
-            {analyzing ? "Menganalisis data..." : "Mulai Analisis Keuangan"}
-          </Button>
-        </div>
-      </Card>
-
-      {/* Loading state */}
-      {(loading || analyzing) && (
+      {/* Loading state (initial data load) */}
+      {loading && !analyzing && (
         <div className="flex flex-col gap-4">
           <Skeleton className="h-40 rounded-2xl w-full" />
           <Skeleton className="h-24 rounded-2xl w-full" />
           <Skeleton className="h-24 rounded-2xl w-full" />
         </div>
+      )}
+
+      {/* AI Analyzing State (AI is thinking) */}
+      {analyzing && (
+        <Card 
+          className="p-8 flex flex-col items-center justify-center text-center bg-card border border-border-subtle relative overflow-hidden"
+          style={{ boxShadow: "var(--shadow-card)" }}
+        >
+          {/* Animated Glowing AI Orb */}
+          <div className="relative size-24 flex items-center justify-center mb-6">
+            <div className="absolute inset-0 rounded-full bg-accent/10 dark:bg-accent/20 animate-ping opacity-75" />
+            <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-accent to-purple-500 opacity-20 blur-md animate-pulse" />
+            <div className="relative size-16 rounded-full bg-accent-soft flex items-center justify-center border border-accent/20 shadow-md">
+              <Sparkles className="size-8 text-accent animate-pulse" />
+            </div>
+          </div>
+
+          <h4 className="text-sm font-bold text-foreground animate-pulse">
+            Asisten AI Sedang Berpikir...
+          </h4>
+          <p className="text-[11px] text-secondary mt-2 max-w-xs leading-relaxed">
+            Mengevaluasi pola pengeluaran 30 hari terakhir, menghitung skor kesehatan, dan merumuskan rekomendasi finansial personal untuk Anda.
+          </p>
+        </Card>
       )}
 
       {/* Onboarding State: belum pernah analisis & tidak ada data insight */}
@@ -201,9 +207,6 @@ export default function AiAnalysisPage() {
               <span className="text-3xl font-extrabold text-foreground tabular-nums leading-none tracking-tight">
                 {score}
               </span>
-              <span className="text-[8px] font-bold text-muted uppercase tracking-widest mt-1">
-                Skor Anda
-              </span>
             </div>
           </div>
 
@@ -221,6 +224,12 @@ export default function AiAnalysisPage() {
               ? "Terdapat beberapa pengeluaran Wants yang melebihi batas atau saldo tabungan yang mulai pas-pasan."
               : "Pengeluaran melampaui pendapatan bersih atau target tabungan diabaikan secara signifikan."}
           </p>
+
+          {lastRun && (
+            <span className="text-[9px] font-bold text-muted uppercase tracking-wider mt-3.5">
+              Terakhir Diperbarui: Hari ini pukul {lastRun}
+            </span>
+          )}
         </Card>
       )}
 
