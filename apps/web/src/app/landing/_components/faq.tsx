@@ -8,7 +8,7 @@ const FAQS = [
   { q: "Beneran gratis?", a: "Ya, gratis selamanya untuk penggunaan personal. Tidak ada biaya tersembunyi, tidak butuh kartu kredit untuk daftar." },
   { q: "Apakah data saya aman?", a: "Data disimpan terenkripsi dan tidak pernah dibagikan ke pihak ketiga. Hanya kamu yang bisa mengakses catatan keuanganmu." },
   { q: "Bisa dipakai lebih dari satu perangkat?", a: "Ya. Login dari perangkat mana pun dan data kamu langsung tersinkron." },
-  { q: "Bisa berbagi catatan dengan pasangan atau tim?", a: "Bisa. Buat satu workspace bersama dan undang anggota. Setiap workspace punya data terpisah." },
+  { q: "Apakah ada asisten AI?", a: "Ya. Teman Kas dilengkapi asisten AI untuk memindai (scan) struk belanja secara otomatis dan memproses pencatatan lewat teks bahasa sehari-hari." },
   { q: "Apakah ada iklan di aplikasi?", a: "Tidak ada iklan sama sekali. Fokus kamu tidak kami ganggu." },
   { q: "Bagaimana cara menghapus akun saya?", a: "Kamu bisa menghapus akun dan semua data kapan saja melalui pengaturan profil." },
 ];

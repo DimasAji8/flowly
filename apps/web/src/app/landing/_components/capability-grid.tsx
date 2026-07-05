@@ -9,7 +9,7 @@ const CAPABILITIES = [
   { t: "Kategori Kustom",    d: "Kategori berwarna untuk merapikan setiap transaksi.", tint: T.tintLilac },
   { t: "Transfer Dompet",    d: "Pindahkan dana antar dompet, tercatat otomatis.", tint: T.tintPeach },
   { t: "Transaksi Berulang", d: "Gaji, langganan, tagihan — dibuat otomatis sesuai jadwal.", tint: T.tintBlueDeep },
-  { t: "Multi-pengguna",     d: "Satu workspace bisa dibagikan ke pasangan atau tim.", tint: T.tintMint },
+  { t: "Pencatatan AI",      d: "Scan struk belanja otomatis & input transaksi pakai bahasa sehari-hari.", tint: T.tintMint },
 ];
 
 export function CapabilityGrid() {
