@@ -28,6 +28,17 @@ interface ParsedReceiptResponse {
   walletName?: string;
 }
 
+export interface ScannedMutationItem {
+  date: string; // YYYY-MM-DD
+  type: 'income' | 'expense';
+  amount: number;
+  description: string;
+  note: string;
+  categoryId: string | null;
+  walletId: string | null;
+  isDuplicate: boolean;
+}
+
 export interface FinancialInsight {
   id: string;
   type: 'warning' | 'success' | 'info';
@@ -532,6 +543,186 @@ Data Keuangan Pengguna (30 hari terakhir):
     } catch {
       // Return empty array jika AI gagal/error agar dashboard tidak rusak
       return [];
+    }
+  }
+
+  async scanMutation(
+    workspaceId: string,
+    file: Express.Multer.File,
+  ): Promise<ScannedMutationItem[]> {
+    if (
+      !process.env.GEMINI_API_KEY ||
+      process.env.GEMINI_API_KEY === 'your_gemini_api_key_here'
+    ) {
+      throw new InternalServerErrorException(
+        'Gemini API key is not configured.',
+      );
+    }
+
+    const [categories, wallets, existingTx] = await Promise.all([
+      this.prisma.category.findMany({ where: { workspaceId } }),
+      this.prisma.wallet.findMany({ where: { workspaceId } }),
+      this.prisma.transaction.findMany({
+        where: { workspaceId },
+        select: { amount: true, transactionDate: true },
+      }),
+    ]);
+
+    const expenseCategories = categories
+      .filter((c) => c.type === 'expense')
+      .map((c) => c.name);
+    const incomeCategories = categories
+      .filter((c) => c.type === 'income')
+      .map((c) => c.name);
+    const walletNames = wallets.map((w) => w.name);
+
+    // Buat set untuk deteksi duplikat: "amount|YYYY-MM-DD"
+    const existingSet = new Set(
+      existingTx.map(
+        (t) =>
+          `${Number(t.amount)}|${t.transactionDate.toISOString().slice(0, 10)}`,
+      ),
+    );
+
+    const isPdf = file.mimetype === 'application/pdf';
+    let mutationText = '';
+
+    if (isPdf) {
+      // ponytail: inline require untuk CJS interop pdf-parse
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>;
+      const pdfData = await pdfParse(file.buffer);
+      mutationText = pdfData.text;
+
+      if (!mutationText.trim()) {
+        throw new BadRequestException(
+          'PDF tidak bisa dibaca. Pastikan PDF bukan scan gambar.',
+        );
+      }
+    }
+
+    const responseSchema = {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          date: {
+            type: Type.STRING,
+            description: 'Tanggal transaksi format YYYY-MM-DD',
+          },
+          type: {
+            type: Type.STRING,
+            enum: ['income', 'expense'],
+            description:
+              'income jika kredit/masuk, expense jika debit/keluar',
+          },
+          amount: {
+            type: Type.INTEGER,
+            description: 'Nominal transaksi (angka saja, tanpa titik/koma)',
+          },
+          description: {
+            type: Type.STRING,
+            description: 'Deskripsi asli dari mutasi rekening',
+          },
+          note: {
+            type: Type.STRING,
+            description: 'Ringkasan catatan singkat untuk transaksi',
+          },
+          categoryName: {
+            type: Type.STRING,
+            description: 'Nama kategori yang paling cocok dari daftar valid',
+          },
+          walletName: {
+            type: Type.STRING,
+            description: 'Nama dompet dari daftar valid',
+          },
+        },
+        required: ['date', 'type', 'amount', 'description', 'note'],
+      },
+    };
+
+    const systemInstruction = `Kamu adalah asisten pembaca mutasi rekening bank Indonesia untuk aplikasi "Teman Kas".
+Tugasmu: ekstrak SEMUA transaksi dari mutasi rekening yang diberikan ke format JSON array.
+
+Aturan:
+- type "income" untuk transaksi KREDIT (uang masuk/+), "expense" untuk DEBIT (uang keluar/-).
+- amount: nominal angka bulat saja (tanpa pemisah ribuan).
+- Abaikan baris saldo, header, footer, dan informasi non-transaksi.
+- Pilih categoryName dari daftar Kategori Pengeluaran Valid (untuk expense) atau Kategori Pemasukan Valid (untuk income).
+- Pilih walletName dari Daftar Dompet Valid yang paling relevan dengan rekening ini.
+- Jika tidak bisa menentukan kategori atau dompet, kosongkan (null).
+- Kembalikan SEMUA transaksi yang ditemukan.
+
+Kategori Pengeluaran Valid: ${JSON.stringify(expenseCategories)}
+Kategori Pemasukan Valid: ${JSON.stringify(incomeCategories)}
+Daftar Dompet Valid: ${JSON.stringify(walletNames)}
+Tanggal hari ini: ${new Date().toISOString().split('T')[0]}`;
+
+    let contents: Parameters<typeof this.ai.models.generateContent>[0]['contents'];
+
+    if (isPdf) {
+      contents = `${systemInstruction}\n\nIsi Mutasi Rekening (teks dari PDF):\n${mutationText}`;
+    } else {
+      contents = [
+        { inlineData: { data: file.buffer.toString('base64'), mimeType: file.mimetype } },
+        `${systemInstruction}\n\nAnalisis gambar mutasi rekening di atas dan ekstrak semua transaksi.`,
+      ];
+    }
+
+    try {
+      const response = await this.ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema,
+          temperature: 0.1,
+        },
+      });
+
+      if (!response.text) throw new Error('Empty response from Gemini');
+
+      const parsed = JSON.parse(response.text) as Array<{
+        date: string;
+        type: 'income' | 'expense';
+        amount: number;
+        description: string;
+        note: string;
+        categoryName?: string;
+        walletName?: string;
+      }>;
+
+      return parsed.map((item) => {
+        const matchedCategory = categories.find(
+          (c) =>
+            c.name.toLowerCase() === item.categoryName?.toLowerCase() &&
+            c.type === item.type,
+        );
+        const matchedWallet = wallets.find(
+          (w) => w.name.toLowerCase() === item.walletName?.toLowerCase(),
+        );
+        const fallbackCategory = categories.find((c) => c.type === item.type);
+        const fallbackWallet = wallets[0];
+
+        const isDuplicate = existingSet.has(`${item.amount}|${item.date}`);
+
+        return {
+          date: item.date,
+          type: item.type,
+          amount: item.amount,
+          description: item.description,
+          note: item.note,
+          categoryId: matchedCategory?.id ?? fallbackCategory?.id ?? null,
+          walletId: matchedWallet?.id ?? fallbackWallet?.id ?? null,
+          isDuplicate,
+        };
+      });
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      const message = error instanceof Error ? error.message : String(error);
+      throw new InternalServerErrorException(
+        `Gagal membaca mutasi rekening: ${message}`,
+      );
     }
   }
 }

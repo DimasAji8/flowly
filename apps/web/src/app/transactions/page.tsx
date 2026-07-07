@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, ArrowLeft, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, Plus, FileBarChart2 } from "lucide-react";
 import Link from "next/link";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionModal } from "@/components/transaction/transaction-modal";
 import { DeleteTransactionModal } from "@/components/transaction/delete-transaction-modal";
+import { MutationScanModal } from "@/components/transaction/mutation-scan-modal";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
@@ -53,6 +54,7 @@ export default function TransactionsPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTxId, setDeleteTxId] = useState<string | null>(null);
+  const [mutationOpen, setMutationOpen] = useState(false);
 
   const load = useCallback(() => {
     if (!mounted || !year || !month) return;
@@ -126,14 +128,24 @@ export default function TransactionsPage() {
         <h1 className="text-xl font-semibold text-foreground md:text-2xl">
           Transaksi
         </h1>
-        <button
-          type="button"
-          onClick={() => setAddOpen(true)}
-          className="hidden lg:inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
-        >
-          <Plus className="size-4" />
-          Tambah
-        </button>
+        <div className="hidden lg:flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMutationOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border-subtle bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-card-subtle transition-colors"
+          >
+            <FileBarChart2 className="size-4" />
+            Impor Mutasi
+          </button>
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
+          >
+            <Plus className="size-4" />
+            Tambah
+          </button>
+        </div>
       </div>
 
       {/* Filter bulan */}
@@ -196,6 +208,12 @@ export default function TransactionsPage() {
         onClose={() => { setAddOpen(false); setEditTx(null); }}
         onSuccess={load}
         transaction={editTx ?? undefined}
+      />
+
+      <MutationScanModal
+        open={mutationOpen}
+        onClose={() => setMutationOpen(false)}
+        onSuccess={load}
       />
 
       {deleteTxId && (

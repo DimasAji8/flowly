@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
@@ -25,7 +26,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { AiService, FinancialInsight } from './ai.service';
+import { AiService, FinancialInsight, ScannedMutationItem } from './ai.service';
 import { ParseTransactionDto } from './dto/parse-transaction.dto';
 import { AiParsedTransactionResponseDto } from './dto/ai-parsed-transaction-response.dto';
 import { AiInsightResponseDto } from './dto/ai-insight-response.dto';
@@ -129,5 +130,49 @@ export class AiController {
   ): Promise<FinancialInsight[]> {
     const isForce = force === 'true';
     return this.aiService.getInsights(ws.id, isForce);
+  }
+
+  // 5 request per menit per user (scan mutasi lebih berat: banyak transaksi)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @Post('scan-mutation')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description:
+            'Gambar mutasi rekening (png, jpeg, webp) atau PDF - max 10MB',
+        },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Membaca mutasi rekening bank dari gambar/PDF dan mengekstrak semua transaksi',
+  })
+  async scanMutation(
+    @CurrentWorkspace() ws: WorkspaceContext,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
+        ],
+        fileIsRequired: true,
+      }),
+    )
+    file: Express.Multer.File,
+  ): Promise<ScannedMutationItem[]> {
+    const allowed = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+    if (!allowed.includes(file.mimetype)) {
+      throw new BadRequestException(
+        'Format file tidak didukung. Gunakan gambar (png/jpeg/webp) atau PDF.',
+      );
+    }
+    return this.aiService.scanMutation(ws.id, file);
   }
 }
