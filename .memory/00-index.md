@@ -85,6 +85,7 @@ calm & personal (bukan ERP/dashboard analytics).
 - Filter, navigasi/menu, laporan fase 1
 - Deployment (VPS, Nginx, systemd, CI/CD, SSL)
 - **Stale data fix** — semua halaman auto-refresh setelah mutasi via custom event `flowly:transaction-added` (15 file, 7 dispatchers + 8 listeners)
+- **Impor Mutasi Rekening** — scan gambar/PDF mutasi bank via AI (Gemini Vision + pdf-parse), preview tabel dengan checkbox + badge duplikat, bulk save ke transaksi. Endpoint: `POST /ai/scan-mutation`. Frontend: `MutationScanModal` di halaman Transaksi.
 
 ---
 
@@ -134,7 +135,7 @@ calm & personal (bukan ERP/dashboard analytics).
 | Tarik Tunai | Transfer ke dompet Tunai, reuse `POST /transfers`, `WithdrawalModal` |
 | Bahasa UI | Indonesia |
 | SSL API | `api.temankas.com` — Certbot (reinstall existing cert, tambah domain). **Jangan hardcode** SSL blok di config repo |
-| AI Rate Limiting | Custom User-ID ThrottlerGuard, limit parse (20/m), scan (10/m), insights (5/m) |
+| AI Rate Limiting | Custom User-ID ThrottlerGuard, limit parse (20/m), scan struk (10/m), insights (5/m), **scan mutasi (5/m)** |
 | AI Camera Compression | Client-side Canvas resizing/compression for >1.5MB images before API upload |
 | AI Page Performance | File-based persistent cache + instant empty/onboarding load on mount |
 
