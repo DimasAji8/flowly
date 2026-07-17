@@ -57,6 +57,7 @@ calm & personal (bukan ERP/dashboard analytics).
 | **`seo-setup.md`** | Implementasi SEO (SELESAI ✅) | Task SEO, metadata, structured data |
 | **`ai-features-plan.md`** | Rencana detail fitur AI lanjutan (Receipt OCR & Insights) | Task AI Scanner dan Proactive Insights |
 | **`whatsapp-integration-plan.md`** | Rencana integrasi WhatsApp bot gratis berbasis Baileys | Rencana fitur integrasi WhatsApp |
+| **`mobile-app-plan.md`** | Rencana porting aplikasi web ke mobile Android (CapacitorJS) | Diskusi/tahapan pembuatan versi mobile/Android |
 
 ---
 
