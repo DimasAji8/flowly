@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
+import { Coins, ChevronDown } from "lucide-react";
 import { SavingsGoalsSummary } from "@/components/dashboard/savings-goals-summary";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -13,10 +14,12 @@ import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
 import { transactionsService } from "@/services/transactions.service";
+import { budgetsService } from "@/services/budgets.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useWalletStore } from "@/store/wallets.store";
 import type { MonthlySummary, Transaction, SavingsGoal } from "@/types/finance";
 import { formatMonthYear } from "@/utils/format-date";
+import { formatAmount } from "@/utils/format-currency";
 import { useTour } from "@/hooks/use-tour";
 import { getDashboardSteps } from "@/components/tour/tours/dashboard-tour";
 import { useRouter } from "next/navigation";
@@ -50,6 +53,9 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
+  const [overBudgets, setOverBudgets] = useState<any[]>([]);
+  const [nearBudgets, setNearBudgets] = useState<any[]>([]);
+  const [alertsExpanded, setAlertsExpanded] = useState(false);
   const { wallets, fetch: fetchWallets } = useWalletStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,14 +91,16 @@ export default function DashboardPage() {
     const from = `${year}-${String(month).padStart(2, "0")}-01`;
     const lastDay = new Date(year, month, 0).getDate();
     const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    const period = `${year}-${String(month).padStart(2, "0")}`;
 
     Promise.all([
       transactionsService.monthlySummary(),
       transactionsService.list({ limit: 5, page: 1, from, to }),
       savingsGoalsService.list(),
       fetchWallets(),
+      budgetsService.getSummary(period).catch(() => []),
     ])
-      .then(([s, all, goals]) => {
+      .then(([s, all, goals, _, budgetSummary]) => {
         if (cancelled) return;
         setSummary(s);
         setRecent(all.data
@@ -101,6 +109,10 @@ export default function DashboardPage() {
           .slice(0, 3)
         );
         setSavingsGoals(goals);
+        const over = budgetSummary.filter((b: any) => b.limit !== null && b.spent > b.limit);
+        const near = budgetSummary.filter((b: any) => b.limit !== null && b.spent >= b.limit * 0.8 && b.spent <= b.limit);
+        setOverBudgets(over);
+        setNearBudgets(near);
         setError(null);
       })
       .catch((e: unknown) => {
@@ -167,6 +179,72 @@ export default function DashboardPage() {
 
 
       <QuickActions />
+
+      {/* Collapsible Budget Alerts */}
+      {!loading && (overBudgets.length > 0 || nearBudgets.length > 0) && (
+        <div className="rounded-2xl border border-border-subtle bg-card shadow-sm overflow-hidden transition-all duration-300">
+          <button
+            type="button"
+            onClick={() => setAlertsExpanded(!alertsExpanded)}
+            className="w-full flex items-center justify-between p-4 text-left transition-colors hover:bg-card-subtle/50"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={[
+                  "grid size-9 shrink-0 place-items-center rounded-xl transition-colors",
+                  overBudgets.length > 0 ? "bg-danger-soft text-danger" : "bg-warning-soft text-warning",
+                ].join(" ")}
+              >
+                <Coins className="size-5" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-secondary">
+                  Notifikasi Anggaran
+                </span>
+                <span className="text-xs md:text-sm font-semibold text-foreground truncate mt-0.5">
+                  {overBudgets.length > 0 && nearBudgets.length > 0
+                    ? `${overBudgets.length} kategori overbudget & ${nearBudgets.length} hampir habis`
+                    : overBudgets.length > 0
+                    ? `${overBudgets.length} kategori overbudget`
+                    : `${nearBudgets.length} kategori hampir habis`}
+                </span>
+              </div>
+            </div>
+            <ChevronDown
+              className={[
+                "size-5 text-muted transition-transform duration-300",
+                alertsExpanded ? "rotate-180" : "",
+              ].join(" ")}
+            />
+          </button>
+
+          <div
+            className={[
+              "transition-all duration-300 ease-in-out border-t border-border-subtle/50 bg-card-subtle/20",
+              alertsExpanded ? "max-h-[500px] opacity-100 p-4" : "max-h-0 opacity-0 overflow-hidden",
+            ].join(" ")}
+          >
+            <ul className="flex flex-col gap-2">
+              {overBudgets.map((b) => (
+                <li key={b.categoryId} className="flex items-start gap-2 text-xs md:text-sm text-secondary leading-relaxed">
+                  <span className="size-1.5 rounded-full shrink-0 bg-danger mt-1.5" />
+                  <span>
+                    Kategori <span className="font-semibold text-foreground">{b.categoryName}</span> melebihi anggaran sebesar <span className="font-bold text-danger">Rp {formatAmount(b.spent - b.limit)}</span>.
+                  </span>
+                </li>
+              ))}
+              {nearBudgets.map((b) => (
+                <li key={b.categoryId} className="flex items-start gap-2 text-xs md:text-sm text-secondary leading-relaxed">
+                  <span className="size-1.5 rounded-full shrink-0 bg-warning mt-1.5" />
+                  <span>
+                    Kategori <span className="font-semibold text-foreground">{b.categoryName}</span> hampir habis, sisa <span className="font-bold text-warning">Rp {formatAmount(b.limit - b.spent)}</span>.
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-6">
         <section className="flex flex-col gap-3">
