@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RecurringForm } from "@/components/forms/recurring-form";
@@ -13,10 +13,10 @@ import { ApiError } from "@/lib/api-client";
 import { recurringService } from "@/services/recurring.service";
 import type { RecurringTransaction } from "@/types/finance";
 
-export default function EditRecurringPage() {
+function EditRecurringContent() {
   const router = useRouter();
-  const params = useParams<{ id: string }>();
-  const id = params?.id;
+  const searchParams = useSearchParams();
+  const id = searchParams?.get("id");
 
   const [item, setItem] = useState<RecurringTransaction | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,7 +115,8 @@ export default function EditRecurringPage() {
               className="w-full md:w-auto md:px-8"
             >
               Hapus recurring
-            </Button>          </div>
+            </Button>
+          </div>
 
           <ConfirmModal
             open={confirmOpen}
@@ -126,5 +127,20 @@ export default function EditRecurringPage() {
         </>
       ) : null}
     </div>
+  );
+}
+
+export default function EditRecurringPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col gap-5 max-w-lg">
+        <BackButton />
+        <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
+          Memuat…
+        </div>
+      </div>
+    }>
+      <EditRecurringContent />
+    </Suspense>
   );
 }

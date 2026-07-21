@@ -6,9 +6,13 @@
     "dev": "next dev --hostname 0.0.0.0 --port ${PORT:-4000}",
     "build": "next build --turbopack",
     "start": "next start --port ${PORT:-4000}",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mobile:build": "EXPORT_MOBILE=true next build --turbopack && cap sync",
+    "mobile:sync": "cap sync"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "@fontsource-variable/urbanist": "^5.2.7",
     "@fontsource/playfair-display": "^5.2.8",
     "@hookform/resolvers": "^5.4.0",
@@ -42,6 +46,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.2",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",

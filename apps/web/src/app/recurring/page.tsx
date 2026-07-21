@@ -215,7 +215,7 @@ export default function RecurringListPage() {
                   </button>
 
                   <ActionMenu
-                    onEdit={() => router.push(`${ROUTES.recurring}/${r.id}/edit`)}
+                    onEdit={() => router.push(`${ROUTES.recurring}/edit?id=${r.id}`)}
                     onDelete={() => setConfirmId(r.id)}
                   />
                 </li>

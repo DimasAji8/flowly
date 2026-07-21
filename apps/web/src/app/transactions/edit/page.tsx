@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TransactionForm } from "@/components/forms/transaction-form";
@@ -13,10 +13,10 @@ import { ApiError } from "@/lib/api-client";
 import { transactionsService } from "@/services/transactions.service";
 import type { Transaction } from "@/types/finance";
 
-export default function EditTransactionPage() {
+function EditTransactionContent() {
   const router = useRouter();
-  const params = useParams<{ id: string }>();
-  const id = params?.id;
+  const searchParams = useSearchParams();
+  const id = searchParams?.get("id");
 
   const [tx, setTx] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
@@ -128,5 +128,20 @@ export default function EditTransactionPage() {
         </>
       ) : null}
     </div>
+  );
+}
+
+export default function EditTransactionPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col gap-5 max-w-lg">
+        <BackButton />
+        <div className="rounded-2xl border border-border-subtle bg-card p-6 text-center text-sm text-muted">
+          Memuat…
+        </div>
+      </div>
+    }>
+      <EditTransactionContent />
+    </Suspense>
   );
 }

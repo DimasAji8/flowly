@@ -57,7 +57,7 @@ function TransactionItem({ tx, onItemClick, showDate = false }: {
       {content}
     </button>
   ) : (
-    <Link href={`/transactions/${tx.id}/edit`}>{content}</Link>
+    <Link href={`/transactions/edit?id=${tx.id}`}>{content}</Link>
   );
 }
 
