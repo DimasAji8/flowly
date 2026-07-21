@@ -4,6 +4,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Utility to hide scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
 /* =========================================================
  * Flowly Design Tokens (v2)
  * Lihat docs/instructions/design.md

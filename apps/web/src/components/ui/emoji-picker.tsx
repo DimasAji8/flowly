@@ -2,54 +2,53 @@
 
 import { useState } from "react";
 
-// Emoji presets yang lebih lengkap dan terorganisir
 const EMOJI_CATEGORIES = {
-  "Makanan & Minuman": [
+  "🍔 Makan": [
     "🍔", "🍕", "🍜", "🍱", "🍛", "🍝", "🍲", "🥗", "🍣", "🍤",
     "☕", "🍵", "🧃", "🥤", "🍺", "🍷", "🍰", "🍪", "🍩", "🍦",
     "🍎", "🍊", "🍇", "🥑", "🥕", "🌮", "🥙", "🌯", "🥪", "🍿"
   ],
-  "Transportasi": [
+  "🛵 Transpor": [
     "🚗", "🚕", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐",
     "🚛", "🚚", "🚜", "🛵", "🏍️", "🚲", "🛴", "✈️", "🚁", "🚂",
     "🚆", "🚇", "🚊", "🚝", "🚅", "⛵", "🛶", "🚤", "⛴️", "🚢"
   ],
-  "Belanja & Fashion": [
+  "🛍️ Belanja": [
     "🛍️", "👕", "👔", "👗", "👠", "👟", "👞", "👡", "👢", "👒",
     "🧢", "👑", "💄", "💅", "👜", "👝", "🎒", "👓", "🕶️", "💍",
     "⌚", "📿", "🧣", "🧤", "🧥", "🩱", "🩳", "🛒", "💳", "🏬"
   ],
-  "Rumah & Perabotan": [
+  "🏠 Rumah": [
     "🏠", "🏡", "🏘️", "🏚️", "🏗️", "🏢", "🔨", "🔧", "🪛", "🪚",
     "🛋️", "🛏️", "🚪", "🪟", "🚿", "🚽", "🧹", "🧺", "🧼", "🧽",
     "🪣", "🧴", "🧻", "💡", "🕯️", "🔌", "📺", "🖥️", "📱", "⚡"
   ],
-  "Kesehatan & Olahraga": [
+  "💊 Sehat": [
     "💊", "💉", "🩺", "🩹", "🏥", "⚕️", "🧘", "🏃", "🚴", "🏊",
     "⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏓", "🏸", "🏒", "🥊",
     "🤸", "🧗", "🏋️", "🤾", "🎽", "🥇", "🏆", "🎖️", "💪", "🧠"
   ],
-  "Pendidikan & Kantor": [
+  "💼 Kerja": [
     "📚", "📖", "📝", "✏️", "✒️", "🖊️", "🖋️", "📔", "📓", "📒",
     "📕", "📗", "📘", "📙", "📃", "📄", "📑", "🗂️", "📁", "📂",
     "📆", "📅", "📇", "📋", "📊", "📈", "📉", "🖇️", "📌", "📍"
   ],
-  "Hiburan & Hobi": [
+  "🎮 Hobi": [
     "🎮", "🎯", "🎲", "🎰", "🎳", "🎹", "🎸", "🎺", "🎻", "🥁",
     "🎬", "🎭", "🎪", "🎨", "🖼️", "🎤", "🎧", "🎵", "🎶", "📷",
     "📸", "📹", "🎥", "📺", "📻", "🎙️", "🎟️", "🎫", "🎗️", "🏅"
   ],
-  "Perjalanan & Liburan": [
+  "✈️ Liburan": [
     "✈️", "🛫", "🛬", "🗺️", "🧳", "⛱️", "🏖️", "🏝️", "🗾", "🏔️",
     "⛰️", "🏕️", "⛺", "🏞️", "🎒", "🧭", "🗿", "🗼", "🏰", "🏯",
     "🕌", "🕍", "⛩️", "🛕", "🎡", "🎢", "🎠", "🌋", "🗻", "🏜️"
   ],
-  "Layanan & Utilitas": [
+  "💸 Layanan": [
     "💳", "💰", "💵", "💴", "💶", "💷", "🪙", "💸", "🏦", "🏧",
     "📱", "📞", "☎️", "📟", "📠", "💻", "⌨️", "🖱️", "🖨️", "📡",
     "🔋", "🔌", "💡", "🕯️", "🧯", "🗑️", "🚰", "🚻", "🚹", "🚺"
   ],
-  "Lainnya": [
+  "📦 Lainnya": [
     "❤️", "🎁", "🎉", "🎊", "🎈", "💐", "🌹", "🌸", "🌺", "🌻",
     "🌼", "🌷", "⭐", "✨", "💫", "⚡", "🔥", "💧", "🌈", "☀️",
     "🌙", "⛅", "☁️", "💨", "❄️", "⛄", "🌊", "🐶", "🐱", "🦊"
@@ -62,34 +61,34 @@ interface EmojiPickerProps {
 }
 
 export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
-  const [activeCategory, setActiveCategory] = useState<string>("Makanan & Minuman");
+  const [activeCategory, setActiveCategory] = useState<string>("🍔 Makan");
 
   const categories = Object.keys(EMOJI_CATEGORIES);
   const emojis = EMOJI_CATEGORIES[activeCategory as keyof typeof EMOJI_CATEGORIES];
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       {/* Selected emoji display */}
-      <div className="flex items-center gap-3">
-        <div className="grid size-16 place-items-center rounded-2xl bg-card-subtle text-4xl">
+      <div className="flex items-center gap-3 bg-card-subtle/50 px-3.5 py-3 rounded-2xl border border-border-subtle">
+        <div className="grid size-14 place-items-center rounded-xl bg-card text-3xl shadow-sm border border-border-subtle animate-pulse-once">
           {value || "?"}
         </div>
-        <div className="flex-1">
-          <p className="text-xs font-medium text-muted uppercase tracking-wide">Emoji terpilih</p>
-          <p className="text-sm text-foreground">Klik emoji untuk mengubah</p>
+        <div className="flex flex-col">
+          <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">Emoji Terpilih</span>
+          <span className="text-xs text-secondary">Ketuk salah satu emoji di bawah untuk mengganti</span>
         </div>
       </div>
 
-      {/* Category tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+      {/* Category tabs (no scrollbar) */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1.5 -mx-1 px-1 no-scrollbar">
         {categories.map((cat) => (
           <button
             key={cat}
             type="button"
             onClick={() => setActiveCategory(cat)}
-            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
               activeCategory === cat
-                ? "bg-accent text-white"
+                ? "bg-accent text-white shadow-sm scale-[1.02]"
                 : "bg-card-subtle text-secondary hover:bg-card hover:text-foreground"
             }`}
           >
@@ -99,19 +98,24 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
       </div>
 
       {/* Emoji grid */}
-      <div className="grid grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1 rounded-xl border border-border-subtle bg-card-subtle/30">
-        {emojis.map((emoji) => (
-          <button
-            key={emoji}
-            type="button"
-            onClick={() => onChange(emoji)}
-            className={`aspect-square rounded-lg text-2xl transition-all hover:scale-110 hover:bg-card ${
-              value === emoji ? "bg-accent/20 ring-2 ring-accent" : "bg-card-subtle hover:shadow-sm"
-            }`}
-          >
-            {emoji}
-          </button>
-        ))}
+      <div className="grid grid-cols-6 gap-2 max-h-56 overflow-y-auto p-2.5 rounded-2xl border border-border-subtle bg-card-subtle/20 no-scrollbar">
+        {emojis.map((emoji) => {
+          const isSelected = value === emoji;
+          return (
+            <button
+              key={emoji}
+              type="button"
+              onClick={() => onChange(emoji)}
+              className={`aspect-square rounded-xl text-2xl flex items-center justify-center transition-all duration-200 hover:scale-125 hover:bg-card hover:shadow-md hover:z-10 ${
+                isSelected
+                  ? "bg-accent-soft text-accent ring-2 ring-accent scale-[1.05]"
+                  : "bg-card/40 hover:bg-card border border-transparent hover:border-border-subtle"
+              }`}
+            >
+              {emoji}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

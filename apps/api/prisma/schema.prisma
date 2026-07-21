@@ -101,6 +101,7 @@ model Workspace {
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
   transfers             Transfer[]
+  budgets               Budget[]
 
   @@index([ownerId])
   @@map("workspaces")
@@ -169,6 +170,7 @@ model Category {
   workspace             Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
+  budgets               Budget[]
 
   @@index([workspaceId])
   @@index([workspaceId, type])
@@ -253,6 +255,7 @@ model Transfer {
   fromWalletId    String   @map("from_wallet_id")
   toWalletId      String   @map("to_wallet_id")
   amount          Decimal  @db.Decimal(18, 2)
+  fee             Decimal  @default(0) @db.Decimal(18, 2) @map("fee")
   note            String?
   transferDate    DateTime @map("transfer_date") @db.Date
   createdAt       DateTime @default(now()) @map("created_at")
@@ -306,4 +309,26 @@ model Review {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("reviews")
+}
+
+// =====================================================
+// Budget (anggaran bulanan per kategori pengeluaran)
+// =====================================================
+
+model Budget {
+  id          String    @id @default(cuid())
+  workspaceId String    @map("workspace_id")
+  categoryId  String    @map("category_id")
+  amount      Decimal   @db.Decimal(18, 2)
+  period      String    // Format: "YYYY-MM" (contoh: "2026-07")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  category  Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, categoryId, period])
+  @@index([workspaceId])
+  @@index([workspaceId, period])
+  @@map("budgets")
 }

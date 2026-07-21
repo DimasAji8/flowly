@@ -58,6 +58,7 @@ calm & personal (bukan ERP/dashboard analytics).
 | **`ai-features-plan.md`** | Rencana detail fitur AI lanjutan (Receipt OCR & Insights) | Task AI Scanner dan Proactive Insights |
 | **`whatsapp-integration-plan.md`** | Rencana integrasi WhatsApp bot gratis berbasis Baileys | Rencana fitur integrasi WhatsApp |
 | **`mobile-app-plan.md`** | Rencana porting aplikasi web ke mobile Android (CapacitorJS) | Diskusi/tahapan pembuatan versi mobile/Android |
+| **`budget-plan-implementation.md`** | Rencana detail fitur Budgeting Bulanan (Anggaran) | Tahapan pembuatan fitur budget bulanan |
 
 ---
 
@@ -65,7 +66,9 @@ calm & personal (bukan ERP/dashboard analytics).
 
 ### ⏳ Aktif (belum selesai)
 
-1. **Integrasi WhatsApp** — integrasi bot WhatsApp gratis & ringan menggunakan Baileys
+1. **Budgeting Bulanan** — implementasi sistem budget bulanan per kategori
+   → Baca: `budget-plan-implementation.md`
+2. **Integrasi WhatsApp** — integrasi bot WhatsApp gratis & ringan menggunakan Baileys
    → Baca: `whatsapp-integration-plan.md`
 
 ### ✅ Selesai (referensi saja, jangan kerja ulang)

@@ -6,6 +6,7 @@ export interface CreateTransferPayload {
   toWalletId: string;
   amount: number;
   note?: string;
+  fee?: number;
   transferDate: string;
 }
 
