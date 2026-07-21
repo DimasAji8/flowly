@@ -30,7 +30,7 @@ export class TransfersService {
     return transfers.map((t) => this.serialize(t));
   }
 
-  async create(workspaceId: string, dto: CreateTransferDto) {
+  async create(workspaceId: string, userId: string, dto: CreateTransferDto) {
     if (dto.fromWalletId === dto.toWalletId) {
       throw new BadRequestException('Wallet asal dan tujuan tidak boleh sama');
     }
@@ -49,9 +49,11 @@ export class TransfersService {
     if (!to) throw new BadRequestException('Wallet tujuan tidak ditemukan');
 
     const amount = new Prisma.Decimal(dto.amount);
+    const fee = new Prisma.Decimal(dto.fee || 0);
+    const totalDeduction = amount.add(fee);
 
-    if (from.balance.lessThan(amount)) {
-      throw new BadRequestException('Saldo tidak cukup');
+    if (from.balance.lessThan(totalDeduction)) {
+      throw new BadRequestException('Saldo tidak cukup (termasuk biaya admin)');
     }
 
     const transfer = await this.prisma.$transaction(async (tx) => {
@@ -61,6 +63,7 @@ export class TransfersService {
           fromWalletId: dto.fromWalletId,
           toWalletId: dto.toWalletId,
           amount,
+          fee,
           note: dto.note,
           transferDate: new Date(dto.transferDate),
         },
@@ -69,14 +72,58 @@ export class TransfersService {
           toWallet: { select: { id: true, name: true } },
         },
       });
+
+      // Update balances
       await tx.wallet.update({
         where: { id: dto.fromWalletId },
-        data: { balance: { decrement: amount } },
+        data: { balance: { decrement: totalDeduction } },
       });
       await tx.wallet.update({
         where: { id: dto.toWalletId },
         data: { balance: { increment: amount } },
       });
+
+      // Jika ada biaya admin, buat otomatis transaksi pengeluaran
+      if (fee.greaterThan(0)) {
+        let category = await tx.category.findFirst({
+          where: {
+            workspaceId,
+            type: 'expense',
+            OR: [
+              { name: { contains: 'Admin', mode: 'insensitive' } },
+              { name: { contains: 'Transfer', mode: 'insensitive' } },
+              { name: 'Lainnya' },
+            ],
+          },
+        });
+
+        if (!category) {
+          category = await tx.category.create({
+            data: {
+              workspaceId,
+              name: 'Lainnya',
+              type: 'expense',
+              color: '#4B5563',
+              icon: '📦',
+              group: 'wants',
+            },
+          });
+        }
+
+        await tx.transaction.create({
+          data: {
+            workspaceId,
+            walletId: dto.fromWalletId,
+            categoryId: category.id,
+            userId,
+            type: 'expense',
+            amount: fee,
+            note: `Biaya transfer ke ${to.name}${dto.note ? ` (${dto.note})` : ''}`,
+            transactionDate: new Date(dto.transferDate),
+          },
+        });
+      }
+
       return created;
     });
 
@@ -86,18 +133,45 @@ export class TransfersService {
   async remove(workspaceId: string, id: string) {
     const transfer = await this.prisma.transfer.findFirst({
       where: { id, workspaceId },
+      include: {
+        toWallet: { select: { name: true } },
+      },
     });
     if (!transfer) throw new NotFoundException('Transfer tidak ditemukan');
 
     await this.prisma.$transaction(async (tx) => {
+      const totalRefund = transfer.amount.add(transfer.fee);
+
+      // Kembalikan saldo
       await tx.wallet.update({
         where: { id: transfer.fromWalletId },
-        data: { balance: { increment: transfer.amount } },
+        data: { balance: { increment: totalRefund } },
       });
       await tx.wallet.update({
         where: { id: transfer.toWalletId },
         data: { balance: { decrement: transfer.amount } },
       });
+
+      // Hapus transaksi otomatis biaya admin jika ada
+      if (transfer.fee.greaterThan(0)) {
+        const toWalletName = transfer.toWallet.name;
+        const adminTx = await tx.transaction.findFirst({
+          where: {
+            workspaceId,
+            walletId: transfer.fromWalletId,
+            amount: transfer.fee,
+            type: 'expense',
+            transactionDate: transfer.transferDate,
+            note: {
+              startsWith: `Biaya transfer ke ${toWalletName}`,
+            },
+          },
+        });
+        if (adminTx) {
+          await tx.transaction.delete({ where: { id: adminTx.id } });
+        }
+      }
+
       await tx.transfer.delete({ where: { id } });
     });
   }
@@ -108,6 +182,7 @@ export class TransfersService {
     fromWalletId: string;
     toWalletId: string;
     amount: Prisma.Decimal;
+    fee: Prisma.Decimal;
     note: string | null;
     transferDate: Date;
     createdAt: Date;
@@ -122,6 +197,7 @@ export class TransfersService {
       fromWalletName: t.fromWallet.name,
       toWalletName: t.toWallet.name,
       amount: t.amount.toString(),
+      fee: t.fee.toString(),
       note: t.note,
       transferDate: t.transferDate.toISOString().slice(0, 10),
       createdAt: t.createdAt.toISOString(),

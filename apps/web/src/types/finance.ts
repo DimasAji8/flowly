@@ -94,6 +94,7 @@ export interface Transfer {
   fromWalletName: string;
   toWalletName: string;
   amount: string;
+  fee: string;
   note: string | null;
   transferDate: string;
   createdAt: string;

@@ -41,6 +41,16 @@ export class CreateTransferDto {
   @IsString()
   note?: string;
 
+  @ApiPropertyOptional({
+    example: 2500,
+    description: 'Biaya admin/transfer bank (opsional)',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  fee?: number;
+
   @ApiProperty({ example: '2026-05-26' })
   @IsDateString()
   @IsNotEmpty()

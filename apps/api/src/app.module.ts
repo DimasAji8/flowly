@@ -20,6 +20,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
 import { DeveloperModule } from './modules/developer/developer.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { AiModule } from './modules/ai/ai.module';
+import { BudgetsModule } from './modules/budgets/budgets.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { AiModule } from './modules/ai/ai.module';
     DeveloperModule,
     ReviewsModule,
     AiModule,
+    BudgetsModule,
   ],
   controllers: [AppController],
   providers: [

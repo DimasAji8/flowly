@@ -95,13 +95,23 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
     toId: "",
     amountDisplay: "",
     amountValue: 0,
+    feeDisplay: "",
+    feeValue: 0,
     note: "",
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
-    setForm({ fromId: defaultFromId ?? "", toId: "", amountDisplay: "", amountValue: 0, note: "" });
+    setForm({
+      fromId: defaultFromId ?? "",
+      toId: "",
+      amountDisplay: "",
+      amountValue: 0,
+      feeDisplay: "",
+      feeValue: 0,
+      note: "",
+    });
     onClose();
   };
 
@@ -121,6 +131,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
         fromWalletId: form.fromId,
         toWalletId: form.toId,
         amount: form.amountValue,
+        fee: form.feeValue || undefined,
         note: form.note || undefined,
         transferDate: isoToday(),
       });
@@ -175,6 +186,40 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
           required
         />
 
+        <div className="flex flex-col gap-2">
+          <Input
+            label="Biaya Admin (opsional)"
+            inputMode="numeric"
+            placeholder="0"
+            leftAdornment={<span className="font-medium">Rp</span>}
+            value={form.feeDisplay}
+            onChange={(e) => {
+              const formatted = formatRupiah(e.target.value);
+              setForm((f) => ({ ...f, feeDisplay: formatted, feeValue: parseRupiah(formatted) }));
+            }}
+          />
+          <div className="flex gap-2">
+            {[0, 2500, 6500].map((val) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => {
+                  const formatted = val === 0 ? "" : formatRupiah(String(val));
+                  setForm((f) => ({ ...f, feeDisplay: formatted, feeValue: val }));
+                }}
+                className={[
+                  "px-2.5 py-1 text-xs rounded-md border text-secondary transition-colors",
+                  form.feeValue === val
+                    ? "bg-accent-soft border-accent text-accent font-semibold"
+                    : "border-border-subtle hover:bg-card-subtle hover:text-foreground",
+                ].join(" ")}
+              >
+                {val === 0 ? "Gratis" : `Rp ${formatRupiah(String(val))}`}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <Input
           label="Catatan (opsional)"
           placeholder="mis. Top up GoPay"
@@ -200,6 +245,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
         description={[
           `${fromWallet?.name ?? "-"}  →  ${toWallet?.name ?? "-"}`,
           `Rp ${form.amountDisplay}`,
+          form.feeValue > 0 ? `Biaya Admin: Rp ${form.feeDisplay}` : "",
           form.note ? `"${form.note}"` : "",
         ].filter(Boolean).join("  ·  ")}
         confirmLabel="Ya, Transfer"

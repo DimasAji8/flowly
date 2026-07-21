@@ -12,6 +12,7 @@ export const ROUTES = {
   walletTransfers: "/wallets/transfers",
   categories: "/categories",
   recurring: "/recurring",
+  budgets: "/budgets",
   profileAllocation: "/profile/allocation",
   reports: "/reports",
   developer: "/developer",

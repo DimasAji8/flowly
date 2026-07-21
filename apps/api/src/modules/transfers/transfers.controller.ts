@@ -24,7 +24,9 @@ import { CreateTransferDto } from './dto/create-transfer.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
 import { CurrentWorkspace } from '../../common/decorators/current-workspace.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { WorkspaceContext } from '../../common/types/workspace';
+import type { AuthUser } from '../../common/types/auth';
 
 @ApiTags('transfers')
 @ApiBearerAuth('access-token')
@@ -67,9 +69,10 @@ export class TransfersController {
   @ApiResponse({ status: 201, description: 'Transfer berhasil dibuat' })
   create(
     @CurrentWorkspace() ws: WorkspaceContext,
+    @CurrentUser() user: AuthUser,
     @Body() dto: CreateTransferDto,
   ) {
-    return this.transfersService.create(ws.id, dto);
+    return this.transfersService.create(ws.id, user.id, dto);
   }
 
   @Delete(':id')
