@@ -590,7 +590,9 @@ Data Keuangan Pengguna (30 hari terakhir):
     if (isPdf) {
       // ponytail: inline require untuk CJS interop pdf-parse
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>;
+      const pdfParse = require('pdf-parse') as (
+        buf: Buffer,
+      ) => Promise<{ text: string }>;
       const pdfData = await pdfParse(file.buffer);
       mutationText = pdfData.text;
 
@@ -613,8 +615,7 @@ Data Keuangan Pengguna (30 hari terakhir):
           type: {
             type: Type.STRING,
             enum: ['income', 'expense'],
-            description:
-              'income jika kredit/masuk, expense jika debit/keluar',
+            description: 'income jika kredit/masuk, expense jika debit/keluar',
           },
           amount: {
             type: Type.INTEGER,
@@ -658,13 +659,20 @@ Kategori Pemasukan Valid: ${JSON.stringify(incomeCategories)}
 Daftar Dompet Valid: ${JSON.stringify(walletNames)}
 Tanggal hari ini: ${new Date().toISOString().split('T')[0]}`;
 
-    let contents: Parameters<typeof this.ai.models.generateContent>[0]['contents'];
+    let contents: Parameters<
+      typeof this.ai.models.generateContent
+    >[0]['contents'];
 
     if (isPdf) {
       contents = `${systemInstruction}\n\nIsi Mutasi Rekening (teks dari PDF):\n${mutationText}`;
     } else {
       contents = [
-        { inlineData: { data: file.buffer.toString('base64'), mimeType: file.mimetype } },
+        {
+          inlineData: {
+            data: file.buffer.toString('base64'),
+            mimeType: file.mimetype,
+          },
+        },
         `${systemInstruction}\n\nAnalisis gambar mutasi rekening di atas dan ekstrak semua transaksi.`,
       ];
     }

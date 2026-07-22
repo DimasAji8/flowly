@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Chip } from "@/components/ui/chip";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
@@ -26,7 +25,7 @@ export default function BudgetsPage() {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const { categories, fetch: fetchCategories } = useCategoryStore();
+  const { fetch: fetchCategories } = useCategoryStore();
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -51,6 +50,7 @@ export default function BudgetsPage() {
   // Fetch Budget Summaries
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(null);
     budgetsService

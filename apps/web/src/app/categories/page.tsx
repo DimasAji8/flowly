@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { Plus, Edit2, Trash2, ChevronDown, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, ChevronDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,23 +20,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ApiError } from "@/lib/api-client";
 import { categoriesService } from "@/services/categories.service";
-import { budgetsService } from "@/services/budgets.service";
+import { budgetsService, type BudgetSummaryItem } from "@/services/budgets.service";
 import { useCategoryStore } from "@/store/categories.store";
 import type { Category, TransactionType } from "@/types/finance";
-import { formatCurrency, formatAmount } from "@/utils/format-currency";
+import { formatAmount } from "@/utils/format-currency";
 import { formatMonthYear } from "@/utils/format-date";
 
 const DEFAULT_ICON = "📦";
 
-const GROUP_OPTIONS = [
-  { value: "needs", label: "Needs", desc: "Kebutuhan pokok" },
-  { value: "wants", label: "Wants", desc: "Lifestyle & keinginan" },
-  { value: "savings", label: "Savings", desc: "Tabungan & investasi" },
-] as const;
+
 
 export default function CategoriesPage() {
   const { categories, loading, fetch: fetchCategories } = useCategoryStore();
-  const [budgets, setBudgets] = useState<any[]>([]);
+  const [budgets, setBudgets] = useState<BudgetSummaryItem[]>([]);
 
   const today = new Date();
   const currentPeriod = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
@@ -59,7 +55,6 @@ export default function CategoriesPage() {
   const [editIcon, setEditIcon] = useState("");
   const [editGroup, setEditGroup] = useState<"needs" | "wants" | "savings">("needs");
   const [editBudgetInput, setEditBudgetInput] = useState("");
-  const [editBudgetId, setEditBudgetId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Delete State
@@ -77,6 +72,7 @@ export default function CategoriesPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -324,14 +320,14 @@ export default function CategoriesPage() {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)" align="start">
-                      {[
+                      {([
                         { value: "needs", label: "Needs (Kebutuhan Pokok)" },
                         { value: "wants", label: "Wants (Lifestyle & Keinginan)" },
                         { value: "savings", label: "Savings (Tabungan & Investasi)" },
-                      ].map((item) => (
+                      ] as const).map((item) => (
                         <DropdownMenuItem
                           key={item.value}
-                          onSelect={() => setGroup(item.value as any)}
+                          onSelect={() => setGroup(item.value)}
                           className="flex items-center justify-between"
                         >
                           <span>{item.label}</span>
@@ -423,14 +419,14 @@ export default function CategoriesPage() {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)" align="start">
-                      {[
+                      {([
                         { value: "needs", label: "Needs (Kebutuhan Pokok)" },
                         { value: "wants", label: "Wants (Lifestyle & Keinginan)" },
                         { value: "savings", label: "Savings (Tabungan & Investasi)" },
-                      ].map((item) => (
+                      ] as const).map((item) => (
                         <DropdownMenuItem
                           key={item.value}
-                          onSelect={() => setEditGroup(item.value as any)}
+                          onSelect={() => setEditGroup(item.value)}
                           className="flex items-center justify-between"
                         >
                           <span>{item.label}</span>
@@ -494,7 +490,7 @@ function CategorySection({
   title: string;
   tone: "danger" | "success";
   items: Category[];
-  budgets: any[];
+  budgets: BudgetSummaryItem[];
   onEdit: (c: Category) => void;
   onDelete: (id: string, name: string) => void;
 }) {

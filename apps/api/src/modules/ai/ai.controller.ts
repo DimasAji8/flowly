@@ -167,7 +167,12 @@ export class AiController {
     )
     file: Express.Multer.File,
   ): Promise<ScannedMutationItem[]> {
-    const allowed = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+    const allowed = [
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+      'application/pdf',
+    ];
     if (!allowed.includes(file.mimetype)) {
       throw new BadRequestException(
         'Format file tidak didukung. Gunakan gambar (png/jpeg/webp) atau PDF.',

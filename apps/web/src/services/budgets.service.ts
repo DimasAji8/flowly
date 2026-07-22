@@ -24,7 +24,7 @@ export const budgetsService = {
   },
 
   upsert(payload: { categoryId: string; amount: number; period: string }) {
-    return apiClient.post<any>("/budgets", payload, {
+    return apiClient.post<unknown>("/budgets", payload, {
       auth: true,
       workspaceScoped: true,
     });
