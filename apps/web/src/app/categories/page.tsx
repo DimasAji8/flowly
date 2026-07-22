@@ -122,7 +122,6 @@ export default function CategoriesPage() {
     setEditIcon(c.icon);
     setEditGroup(c.group || "needs");
     setEditBudgetInput(matchedBudget?.limit ? String(matchedBudget.limit) : "");
-    setEditBudgetId(matchedBudget?.id || null);
     setEditOpen(true);
   };
 

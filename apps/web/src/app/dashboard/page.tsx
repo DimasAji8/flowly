@@ -229,7 +229,7 @@ export default function DashboardPage() {
                 <li key={b.categoryId} className="flex items-start gap-2 text-xs md:text-sm text-secondary leading-relaxed">
                   <span className="size-1.5 rounded-full shrink-0 bg-danger mt-1.5" />
                   <span>
-                    Kategori <span className="font-semibold text-foreground">{b.categoryName}</span> melebihi anggaran sebesar <span className="font-bold text-danger">Rp {formatAmount(b.spent - b.limit)}</span>.
+                    Kategori <span className="font-semibold text-foreground">{b.categoryName}</span> melebihi anggaran sebesar <span className="font-bold text-danger">Rp {formatAmount(b.spent - b.limit!)}</span>.
                   </span>
                 </li>
               ))}
@@ -237,7 +237,7 @@ export default function DashboardPage() {
                 <li key={b.categoryId} className="flex items-start gap-2 text-xs md:text-sm text-secondary leading-relaxed">
                   <span className="size-1.5 rounded-full shrink-0 bg-warning mt-1.5" />
                   <span>
-                    Kategori <span className="font-semibold text-foreground">{b.categoryName}</span> hampir habis, sisa <span className="font-bold text-warning">Rp {formatAmount(b.limit - b.spent)}</span>.
+                    Kategori <span className="font-semibold text-foreground">{b.categoryName}</span> hampir habis, sisa <span className="font-bold text-warning">Rp {formatAmount(b.limit! - b.spent)}</span>.
                   </span>
                 </li>
               ))}
