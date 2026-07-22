@@ -112,15 +112,17 @@ export function MutationScanModal({ open, onClose, onSuccess }: MutationScanModa
   const toggleRow = (id: string) => {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, selected: !r.selected } : r)));
   };
-
   const toggleExpand = (id: string) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
-
   const selectedRows = rows.filter((r) => r.selected);
 
   const handleSave = async () => {

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateBudgetDto } from './dto/create-budget.dto';
 
@@ -17,7 +21,9 @@ export class BudgetsService {
     }
 
     if (category.type !== 'expense') {
-      throw new BadRequestException('Anggaran hanya dapat dibuat untuk kategori pengeluaran');
+      throw new BadRequestException(
+        'Anggaran hanya dapat dibuat untuk kategori pengeluaran',
+      );
     }
 
     // Upsert budget
@@ -82,13 +88,14 @@ export class BudgetsService {
 
     // Memetakan pengeluaran aktual
     const spentMap = new Map<string, number>(
-      spentAggregations.map((agg) => [agg.categoryId, Number(agg._sum.amount || 0)]),
+      spentAggregations.map((agg) => [
+        agg.categoryId,
+        Number(agg._sum.amount || 0),
+      ]),
     );
 
     // Memetakan budget target
-    const budgetMap = new Map(
-      budgets.map((b) => [b.categoryId, b]),
-    );
+    const budgetMap = new Map(budgets.map((b) => [b.categoryId, b]));
 
     // Membangun rangkuman (summary)
     return categories.map((cat) => {

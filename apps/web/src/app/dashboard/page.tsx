@@ -14,7 +14,7 @@ import { ROUTES } from "@/constants/routes";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
 import { transactionsService } from "@/services/transactions.service";
-import { budgetsService } from "@/services/budgets.service";
+import { budgetsService, type BudgetSummaryItem } from "@/services/budgets.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useWalletStore } from "@/store/wallets.store";
 import type { MonthlySummary, Transaction, SavingsGoal } from "@/types/finance";
@@ -53,8 +53,8 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [recent, setRecent] = useState<Transaction[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
-  const [overBudgets, setOverBudgets] = useState<any[]>([]);
-  const [nearBudgets, setNearBudgets] = useState<any[]>([]);
+  const [overBudgets, setOverBudgets] = useState<BudgetSummaryItem[]>([]);
+  const [nearBudgets, setNearBudgets] = useState<BudgetSummaryItem[]>([]);
   const [alertsExpanded, setAlertsExpanded] = useState(false);
   const { wallets, fetch: fetchWallets } = useWalletStore();
   const [loading, setLoading] = useState(true);
@@ -109,8 +109,8 @@ export default function DashboardPage() {
           .slice(0, 3)
         );
         setSavingsGoals(goals);
-        const over = budgetSummary.filter((b: any) => b.limit !== null && b.spent > b.limit);
-        const near = budgetSummary.filter((b: any) => b.limit !== null && b.spent >= b.limit * 0.8 && b.spent <= b.limit);
+        const over = budgetSummary.filter((b: BudgetSummaryItem) => b.limit !== null && b.spent > b.limit);
+        const near = budgetSummary.filter((b: BudgetSummaryItem) => b.limit !== null && b.spent >= b.limit * 0.8 && b.spent <= b.limit);
         setOverBudgets(over);
         setNearBudgets(near);
         setError(null);

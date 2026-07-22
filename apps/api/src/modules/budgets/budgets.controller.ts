@@ -9,7 +9,12 @@ import {
   Query,
   BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiSecurity, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiSecurity,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
 import { CurrentWorkspace } from '../../common/decorators/current-workspace.decorator';
@@ -41,17 +46,16 @@ export class BudgetsController {
     @Query('period') period: string,
   ) {
     if (!period || !/^\d{4}-\d{2}$/.test(period)) {
-      throw new BadRequestException('Query parameter period wajib diisi dalam format YYYY-MM');
+      throw new BadRequestException(
+        'Query parameter period wajib diisi dalam format YYYY-MM',
+      );
     }
     return this.service.getSummary(ws.id, period);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Hapus anggaran' })
-  remove(
-    @CurrentWorkspace() ws: WorkspaceContext,
-    @Param('id') id: string,
-  ) {
+  remove(@CurrentWorkspace() ws: WorkspaceContext, @Param('id') id: string) {
     return this.service.remove(ws.id, id);
   }
 }
