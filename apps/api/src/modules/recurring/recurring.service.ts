@@ -12,7 +12,7 @@ import {
   serializeRecurring,
   SerializedRecurring,
 } from './recurring.serializer';
-import { computeNextRunAt } from './recurring.utils';
+import { computeNextRunAt, parseNextRunAt } from './recurring.utils';
 
 @Injectable()
 export class RecurringService {
@@ -55,7 +55,7 @@ export class RecurringService {
         walletId: dto.walletId,
         frequency: dto.frequency,
         note: dto.note,
-        nextRunAt: new Date(dto.nextRunAt),
+        nextRunAt: parseNextRunAt(dto.nextRunAt),
         isActive: dto.isActive ?? true,
       },
     });
@@ -104,7 +104,7 @@ export class RecurringService {
         ...(dto.frequency !== undefined ? { frequency: dto.frequency } : {}),
         ...(dto.note !== undefined ? { note: dto.note } : {}),
         ...(dto.nextRunAt !== undefined
-          ? { nextRunAt: new Date(dto.nextRunAt) }
+          ? { nextRunAt: parseNextRunAt(dto.nextRunAt) }
           : {}),
         ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
       },

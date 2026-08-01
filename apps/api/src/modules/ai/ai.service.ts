@@ -584,22 +584,44 @@ Data Keuangan Pengguna (30 hari terakhir):
       ),
     );
 
-    const isPdf = file.mimetype === 'application/pdf';
+    const ext = path.extname(file.originalname).toLowerCase();
+    const isSpreadsheet =
+      ['.csv', '.xls', '.xlsx'].includes(ext) ||
+      [
+        'text/csv',
+        'application/csv',
+        'text/x-comma-separated-values',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ].includes(file.mimetype);
+
+    const isPdf = !isSpreadsheet && (file.mimetype === 'application/pdf' || ext === '.pdf');
     let mutationText = '';
 
-    if (isPdf) {
-      // ponytail: inline require untuk CJS interop pdf-parse
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const pdfParse = require('pdf-parse') as (
-        buf: Buffer,
-      ) => Promise<{ text: string }>;
-      const pdfData = await pdfParse(file.buffer);
-      mutationText = pdfData.text;
-
-      if (!mutationText.trim()) {
-        throw new BadRequestException(
-          'PDF tidak bisa dibaca. Pastikan PDF bukan scan gambar.',
-        );
+    if (isSpreadsheet) {
+      try {
+        // ponytail: inline require xlsx
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const xlsx = require('xlsx') as typeof import('xlsx');
+        const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        if (sheetName && workbook.Sheets[sheetName]) {
+          mutationText = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetName]) || '';
+        }
+      } catch {
+        mutationText = '';
+      }
+    } else if (isPdf) {
+      try {
+        // ponytail: inline require untuk CJS interop pdf-parse
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const pdfParse = require('pdf-parse') as (
+          buf: Buffer,
+        ) => Promise<{ text: string }>;
+        const pdfData = await pdfParse(file.buffer);
+        mutationText = pdfData.text || '';
+      } catch {
+        mutationText = '';
       }
     }
 
@@ -663,8 +685,8 @@ Tanggal hari ini: ${new Date().toISOString().split('T')[0]}`;
       typeof this.ai.models.generateContent
     >[0]['contents'];
 
-    if (isPdf) {
-      contents = `${systemInstruction}\n\nIsi Mutasi Rekening (teks dari PDF):\n${mutationText}`;
+    if ((isPdf || isSpreadsheet) && mutationText.trim()) {
+      contents = `${systemInstruction}\n\nIsi Mutasi Rekening (teks dari ${isSpreadsheet ? 'Excel/CSV' : 'PDF'}):\n${mutationText}`;
     } else {
       contents = [
         {
@@ -673,7 +695,7 @@ Tanggal hari ini: ${new Date().toISOString().split('T')[0]}`;
             mimeType: file.mimetype,
           },
         },
-        `${systemInstruction}\n\nAnalisis gambar mutasi rekening di atas dan ekstrak semua transaksi.`,
+        `${systemInstruction}\n\nAnalisis berkas mutasi rekening di atas dan ekstrak semua transaksi.`,
       ];
     }
 

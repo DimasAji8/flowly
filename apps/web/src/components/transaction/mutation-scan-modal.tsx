@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import {
   FileText,
+  FileSpreadsheet,
   Image as ImageIcon,
   Upload,
   CheckCircle2,
@@ -20,6 +21,8 @@ import { aiService, type ScannedMutationItem } from "@/services/ai.service";
 import { transactionsService } from "@/services/transactions.service";
 import { useWalletStore } from "@/store/wallets.store";
 import { useCategoryStore } from "@/store/categories.store";
+
+import { ApiError } from "@/lib/api-client";
 
 interface MutationScanModalProps {
   open: boolean;
@@ -44,6 +47,7 @@ export function MutationScanModal({ open, onClose, onSuccess }: MutationScanModa
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
+  const excelInputRef = useRef<HTMLInputElement>(null);
   const { wallets } = useWalletStore();
   const { categories } = useCategoryStore();
 
@@ -53,13 +57,26 @@ export function MutationScanModal({ open, onClose, onSuccess }: MutationScanModa
     setExpandedRows(new Set());
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (pdfInputRef.current) pdfInputRef.current.value = "";
+    if (excelInputRef.current) excelInputRef.current.value = "";
     onClose();
   };
 
   const processFile = useCallback(async (file: File) => {
-    const allowed = ["image/png", "image/jpeg", "image/webp", "application/pdf"];
-    if (!allowed.includes(file.type)) {
-      toast.error("Format tidak didukung. Gunakan gambar (png/jpg/webp) atau PDF.");
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    const allowedExts = ["png", "jpg", "jpeg", "webp", "pdf", "csv", "xls", "xlsx"];
+    const allowedMimes = [
+      "image/png",
+      "image/jpeg",
+      "image/webp",
+      "application/pdf",
+      "text/csv",
+      "application/csv",
+      "text/x-comma-separated-values",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ];
+    if (!allowedMimes.includes(file.type) && !allowedExts.includes(ext)) {
+      toast.error("Format tidak didukung. Gunakan gambar, PDF, Excel (xls/xlsx), atau CSV.");
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -84,8 +101,13 @@ export function MutationScanModal({ open, onClose, onSuccess }: MutationScanModa
         }))
       );
       setStep("preview");
-    } catch {
-      toast.error("Gagal membaca mutasi. Coba lagi atau gunakan file lain.");
+    } catch (err: unknown) {
+      const msg = err instanceof ApiError ? err.message : (err instanceof Error ? err.message : "");
+      if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("Load failed")) {
+        toast.error("Gagal terhubung ke server. Pastikan file tidak melebihi 10MB dan jaringan aktif.");
+      } else {
+        toast.error(msg || "Gagal membaca mutasi. Coba lagi atau gunakan file lain.");
+      }
       setStep("upload");
     }
   }, []);
@@ -177,7 +199,7 @@ export function MutationScanModal({ open, onClose, onSuccess }: MutationScanModa
       {step === "upload" && (
         <div className="flex flex-col gap-4">
           <p className="text-sm text-muted">
-            Upload screenshot atau PDF mutasi rekening bank. AI akan membaca semua transaksi secara otomatis.
+            Upload screenshot, PDF, Excel (xls/xlsx), atau CSV mutasi rekening bank. AI akan membaca semua transaksi secara otomatis.
           </p>
 
           {/* Drop zone */}
@@ -195,27 +217,35 @@ export function MutationScanModal({ open, onClose, onSuccess }: MutationScanModa
             <Upload className="size-8 text-muted" />
             <div className="text-center">
               <p className="text-sm font-medium text-foreground">Seret file ke sini</p>
-              <p className="text-xs text-muted mt-1">PNG, JPG, WEBP, atau PDF — maks. 10MB</p>
+              <p className="text-xs text-muted mt-1">PNG, JPG, WEBP, PDF, Excel (xls/xlsx), atau CSV — maks. 10MB</p>
             </div>
           </div>
 
-          {/* Dua tombol terpisah */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Tiga tombol terpisah */}
+          <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center justify-center gap-2 rounded-xl border border-border-subtle bg-card px-4 py-3 text-sm font-medium text-foreground hover:bg-card-subtle transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-border-subtle bg-card px-3 py-2.5 text-xs font-medium text-foreground hover:bg-card-subtle transition-colors"
             >
-              <ImageIcon className="size-4 text-muted" />
-              Pilih Gambar
+              <ImageIcon className="size-4 text-muted shrink-0" />
+              <span>Gambar</span>
             </button>
             <button
               type="button"
               onClick={() => pdfInputRef.current?.click()}
-              className="flex items-center justify-center gap-2 rounded-xl border border-border-subtle bg-card px-4 py-3 text-sm font-medium text-foreground hover:bg-card-subtle transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-border-subtle bg-card px-3 py-2.5 text-xs font-medium text-foreground hover:bg-card-subtle transition-colors"
             >
-              <FileText className="size-4 text-muted" />
-              Pilih PDF
+              <FileText className="size-4 text-muted shrink-0" />
+              <span>PDF</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => excelInputRef.current?.click()}
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-border-subtle bg-card px-3 py-2.5 text-xs font-medium text-foreground hover:bg-card-subtle transition-colors"
+            >
+              <FileSpreadsheet className="size-4 text-muted shrink-0" />
+              <span>Excel / CSV</span>
             </button>
           </div>
 
@@ -227,11 +257,19 @@ export function MutationScanModal({ open, onClose, onSuccess }: MutationScanModa
             className="hidden"
             onChange={handleFileChange}
           />
-          {/* Input PDF terpisah agar file picker langsung filter PDF */}
+          {/* Input PDF terpisah */}
           <input
             ref={pdfInputRef}
             type="file"
             accept="application/pdf,.pdf"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          {/* Input Excel & CSV terpisah */}
+          <input
+            ref={excelInputRef}
+            type="file"
+            accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             className="hidden"
             onChange={handleFileChange}
           />

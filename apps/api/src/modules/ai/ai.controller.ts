@@ -167,15 +167,23 @@ export class AiController {
     )
     file: Express.Multer.File,
   ): Promise<ScannedMutationItem[]> {
-    const allowed = [
+    const ext = file.originalname.split('.').pop()?.toLowerCase() || '';
+    const allowedExts = ['png', 'jpg', 'jpeg', 'webp', 'pdf', 'csv', 'xls', 'xlsx'];
+    const allowedMimes = [
       'image/png',
       'image/jpeg',
       'image/webp',
       'application/pdf',
+      'text/csv',
+      'application/csv',
+      'text/x-comma-separated-values',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/octet-stream',
     ];
-    if (!allowed.includes(file.mimetype)) {
+    if (!allowedMimes.includes(file.mimetype) && !allowedExts.includes(ext)) {
       throw new BadRequestException(
-        'Format file tidak didukung. Gunakan gambar (png/jpeg/webp) atau PDF.',
+        'Format file tidak didukung. Gunakan gambar (png/jpeg/webp), PDF, Excel (xls/xlsx), atau CSV.',
       );
     }
     return this.aiService.scanMutation(ws.id, file);
