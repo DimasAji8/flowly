@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Users,
   RefreshCw,
-  Shield,
   Database,
   UserPlus,
   TrendingUp,
@@ -41,36 +41,46 @@ import {
 // ---------------------------------------------------------------------------
 // Premium Big stat card with modern shadow, hover states, and visual focus
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Premium Big stat card with modern shadow, gradient icons, and visual focus
+// ---------------------------------------------------------------------------
 function BigStat({
   icon: Icon,
   label,
   value,
   sub,
   color = "text-accent",
+  bgColor = "bg-accent/10",
+  borderColor = "border-accent/20",
 }: {
   icon: React.FC<{ className?: string; strokeWidth?: number }>;
   label: string;
   value: string | number;
   sub?: string;
   color?: string;
+  bgColor?: string;
+  borderColor?: string;
 }) {
   return (
     <Card
       padding="lg"
-      className="flex items-center gap-5 border border-border-subtle bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] hover:translate-y-[-2px] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 rounded-2xl group cursor-default"
+      className="relative overflow-hidden flex items-center gap-5 border border-border-subtle bg-card shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:translate-y-[-2px] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-accent/30 transition-all duration-300 rounded-2xl group cursor-default"
     >
       <span
-        className={`grid size-12 shrink-0 place-items-center rounded-2xl bg-accent-soft/40 ${color} group-hover:scale-105 transition-transform duration-300`}
+        className={`grid size-13 shrink-0 place-items-center rounded-2xl ${bgColor} ${color} border ${borderColor} shadow-xs group-hover:scale-105 transition-transform duration-300`}
       >
-        <Icon className="size-6" strokeWidth={2} />
+        <Icon className="size-6" strokeWidth={2.2} />
       </span>
-      <div className="flex flex-col min-w-0">
-        <span className="text-[11px] text-muted font-bold uppercase tracking-wider">{label}</span>
-        <span className="text-3xl font-extrabold text-foreground tabular-nums tracking-tight mt-1">
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="text-[11px] text-muted font-extrabold uppercase tracking-wider">{label}</span>
+        <span className="text-3xl font-black text-foreground tabular-nums tracking-tight mt-1">
           {value}
         </span>
         {sub && (
-          <span className="text-xs text-muted mt-1 font-medium">{sub}</span>
+          <span className="text-[11px] text-muted mt-1 font-semibold truncate flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-accent/60 shrink-0" />
+            {sub}
+          </span>
         )}
       </div>
     </Card>
@@ -84,7 +94,7 @@ function SimpleBar({
   value,
   max,
   label,
-  color = "bg-accent",
+  color = "bg-indigo-500",
 }: {
   value: number;
   max: number;
@@ -94,10 +104,10 @@ function SimpleBar({
   const pct = max > 0 ? (value / max) * 100 : 0;
   return (
     <div className="flex items-center gap-3">
-      <span className="w-12 text-[11px] text-muted font-medium text-right shrink-0">
+      <span className="w-14 text-xs text-muted font-semibold text-right shrink-0">
         {label}
       </span>
-      <div className="flex-1 h-3.5 bg-card-subtle rounded-full overflow-hidden border border-border-subtle/40">
+      <div className="flex-1 h-3 bg-card-subtle rounded-full overflow-hidden border border-border-subtle/50">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${Math.max(pct, 2)}%` }}
@@ -111,7 +121,7 @@ function SimpleBar({
 }
 
 // ---------------------------------------------------------------------------
-// Simple month bar chart (CSS bars)
+// Simple month bar chart (CSS bars with solid flat colors)
 // ---------------------------------------------------------------------------
 function MonthChart({
   data,
@@ -120,7 +130,7 @@ function MonthChart({
 }) {
   const max = Math.max(...data.map((d) => d.count), 1);
   return (
-    <div className="flex items-end gap-3 pt-4 px-2" style={{ height: 120 }}>
+    <div className="flex items-end gap-3 pt-6 px-2" style={{ height: 140 }}>
       {data.map((d) => {
         const pct = (d.count / max) * 100;
         return (
@@ -128,14 +138,14 @@ function MonthChart({
             key={d.month}
             className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group"
           >
-            <span className="text-[10px] font-bold text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 tabular-nums">
+            <span className="text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100 opacity-0 group-hover:opacity-100 transition-opacity duration-200 tabular-nums">
               {d.count}
             </span>
             <div
-              className="w-full rounded-t-md bg-accent group-hover:bg-accent/80 transition-all duration-500"
-              style={{ height: `${Math.max(pct, 6)}%` }}
+              className="w-full rounded-t-xl bg-indigo-600 group-hover:bg-indigo-700 transition-all duration-300 shadow-xs"
+              style={{ height: `${Math.max(pct, 8)}%` }}
             />
-            <span className="text-[10px] font-medium text-muted mt-1">{d.month}</span>
+            <span className="text-[11px] font-bold text-muted mt-1.5">{d.month}</span>
           </div>
         );
       })}
@@ -144,15 +154,17 @@ function MonthChart({
 }
 
 // ---------------------------------------------------------------------------
-// Adoption stat — % dengan sub-line absolute count
+// Adoption stat — % dengan visual progress bar & sub-line
 // ---------------------------------------------------------------------------
 function AdoptionStat({
   icon: Icon,
   label,
   rate,
   absolute,
-  color = "text-accent",
-  bgColor = "bg-accent-soft/30",
+  color = "text-indigo-600",
+  bgColor = "bg-indigo-50",
+  borderColor = "border-indigo-100",
+  barColor = "bg-indigo-600",
 }: {
   icon: React.FC<{ className?: string; strokeWidth?: number }>;
   label: string;
@@ -160,22 +172,32 @@ function AdoptionStat({
   absolute: number;
   color?: string;
   bgColor?: string;
+  borderColor?: string;
+  barColor?: string;
 }) {
   const pct = Math.round(rate * 100);
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-border-subtle bg-card px-4 py-3.5 shadow-sm hover:shadow-md hover:translate-y-[-1px] transition-all duration-300 group cursor-default">
-      <span
-        className={`grid size-10 shrink-0 place-items-center rounded-xl ${bgColor} ${color} group-hover:scale-105 transition-transform duration-300`}
-      >
-        <Icon className="size-4.5" strokeWidth={2} />
-      </span>
-      <div className="flex flex-col min-w-0">
-        <span className="text-[11px] text-muted font-semibold uppercase tracking-wider">{label}</span>
-        <span className="text-lg font-extrabold text-foreground tabular-nums mt-0.5">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border-subtle bg-card p-4 shadow-xs hover:shadow-md hover:translate-y-[-1px] hover:border-accent/30 transition-all duration-300 group cursor-default">
+      <div className="flex items-center justify-between">
+        <span
+          className={`grid size-10 shrink-0 place-items-center rounded-xl ${bgColor} ${color} border ${borderColor} group-hover:scale-105 transition-transform duration-300`}
+        >
+          <Icon className="size-5" strokeWidth={2} />
+        </span>
+        <span className="text-xl font-black text-foreground tabular-nums">
           {pct}%
         </span>
-        <span className="text-[10px] text-muted font-medium mt-0.5">
-          {absolute} dari total
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-[11px] text-muted font-bold uppercase tracking-wider truncate">{label}</span>
+        <div className="w-full h-2 bg-card-subtle rounded-full overflow-hidden border border-border-subtle/40 mt-1">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+            style={{ width: `${Math.max(pct, 3)}%` }}
+          />
+        </div>
+        <span className="text-[10px] text-muted font-semibold mt-1">
+          {absolute} user aktif
         </span>
       </div>
     </div>
@@ -190,8 +212,9 @@ function NumericStat({
   label,
   value,
   sub,
-  color = "text-accent",
-  bgColor = "bg-accent-soft/30",
+  color = "text-indigo-600",
+  bgColor = "bg-indigo-50",
+  borderColor = "border-indigo-100",
 }: {
   icon: React.FC<{ className?: string; strokeWidth?: number }>;
   label: string;
@@ -199,21 +222,24 @@ function NumericStat({
   sub?: string;
   color?: string;
   bgColor?: string;
+  borderColor?: string;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-border-subtle bg-card px-4 py-3.5 shadow-sm hover:shadow-md hover:translate-y-[-1px] transition-all duration-300 group cursor-default">
-      <span
-        className={`grid size-10 shrink-0 place-items-center rounded-xl ${bgColor} ${color} group-hover:scale-105 transition-transform duration-300`}
-      >
-        <Icon className="size-4.5" strokeWidth={2} />
-      </span>
-      <div className="flex flex-col min-w-0">
-        <span className="text-[11px] text-muted font-semibold uppercase tracking-wider">{label}</span>
-        <span className="text-lg font-extrabold text-foreground tabular-nums mt-0.5">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border-subtle bg-card p-4 shadow-xs hover:shadow-md hover:translate-y-[-1px] hover:border-accent/30 transition-all duration-300 group cursor-default">
+      <div className="flex items-center justify-between">
+        <span
+          className={`grid size-10 shrink-0 place-items-center rounded-xl ${bgColor} ${color} border ${borderColor} group-hover:scale-105 transition-transform duration-300`}
+        >
+          <Icon className="size-5" strokeWidth={2} />
+        </span>
+        <span className="text-xl font-black text-foreground tabular-nums">
           {value}
         </span>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <span className="text-[11px] text-muted font-bold uppercase tracking-wider truncate">{label}</span>
         {sub && (
-          <span className="text-[10px] text-muted font-medium mt-0.5">{sub}</span>
+          <span className="text-[10px] text-muted font-semibold mt-1">{sub}</span>
         )}
       </div>
     </div>
@@ -221,14 +247,14 @@ function NumericStat({
 }
 
 // ---------------------------------------------------------------------------
-// Trend chart (transaksi 7 hari) — bar vertikal dengan label hari (height: 180px)
+// Trend chart (transaksi 7 hari) — bar vertikal dengan warna flat indigo
 // ---------------------------------------------------------------------------
 function TrendChart({ data }: { data: TransactionTrendPoint[] }) {
   const max = Math.max(...data.map((d) => d.count), 1);
   const total = data.reduce((s, d) => s + d.count, 0);
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-end gap-3 pt-6 px-2" style={{ height: 180 }}>
+      <div className="flex items-end gap-3.5 pt-8 px-2" style={{ height: 200 }}>
         {data.map((d) => {
           const pct = (d.count / max) * 100;
           const dayLabel = new Date(d.date).toLocaleDateString("id-ID", {
@@ -237,28 +263,28 @@ function TrendChart({ data }: { data: TransactionTrendPoint[] }) {
           return (
             <div
               key={d.date}
-              className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group"
+              className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group relative"
               title={`${d.label}: ${d.count} transaksi`}
             >
-              <span className="text-[10px] font-bold text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 tabular-nums">
+              <span className="text-[11px] font-extrabold text-white bg-slate-900 px-2 py-0.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 tabular-nums absolute -top-4 z-10">
                 {d.count}
               </span>
               <div
-                className="w-full rounded-t-lg bg-accent group-hover:bg-accent/80 transition-all duration-500"
-                style={{ height: `${Math.max(pct, 6)}%` }}
+                className="w-full rounded-t-xl bg-indigo-600 group-hover:bg-indigo-700 transition-all duration-300 shadow-xs"
+                style={{ height: `${Math.max(pct, 8)}%` }}
               />
-              <span className="text-[10px] font-bold text-foreground mt-1.5">{dayLabel}</span>
-              <span className="text-[9px] text-muted font-medium -mt-1">
+              <span className="text-[11px] font-extrabold text-foreground mt-2">{dayLabel}</span>
+              <span className="text-[10px] text-muted font-semibold -mt-1">
                 {d.label}
               </span>
             </div>
           );
         })}
       </div>
-      <div className="flex items-center justify-between text-xs text-muted pt-3 border-t border-border-subtle">
-        <span className="font-semibold">7 hari terakhir</span>
-        <span className="tabular-nums font-bold text-foreground bg-accent-soft px-2.5 py-0.5 rounded-full">
-          {total} transaksi
+      <div className="flex items-center justify-between text-xs text-muted pt-3 border-t border-border-subtle/60">
+        <span className="font-semibold">Statistik 7 Hari Terakhir</span>
+        <span className="tabular-nums font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">
+          Total {total} transaksi
         </span>
       </div>
     </div>
@@ -270,11 +296,18 @@ function TrendChart({ data }: { data: TransactionTrendPoint[] }) {
 // ---------------------------------------------------------------------------
 function HealthDot({ status }: { status: string }) {
   return (
-    <span
-      className={`inline-block size-2 rounded-full ${
-        status === "healthy" ? "bg-emerald-500 animate-pulse" : "bg-red-500"
-      }`}
-    />
+    <span className="relative flex size-2.5">
+      <span
+        className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${
+          status === "healthy" ? "bg-emerald-400 animate-ping" : "bg-red-400"
+        }`}
+      />
+      <span
+        className={`relative inline-flex size-2.5 rounded-full ${
+          status === "healthy" ? "bg-emerald-500" : "bg-red-500"
+        }`}
+      />
+    </span>
   );
 }
 
@@ -447,7 +480,7 @@ export default function DeveloperPage() {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
-          <Shield className="size-5 text-accent" strokeWidth={2} />
+          <Image src="/img/logo-blue.webp" alt="Teman Kas" width={20} height={20} className="size-5 rounded-md" />
           <h1 className="text-lg font-semibold text-foreground">Developer</h1>
         </div>
         <Card padding="lg" className="text-center">
@@ -467,62 +500,72 @@ export default function DeveloperPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border-subtle/40 pb-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border-subtle/50 pb-5">
         <div className="flex items-center gap-3.5">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent shadow-xs">
-            <Shield className="size-5" strokeWidth={2} />
-          </span>
-          <div>
-            <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-              Console Developer
-            </h1>
-            <p className="text-xs text-muted font-medium">Ringkasan diagnostik dan metrik sistem TemanKas</p>
+          <Image
+            src="/img/logo-blue.webp"
+            alt="Teman Kas"
+            width={44}
+            height={44}
+            className="size-11 rounded-2xl shadow-xs shrink-0"
+          />
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl font-black tracking-tight text-foreground">
+                Console Developer
+              </h1>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-extrabold text-emerald-700 border border-emerald-200">
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                Operational
+              </span>
+            </div>
+            <p className="text-xs text-muted font-semibold mt-0.5">Ringkasan diagnostik, metrik engagement, dan kesehatan sistem TemanKas</p>
           </div>
         </div>
         <button
           type="button"
           onClick={handleRefresh}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold bg-card border border-border-subtle hover:bg-card-subtle text-foreground active:scale-[0.98] transition-all disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold bg-card border border-border-subtle hover:bg-card-subtle hover:border-accent/40 text-foreground active:scale-[0.98] transition-all shadow-xs disabled:opacity-50"
         >
           <RefreshCw
-            className={`size-3.5 ${refreshing ? "animate-spin" : ""}`}
+            className={`size-3.5 text-indigo-600 ${refreshing ? "animate-spin" : ""}`}
           />
-          Refresh
+          Refresh Data
         </button>
       </div>
 
-      {/* ── Insights Section (Clerk/Railway style) ─────────────────────── */}
+      {/* ── Insights Section ─────────────────────── */}
       {systemInsights.length > 0 && (
         <section className="flex flex-col gap-3.5">
-          <div className="flex items-center gap-1.5 px-1">
-            <Sparkles className="size-4 text-accent" />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-muted">Rekomendasi & Analisis AI</h2>
+          <div className="flex items-center gap-2 px-1">
+            <Sparkles className="size-4 text-indigo-600" />
+            <h2 className="text-xs font-black uppercase tracking-wider text-muted">Rekomendasi & Analisis AI</h2>
           </div>
-          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {systemInsights.map((insight) => {
               const Icon = insight.icon;
               return (
                 <div
                   key={insight.id}
                   className={[
-                    "flex gap-3 px-4 py-3.5 rounded-2xl border text-sm font-medium shadow-sm bg-card cursor-default",
-                    insight.type === "success" && "border-emerald-200/60 bg-emerald-500/[0.02]",
-                    insight.type === "warning" && "border-amber-200/60 bg-amber-500/[0.02]",
-                    insight.type === "info" && "border-blue-200/60 bg-blue-500/[0.02]",
+                    "flex gap-3.5 px-4 py-4 rounded-2xl border text-sm font-medium shadow-xs bg-card hover:shadow-md transition-all duration-300 cursor-default",
+                    insight.type === "success" && "border-emerald-200 bg-emerald-50/40",
+                    insight.type === "warning" && "border-amber-200 bg-amber-50/40",
+                    insight.type === "info" && "border-indigo-200 bg-indigo-50/40",
                   ].join(" ")}
                 >
-                  <Icon
-                    className={[
-                      "size-5 shrink-0 mt-0.5",
-                      insight.type === "success" && "text-emerald-500",
-                      insight.type === "warning" && "text-amber-500",
-                      insight.type === "info" && "text-blue-500",
-                    ].join(" ")}
-                  />
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-bold text-foreground text-xs">{insight.title}</span>
-                    <span className="text-muted text-[11px] leading-relaxed mt-1">{insight.text}</span>
+                  <span className={[
+                    "grid size-9 shrink-0 place-items-center rounded-xl",
+                    insight.type === "success" && "bg-emerald-100 text-emerald-700 border border-emerald-200",
+                    insight.type === "warning" && "bg-amber-100 text-amber-700 border border-amber-200",
+                    insight.type === "info" && "bg-indigo-100 text-indigo-700 border border-indigo-200",
+                  ].join(" ")}>
+                    <Icon className="size-5" strokeWidth={2.2} />
+                  </span>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-extrabold text-foreground text-xs">{insight.title}</span>
+                    <span className="text-muted text-[11px] font-medium leading-relaxed mt-1">{insight.text}</span>
                   </div>
                 </div>
               );
@@ -533,9 +576,9 @@ export default function DeveloperPage() {
 
       {/* ── Hero KPI Cards ───────────────────────────────────────────── */}
       <section className="flex flex-col gap-3.5">
-        <div className="flex items-center gap-1.5 px-1">
-          <TrendingUp className="size-4 text-muted" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-muted">Metrik Utama</h2>
+        <div className="flex items-center gap-2 px-1">
+          <TrendingUp className="size-4 text-indigo-500" />
+          <h2 className="text-xs font-black uppercase tracking-wider text-muted">Metrik Utama</h2>
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <BigStat
@@ -548,6 +591,8 @@ export default function DeveloperPage() {
                 : ""
             }
             color="text-blue-500"
+            bgColor="bg-blue-500/10"
+            borderColor="border-blue-500/20"
           />
           <BigStat
             icon={Activity}
@@ -555,21 +600,25 @@ export default function DeveloperPage() {
             value={stats?.transactions ?? 0}
             sub={
               stats
-                ? `${stats.transactionsThisWeek} minggu ini · rata-rata ${stats.engagement.avgTxPerActiveUser}/user aktif`
+                ? `${stats.transactionsThisWeek} minggu ini · rata-rata ${stats.engagement.avgTxPerActiveUser}/user`
                 : ""
             }
             color="text-amber-500"
+            bgColor="bg-amber-500/10"
+            borderColor="border-amber-500/20"
           />
           <BigStat
             icon={BarChart3}
-            label="Volume"
+            label="Volume Transaksi"
             value={formatCurrency(stats?.volumeNet ?? 0, { compact: true })}
             sub={
               stats
-                ? `In ${formatCurrency(stats.totalIncome, { compact: true })} · Out ${formatCurrency(stats.totalExpense, { compact: true })}`
+                ? `Masuk ${formatCurrency(stats.totalIncome, { compact: true })} · Keluar ${formatCurrency(stats.totalExpense, { compact: true })}`
                 : ""
             }
             color="text-emerald-500"
+            bgColor="bg-emerald-500/10"
+            borderColor="border-emerald-500/20"
           />
         </div>
       </section>
@@ -664,9 +713,9 @@ export default function DeveloperPage() {
 
       {/* ── Cara User Pakai App (engagement) ───────────────────────── */}
       <section className="flex flex-col gap-3.5">
-        <div className="flex items-center gap-1.5 px-1">
-          <Activity className="size-4 text-muted" />
-          <span className="text-xs font-bold uppercase tracking-wider text-muted">
+        <div className="flex items-center gap-2 px-1">
+          <Activity className="size-4 text-indigo-500" />
+          <span className="text-xs font-black uppercase tracking-wider text-muted">
             Keterlibatan Pengguna (Engagement)
           </span>
         </div>
@@ -682,6 +731,8 @@ export default function DeveloperPage() {
             }
             color="text-blue-500"
             bgColor="bg-blue-500/10"
+            borderColor="border-blue-500/20"
+            barColor="bg-blue-500"
           />
           <AdoptionStat
             icon={Banknote}
@@ -695,6 +746,8 @@ export default function DeveloperPage() {
             }
             color="text-emerald-500"
             bgColor="bg-emerald-500/10"
+            borderColor="border-emerald-500/20"
+            barColor="bg-emerald-500"
           />
           <AdoptionStat
             icon={ArrowLeftRight}
@@ -707,42 +760,49 @@ export default function DeveloperPage() {
             }
             color="text-amber-500"
             bgColor="bg-amber-500/10"
+            borderColor="border-amber-500/20"
+            barColor="bg-amber-500"
           />
           <NumericStat
             icon={Sparkles}
-            label="Rata-rata tx / user aktif"
+            label="Rata-rata tx / user"
             value={stats?.engagement.avgTxPerActiveUser ?? 0}
-            sub="transaksi per user"
+            sub="transaksi per user aktif"
             color="text-violet-500"
             bgColor="bg-violet-500/10"
+            borderColor="border-violet-500/20"
           />
         </div>
       </section>
 
       {/* ── Adopsi Fitur Lanjutan (sub-section, secondary) ──────────── */}
       <section className="flex flex-col gap-3.5">
-        <div className="flex items-center gap-1.5 px-1">
-          <Database className="size-4 text-muted" />
-          <span className="text-xs font-bold uppercase tracking-wider text-muted">
+        <div className="flex items-center gap-2 px-1">
+          <Database className="size-4 text-indigo-500" />
+          <span className="text-xs font-black uppercase tracking-wider text-muted">
             Adopsi Fitur Finansial
           </span>
         </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <AdoptionStat
             icon={PiggyBank}
-            label="% dengan target tabungan"
+            label="% target tabungan"
             rate={stats?.featureAdoption.savingsGoalAdoption ?? 0}
             absolute={stats?.savingsGoals ?? 0}
             color="text-teal-500"
             bgColor="bg-teal-500/10"
+            borderColor="border-teal-500/20"
+            barColor="bg-teal-500"
           />
           <AdoptionStat
             icon={Repeat}
-            label="% dengan berulang"
+            label="% transaksi berulang"
             rate={stats?.featureAdoption.recurringAdoption ?? 0}
             absolute={stats?.recurringTransactions ?? 0}
             color="text-pink-500"
             bgColor="bg-pink-500/10"
+            borderColor="border-pink-500/20"
+            barColor="bg-pink-500"
           />
         </div>
       </section>

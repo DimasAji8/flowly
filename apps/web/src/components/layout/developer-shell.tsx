@@ -1,14 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Shield, Users, Database, Activity, MessageSquare, LogOut } from "lucide-react";
+import { Users, Database, Activity, MessageSquare, LogOut, LayoutDashboard } from "lucide-react";
 import { useRequireAuth } from "@/hooks/use-auth";
 import { useAuthStore } from "@/store/auth.store";
 import { ROUTES } from "@/constants/routes";
 
 const DEV_NAV_ITEMS = [
-  { href: ROUTES.developer, label: "Dashboard", icon: Shield },
+  { href: ROUTES.developer, label: "Dashboard", icon: LayoutDashboard },
   { href: `${ROUTES.developer}/users`, label: "Users", icon: Users },
   { href: `${ROUTES.developer}/workspaces`, label: "Workspaces", icon: Database },
   { href: `${ROUTES.developer}/reviews`, label: "Reviews", icon: MessageSquare },
@@ -32,14 +33,9 @@ function DeveloperSideNav() {
       className="hidden lg:flex lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:flex-col lg:border-r lg:border-border-subtle lg:px-5 lg:py-6 bg-card text-foreground"
     >
       {/* Brand */}
-      <div className="mb-8 px-2 flex items-center gap-2.5">
-        <span className="grid size-9 place-items-center rounded-xl bg-accent-soft text-accent">
-          <Shield className="size-5" strokeWidth={2} />
-        </span>
-        <div className="flex flex-col">
-          <span className="text-sm font-bold tracking-tight text-foreground leading-none">Teman Kas</span>
-          <span className="text-[10px] font-semibold tracking-wider text-muted uppercase mt-0.5">Dev Console</span>
-        </div>
+      <div className="mb-8 px-2 flex items-center justify-between">
+        <Image src="/img/logo-text-blue.webp" alt="Teman Kas" width={160} height={40} className="h-10 w-auto" style={{ width: "auto" }} />
+        <span className="text-[10px] font-extrabold tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md uppercase">DEV</span>
       </div>
 
       {/* Navigation */}
@@ -59,7 +55,7 @@ function DeveloperSideNav() {
                   className={[
                     "flex h-11 items-center gap-3 rounded-xl px-3 text-[15px] font-semibold transition-all duration-150 active:scale-[0.98]",
                     isActive
-                      ? "bg-accent-soft text-accent"
+                      ? "bg-accent-soft text-accent font-bold"
                       : "text-secondary hover:bg-card-subtle hover:text-foreground",
                   ].join(" ")}
                 >
@@ -108,10 +104,8 @@ function DeveloperMobileHeader() {
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border-subtle bg-background/90 backdrop-blur-md px-5 py-3 lg:hidden">
       <span className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
-        <span className="grid size-7 place-items-center rounded-lg bg-accent-soft text-accent">
-          <Shield className="size-4" strokeWidth={2} />
-        </span>
-        Dev Console
+        <Image src="/img/logo-blue.webp" alt="Teman Kas" width={28} height={28} className="size-7 rounded-lg" />
+        <span className="font-extrabold text-foreground">Dev Console</span>
       </span>
       <button
         type="button"
@@ -178,13 +172,13 @@ export function DeveloperShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-dvh w-full bg-background">
+    <div className="flex min-h-dvh w-full bg-[#f8fafc]">
       <DeveloperSideNav />
 
-      <div className="flex min-h-dvh w-full flex-col lg:flex-1">
+      <div className="flex min-h-dvh w-full flex-col lg:flex-1 bg-[#f8fafc]">
         <div className="flex w-full flex-1 flex-col">
           <DeveloperMobileHeader />
-          <main className="flex-1 w-full px-5 pb-24 pt-6 lg:px-10 lg:pb-16 lg:pt-10">
+          <main className="flex-1 w-full px-5 pb-24 pt-6 lg:px-10 lg:pb-16 lg:pt-10 bg-[#f8fafc]">
             {children}
           </main>
         </div>

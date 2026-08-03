@@ -253,7 +253,7 @@ export class DeveloperService {
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
-        orderBy: [{ role: 'desc' }, { createdAt: 'desc' }],
+        orderBy: { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
         select: {

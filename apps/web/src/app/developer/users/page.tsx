@@ -110,16 +110,19 @@ export default function DeveloperUsersPage() {
 
   const filteredUsers = useMemo(() => {
     if (!users) return null;
-    return users.filter((u) => {
-      const matchesSearch =
-        u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesRole =
-        roleFilter === "all" ||
-        (roleFilter === "developer" && u.role === "developer") ||
-        (roleFilter === "user" && u.role === "user");
-      return matchesSearch && matchesRole;
-    });
+    return users
+      .filter((u) => {
+        const matchesSearch =
+          u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          u.email.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesRole =
+          roleFilter === "all" ||
+          (roleFilter === "developer" && u.role === "developer") ||
+          (roleFilter === "user" && u.role === "user");
+        return matchesSearch && matchesRole;
+      })
+      .slice()
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [users, searchQuery, roleFilter]);
 
   const isFiltered = searchQuery !== "" || roleFilter !== "all";
