@@ -10,10 +10,13 @@ import * as path from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
 
 interface ParsedResponse {
+  intent?: 'transaction' | 'transfer';
   type?: 'income' | 'expense';
   amount?: number;
   categoryName?: string;
   walletName?: string;
+  fromWalletName?: string;
+  toWalletName?: string;
   note?: string;
   date?: string;
 }
@@ -80,11 +83,17 @@ export class AiService {
     const responseSchema = {
       type: Type.OBJECT,
       properties: {
+        intent: {
+          type: Type.STRING,
+          enum: ['transaction', 'transfer'],
+          description:
+            'Intent: "transfer" jika pesan berupa transfer, top up, atau pemindahan saldo antar dompet/rekening/bank; "transaction" jika pemasukan atau pengeluaran biasa',
+        },
         type: {
           type: Type.STRING,
           enum: ['income', 'expense'],
           description:
-            'Tipe transaksi: income jika pemasukan, expense jika pengeluaran',
+            'Tipe transaksi: income jika pemasukan, expense jika pengeluaran (hanya untuk intent transaction)',
         },
         amount: {
           type: Type.INTEGER,
@@ -94,23 +103,30 @@ export class AiService {
         categoryName: {
           type: Type.STRING,
           enum: categoryNames.length > 0 ? categoryNames : undefined,
-          description: 'Nama kategori terdekat dari daftar kategori valid',
+          description: 'Nama kategori terdekat dari daftar kategori valid (hanya untuk intent transaction)',
         },
         walletName: {
           type: Type.STRING,
-          enum: walletNames.length > 0 ? walletNames : undefined,
-          description: 'Nama dompet terdekat dari daftar dompet valid',
+          description: 'Nama dompet/rekening yang disebutkan dalam teks (contoh: Dompet Utama, Cash, BCA)',
+        },
+        fromWalletName: {
+          type: Type.STRING,
+          description: 'Nama dompet/bank/rekening asal yang disebutkan dalam teks (contoh: BCA, Cash, Mandiri)',
+        },
+        toWalletName: {
+          type: Type.STRING,
+          description: 'Nama dompet/bank/rekening tujuan yang disebutkan dalam teks (contoh: BNI, SeaBank, GoPay)',
         },
         note: {
           type: Type.STRING,
-          description: 'Catatan ringkas detail pengeluaran/pemasukan',
+          description: 'Catatan ringkas detail pengeluaran/pemasukan/transfer',
         },
         date: {
           type: Type.STRING,
           description: 'Tanggal transaksi dalam format YYYY-MM-DD',
         },
       },
-      required: ['type', 'amount'],
+      required: ['intent', 'amount'],
     };
 
     const expenseCategories = categories
@@ -122,12 +138,14 @@ export class AiService {
 
     // 3. Siapkan Prompt untuk AI
     const systemInstruction = `Kamu adalah asisten pengelola keuangan pintar Indonesia.
-Tugasmu adalah menganalisis pesan teks transaksi pengguna dan mengekstraknya menjadi JSON terstruktur.
+Tugasmu adalah menganalisis pesan teks transaksi/transfer pengguna dan mengekstraknya menjadi JSON terstruktur.
 Tanggal hari ini adalah: ${new Date().toISOString().split('T')[0]}.
 PENTING:
-- Jika transaksi adalah pengeluaran (expense), kamu HARUS memilih kategori dari daftar Kategori Pengeluaran Valid.
-- Jika transaksi adalah pemasukan (income), kamu HARUS memilih kategori dari daftar Kategori Pemasukan Valid.
-- Pilihlah nama dompet terdekat yang paling logis dari daftar dompet valid.`;
+- Tentukan intent: "transfer" jika pesan berupa transfer, top up, atau pemindahan saldo antar dompet (contoh: "transfer 1jt dari bca ke bni", "topup gopay 50rb dari bca", "pindahin 500rb dari mandiri ke tabungan"). Selebihnya intent "transaction".
+- Ekstrak nama dompet asal ke fromWalletName dan nama dompet tujuan ke toWalletName persis seperti yang disebutkan pengguna dalam teks (contoh: jika pengguna sebut "BNI", isi toWalletName dengan "BNI").
+- Jika intent = "transaction":
+  * Jika pengeluaran (expense), kamu HARUS memilih kategori dari daftar Kategori Pengeluaran Valid.
+  * Jika pemasukan (income), kamu HARUS memilih kategori dari daftar Kategori Pemasukan Valid.`;
 
     const contents = `Teks Transaksi: "${text}"
 
@@ -154,24 +172,68 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`;
 
       const parsed = JSON.parse(response.text) as ParsedResponse;
 
-      // 5. Cari ID yang cocok dari database lokal berdasarkan nama hasil parsing AI dan tipe transaksi
+      // 5. Jika intent transfer
+      if (parsed.intent === 'transfer') {
+        const notFoundWallets: string[] = [];
+        const matchedFrom = parsed.fromWalletName
+          ? wallets.find(
+              (w) => w.name.toLowerCase() === parsed.fromWalletName?.toLowerCase(),
+            )
+          : undefined;
+        const matchedTo = parsed.toWalletName
+          ? wallets.find(
+              (w) => w.name.toLowerCase() === parsed.toWalletName?.toLowerCase(),
+            )
+          : undefined;
+
+        if (parsed.fromWalletName && !matchedFrom) {
+          notFoundWallets.push(parsed.fromWalletName);
+        }
+        if (parsed.toWalletName && !matchedTo) {
+          notFoundWallets.push(parsed.toWalletName);
+        }
+
+        return {
+          intent: 'transfer',
+          type: 'expense' as const,
+          amount: parsed.amount || 0,
+          fromWalletId: matchedFrom?.id || undefined,
+          fromWalletName: matchedFrom?.name || parsed.fromWalletName || null,
+          toWalletId: matchedTo?.id || undefined,
+          toWalletName: matchedTo?.name || parsed.toWalletName || null,
+          notFoundWallets: notFoundWallets.length > 0 ? notFoundWallets : undefined,
+          note: toTitleCase(parsed.note || text),
+          transactionDate: parsed.date || new Date().toISOString().split('T')[0],
+        };
+      }
+
+      // Cari ID yang cocok dari database lokal berdasarkan nama hasil parsing AI dan tipe transaksi
       const matchedCategory = categories.find(
         (c) =>
           c.name.toLowerCase() === parsed.categoryName?.toLowerCase() &&
           c.type === parsed.type,
       );
-      const matchedWallet = wallets.find(
-        (w) => w.name.toLowerCase() === parsed.walletName?.toLowerCase(),
-      );
+      const matchedWallet = parsed.walletName
+        ? wallets.find(
+            (w) => w.name.toLowerCase() === parsed.walletName?.toLowerCase(),
+          )
+        : undefined;
+
+      const notFoundWallets: string[] = [];
+      if (parsed.walletName && !matchedWallet) {
+        notFoundWallets.push(parsed.walletName);
+      }
 
       // Cari fallback category yang sesuai tipe transaksi jika tidak ada yang cocok
       const fallbackCategory = categories.find((c) => c.type === parsed.type);
 
       return {
+        intent: 'transaction',
         type: parsed.type || 'expense',
         amount: parsed.amount || 0,
         categoryId: matchedCategory?.id || (fallbackCategory?.id ?? null),
-        walletId: matchedWallet?.id || (wallets[0]?.id ?? null),
+        walletId: matchedWallet?.id || undefined,
+        notFoundWallets: notFoundWallets.length > 0 ? notFoundWallets : undefined,
         note: toTitleCase(parsed.note || text),
         transactionDate: parsed.date || new Date().toISOString().split('T')[0],
       };

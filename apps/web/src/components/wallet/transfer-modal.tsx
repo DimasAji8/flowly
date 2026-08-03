@@ -28,6 +28,9 @@ interface TransferModalProps {
   onSuccess: () => void;
   wallets: Wallet[];
   defaultFromId?: string;
+  defaultToId?: string;
+  defaultAmount?: number;
+  defaultNote?: string;
 }
 
 function WalletDropdown({
@@ -89,24 +92,49 @@ function WalletDropdown({
   );
 }
 
-export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId }: TransferModalProps) {
+export function TransferModal({
+  open,
+  onClose,
+  onSuccess,
+  wallets,
+  defaultFromId,
+  defaultToId,
+  defaultAmount,
+  defaultNote,
+}: TransferModalProps) {
   const [form, setForm] = useState({
     fromId: defaultFromId ?? "",
-    toId: "",
-    amountDisplay: "",
-    amountValue: 0,
+    toId: defaultToId ?? "",
+    amountDisplay: defaultAmount ? formatRupiah(String(defaultAmount)) : "",
+    amountValue: defaultAmount ?? 0,
     feeDisplay: "",
     feeValue: 0,
     isMonthlyAllocation: true,
-    note: "",
+    note: defaultNote ?? "",
   });
+
+  useEffect(() => {
+    if (open) {
+      setForm({
+        fromId: defaultFromId ?? "",
+        toId: defaultToId ?? "",
+        amountDisplay: defaultAmount ? formatRupiah(String(defaultAmount)) : "",
+        amountValue: defaultAmount ?? 0,
+        feeDisplay: "",
+        feeValue: 0,
+        isMonthlyAllocation: true,
+        note: defaultNote ?? "",
+      });
+    }
+  }, [open, defaultFromId, defaultToId, defaultAmount, defaultNote]);
+
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
     setForm({
       fromId: defaultFromId ?? "",
-      toId: "",
+      toId: defaultToId ?? "",
       amountDisplay: "",
       amountValue: 0,
       feeDisplay: "",

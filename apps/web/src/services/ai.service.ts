@@ -1,10 +1,16 @@
 import { apiClient } from "@/lib/api-client";
 
 export interface ParsedTransaction {
-  type: "income" | "expense";
+  intent?: "transaction" | "transfer";
+  type?: "income" | "expense";
   amount: number;
-  categoryId: string | null;
-  walletId: string | null;
+  categoryId?: string | null;
+  walletId?: string | null;
+  fromWalletId?: string | null;
+  fromWalletName?: string | null;
+  toWalletId?: string | null;
+  toWalletName?: string | null;
+  notFoundWallets?: string[];
   note: string;
   transactionDate: string;
 }

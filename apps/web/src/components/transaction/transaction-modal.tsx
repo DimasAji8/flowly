@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowDownCircle, ArrowUpCircle, Sparkles, Camera, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { TransactionForm } from "@/components/forms/transaction-form";
+import { TransferModal } from "@/components/wallet/transfer-modal";
 import { transactionsService } from "@/services/transactions.service";
 import { aiService } from "@/services/ai.service";
 import { useWalletStore } from "@/store/wallets.store";
@@ -22,15 +23,28 @@ interface TransactionModalProps {
 
 export function TransactionModal({ open, onClose, onSuccess, transaction }: TransactionModalProps) {
   const isEdit = Boolean(transaction);
+  const { wallets, fetch: fetchWallets } = useWalletStore();
   const [selectedType, setSelectedType] = useState<TransactionType | null>(null);
   const [showAiInput, setShowAiInput] = useState(false);
   const [aiText, setAiText] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [scanLoading, setScanLoading] = useState(false);
   const [aiValues, setAiValues] = useState<Partial<CreateTransactionFormValues> | null>(null);
+  const [transferData, setTransferData] = useState<{
+    fromWalletId?: string;
+    toWalletId?: string;
+    amount?: number;
+    note?: string;
+  } | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open || transferData) {
+      void fetchWallets();
+    }
+  }, [open, transferData, fetchWallets]);
 
   const handleClose = () => {
     setSelectedType(null);
@@ -38,11 +52,11 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
     setAiValues(null);
     setAiText("");
     setScanLoading(false);
+    setTransferData(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (cameraInputRef.current) cameraInputRef.current.value = "";
     onClose();
   };
-
 
   const handleSubmit = async (values: CreateTransactionFormValues) => {
     if (isEdit && transaction) {
@@ -72,17 +86,33 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
     try {
       const res = await aiService.parseTransaction(aiText.trim());
       if (res) {
+        if (res.notFoundWallets && res.notFoundWallets.length > 0) {
+          toast.warning(`Dompet "${res.notFoundWallets.join('", "')}" tidak ditemukan di akun Anda. Silakan pilih dompet di form.`, { duration: 5000 });
+        } else {
+          toast.success(res.intent === "transfer" ? "AI mendeteksi transfer antar dompet!" : "AI berhasil menganalisis teks!");
+        }
+
+        if (res.intent === "transfer") {
+          setTransferData({
+            fromWalletId: res.fromWalletId || undefined,
+            toWalletId: res.toWalletId || undefined,
+            amount: res.amount,
+            note: res.note,
+          });
+          setShowAiInput(false);
+          return;
+        }
+
         setAiValues({
-          type: res.type,
+          type: res.type || "expense",
           amount: res.amount,
           categoryId: res.categoryId || "",
           walletId: res.walletId || "",
           note: res.note || "",
           transactionDate: res.transactionDate,
         });
-        setSelectedType(res.type);
+        setSelectedType(res.type || "expense");
         setShowAiInput(false);
-        toast.success("AI berhasil menganalisis teks!");
       }
     } catch {
       toast.error("Gagal memproses dengan AI");
@@ -101,14 +131,14 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
       const res = await aiService.scanReceipt(file);
       if (res) {
         setAiValues({
-          type: res.type,
+          type: res.type || "expense",
           amount: res.amount,
           categoryId: res.categoryId || "",
           walletId: res.walletId || "",
           note: res.note || "",
           transactionDate: res.transactionDate,
         });
-        setSelectedType(res.type);
+        setSelectedType(res.type || "expense");
         toast.success("Struk berhasil di-scan!");
       }
     } catch (err) {
@@ -186,7 +216,7 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
               rows={3}
               value={aiText}
               onChange={(e) => setAiText(e.target.value)}
-              placeholder="Contoh: 'Tadi sore beli bensin pertamax 50rb pake e-wallet gopay' atau 'Gaji bulanan masuk rekening Mandiri 10 juta'"
+              placeholder="Contoh: Beli kopi 25rb pake GoPay, atau Transfer 500rb dari BCA ke SeaBank..."
               className="w-full rounded-xl border border-border-subtle bg-card-subtle px-4 py-3 text-sm text-foreground placeholder:text-muted focus:border-accent focus:outline-hidden transition-colors resize-none"
               disabled={aiLoading}
             />
@@ -325,6 +355,19 @@ export function TransactionModal({ open, onClose, onSuccess, transaction }: Tran
         capture="environment"
         className="hidden"
       />
+
+      {transferData && (
+        <TransferModal
+          open={Boolean(transferData)}
+          onClose={() => { setTransferData(null); handleClose(); }}
+          onSuccess={() => { setTransferData(null); handleClose(); onSuccess(); }}
+          wallets={wallets}
+          defaultFromId={transferData.fromWalletId}
+          defaultToId={transferData.toWalletId}
+          defaultAmount={transferData.amount}
+          defaultNote={transferData.note}
+        />
+      )}
     </Modal>
   );
 }
