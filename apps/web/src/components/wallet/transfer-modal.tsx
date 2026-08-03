@@ -115,6 +115,7 @@ export function TransferModal({
 
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         fromId: defaultFromId ?? "",
         toId: defaultToId ?? "",

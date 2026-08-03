@@ -168,7 +168,16 @@ export class AiController {
     file: Express.Multer.File,
   ): Promise<ScannedMutationItem[]> {
     const ext = file.originalname.split('.').pop()?.toLowerCase() || '';
-    const allowedExts = ['png', 'jpg', 'jpeg', 'webp', 'pdf', 'csv', 'xls', 'xlsx'];
+    const allowedExts = [
+      'png',
+      'jpg',
+      'jpeg',
+      'webp',
+      'pdf',
+      'csv',
+      'xls',
+      'xlsx',
+    ];
     const allowedMimes = [
       'image/png',
       'image/jpeg',

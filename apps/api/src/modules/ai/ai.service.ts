@@ -103,19 +103,23 @@ export class AiService {
         categoryName: {
           type: Type.STRING,
           enum: categoryNames.length > 0 ? categoryNames : undefined,
-          description: 'Nama kategori terdekat dari daftar kategori valid (hanya untuk intent transaction)',
+          description:
+            'Nama kategori terdekat dari daftar kategori valid (hanya untuk intent transaction)',
         },
         walletName: {
           type: Type.STRING,
-          description: 'Nama dompet/rekening yang disebutkan dalam teks (contoh: Dompet Utama, Cash, BCA)',
+          description:
+            'Nama dompet/rekening yang disebutkan dalam teks (contoh: Dompet Utama, Cash, BCA)',
         },
         fromWalletName: {
           type: Type.STRING,
-          description: 'Nama dompet/bank/rekening asal yang disebutkan dalam teks (contoh: BCA, Cash, Mandiri)',
+          description:
+            'Nama dompet/bank/rekening asal yang disebutkan dalam teks (contoh: BCA, Cash, Mandiri)',
         },
         toWalletName: {
           type: Type.STRING,
-          description: 'Nama dompet/bank/rekening tujuan yang disebutkan dalam teks (contoh: BNI, SeaBank, GoPay)',
+          description:
+            'Nama dompet/bank/rekening tujuan yang disebutkan dalam teks (contoh: BNI, SeaBank, GoPay)',
         },
         note: {
           type: Type.STRING,
@@ -177,12 +181,14 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`;
         const notFoundWallets: string[] = [];
         const matchedFrom = parsed.fromWalletName
           ? wallets.find(
-              (w) => w.name.toLowerCase() === parsed.fromWalletName?.toLowerCase(),
+              (w) =>
+                w.name.toLowerCase() === parsed.fromWalletName?.toLowerCase(),
             )
           : undefined;
         const matchedTo = parsed.toWalletName
           ? wallets.find(
-              (w) => w.name.toLowerCase() === parsed.toWalletName?.toLowerCase(),
+              (w) =>
+                w.name.toLowerCase() === parsed.toWalletName?.toLowerCase(),
             )
           : undefined;
 
@@ -201,9 +207,11 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`;
           fromWalletName: matchedFrom?.name || parsed.fromWalletName || null,
           toWalletId: matchedTo?.id || undefined,
           toWalletName: matchedTo?.name || parsed.toWalletName || null,
-          notFoundWallets: notFoundWallets.length > 0 ? notFoundWallets : undefined,
+          notFoundWallets:
+            notFoundWallets.length > 0 ? notFoundWallets : undefined,
           note: toTitleCase(parsed.note || text),
-          transactionDate: parsed.date || new Date().toISOString().split('T')[0],
+          transactionDate:
+            parsed.date || new Date().toISOString().split('T')[0],
         };
       }
 
@@ -233,7 +241,8 @@ Daftar Dompet Valid: ${JSON.stringify(walletNames)}`;
         amount: parsed.amount || 0,
         categoryId: matchedCategory?.id || (fallbackCategory?.id ?? null),
         walletId: matchedWallet?.id || undefined,
-        notFoundWallets: notFoundWallets.length > 0 ? notFoundWallets : undefined,
+        notFoundWallets:
+          notFoundWallets.length > 0 ? notFoundWallets : undefined,
         note: toTitleCase(parsed.note || text),
         transactionDate: parsed.date || new Date().toISOString().split('T')[0],
       };
@@ -657,7 +666,8 @@ Data Keuangan Pengguna (30 hari terakhir):
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       ].includes(file.mimetype);
 
-    const isPdf = !isSpreadsheet && (file.mimetype === 'application/pdf' || ext === '.pdf');
+    const isPdf =
+      !isSpreadsheet && (file.mimetype === 'application/pdf' || ext === '.pdf');
     let mutationText = '';
 
     if (isSpreadsheet) {
@@ -668,7 +678,8 @@ Data Keuangan Pengguna (30 hari terakhir):
         const workbook = xlsx.read(file.buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0];
         if (sheetName && workbook.Sheets[sheetName]) {
-          mutationText = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetName]) || '';
+          mutationText =
+            xlsx.utils.sheet_to_csv(workbook.Sheets[sheetName]) || '';
         }
       } catch {
         mutationText = '';

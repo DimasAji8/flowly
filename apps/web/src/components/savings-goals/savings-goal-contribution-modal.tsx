@@ -41,6 +41,7 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
     if (open) {
       void fetchWallets();
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAmountDisplay("");
       setFromWalletId("");
       setIsMonthlyAllocation(true);

@@ -25,4 +25,3 @@ export class CreateContributionDto {
   @IsOptional()
   isMonthlyAllocation?: boolean;
 }
-

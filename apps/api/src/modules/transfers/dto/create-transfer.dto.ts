@@ -53,7 +53,8 @@ export class CreateTransferDto {
 
   @ApiPropertyOptional({
     example: true,
-    description: 'Apakah transfer ini dialokasikan dari pemasukan bulan ini (mengurangi Sisa Bulan Ini)?',
+    description:
+      'Apakah transfer ini dialokasikan dari pemasukan bulan ini (mengurangi Sisa Bulan Ini)?',
   })
   @IsOptional()
   isMonthlyAllocation?: boolean;
