@@ -113,16 +113,62 @@ export class SavingsGoalsService {
 
   async addContribution(
     workspaceId: string,
+    userId: string,
     id: string,
     dto: CreateContributionDto,
   ): Promise<SerializedSavingsGoal> {
-    await this.findById(workspaceId, id);
+    const goal = await this.prisma.savingsGoal.findFirst({
+      where: { id, workspaceId },
+    });
+    if (!goal) throw new NotFoundException('Target tabungan tidak ditemukan');
+
+    const amount = new Prisma.Decimal(dto.amount);
 
     const updated = await this.prisma.$transaction(async (tx) => {
+      if (dto.fromWalletId) {
+        const fromWallet = await tx.wallet.findFirst({
+          where: { id: dto.fromWalletId, workspaceId },
+        });
+        if (!fromWallet) {
+          throw new BadRequestException('Dompet asal tidak ditemukan');
+        }
+        if (fromWallet.balance.lessThan(amount)) {
+          throw new BadRequestException('Saldo dompet asal tidak mencukupi');
+        }
+
+        // Potong saldo dompet asal
+        await tx.wallet.update({
+          where: { id: dto.fromWalletId },
+          data: { balance: { decrement: amount } },
+        });
+
+        // Jika ada dompet target tabungan yang di-link, tambah saldonya & catat transfer
+        if (goal.linkedWalletId && goal.linkedWalletId !== dto.fromWalletId) {
+          await tx.wallet.update({
+            where: { id: goal.linkedWalletId },
+            data: { balance: { increment: amount } },
+          });
+
+          await tx.transfer.create({
+            data: {
+              workspaceId,
+              fromWalletId: dto.fromWalletId,
+              toWalletId: goal.linkedWalletId,
+              amount,
+              fee: new Prisma.Decimal(0),
+              isMonthlyAllocation: dto.isMonthlyAllocation ?? true,
+              note: `Setoran Target Tabungan: ${goal.name}`,
+              transferDate: new Date(),
+            },
+          });
+        }
+      }
+
       await tx.savingsGoalContribution.create({
         data: {
           savingsGoalId: id,
-          amount: new Prisma.Decimal(dto.amount),
+          amount,
+          isMonthlyAllocation: dto.isMonthlyAllocation ?? true,
         },
       });
 
@@ -130,7 +176,7 @@ export class SavingsGoalsService {
         where: { id },
         data: {
           currentAmount: {
-            increment: new Prisma.Decimal(dto.amount),
+            increment: amount,
           },
         },
       });

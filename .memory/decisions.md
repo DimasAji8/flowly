@@ -16,6 +16,7 @@
 *   **AI Page Refactor**: Dashboard dibebaskan dari latency Gemini API (3-5 detik) dengan memindahkan modul AI Insights ke halaman khusus **Analisis AI** (`/ai`) dengan indikator skor visual 0-100 yang simetris dan dimuat secara instan menggunakan persistent file-cache.
 *   **Client-Side Image Compression**: Mengompresi gambar struk belanja > 1.5MB pada client-side via HTML Canvas menjadi JPEG resolusi 1600px dengan kualitas 80% sebelum diunggah, untuk menghindari error ukuran berkas backend (max 4MB).
 *   **Sonner Toast Replacement**: Semua pemanggilan `alert()` browser pada Developer Console diganti dengan toast notification modern menggunakan `sonner`.
+*   **Logika Tabungan & Arus Kas Bulanan (Savings & Cash Flow)**: Transfer ke dompet tabungan dan setoran target tabungan TIDAK LAGI membuat transaksi pengeluaran palsu. Sebaliknya, dihitung secara akuntansi murni via kalkulasi `savingsAllocation` di `monthlySummary` (`Sisa Bulan Ini = Pemasukan - Pengeluaran Belanja - Alokasi Tabungan`). Dilengkapi opsi `isMonthlyAllocation` (checkbox UI di modal transfer/setoran) untuk membedakan alokasi dari pemasukan bulan ini vs pemindahan saldo lama.
 
 ---
 

@@ -169,6 +169,7 @@ export default function DashboardPage() {
           <SummaryCards
             income={summary.income}
             expense={summary.expense}
+            savingsAllocation={summary.savingsAllocation}
             net={summary.net}
             month={formatMonthYear(summary.period.year, summary.period.month)}
             totalBalance={totalBalance}

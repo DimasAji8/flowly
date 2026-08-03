@@ -38,11 +38,11 @@ export class TransfersService {
     const [from, to] = await Promise.all([
       this.prisma.wallet.findFirst({
         where: { id: dto.fromWalletId, workspaceId },
-        select: { id: true, name: true, balance: true },
+        select: { id: true, name: true, balance: true, type: true },
       }),
       this.prisma.wallet.findFirst({
         where: { id: dto.toWalletId, workspaceId },
-        select: { id: true, name: true },
+        select: { id: true, name: true, type: true },
       }),
     ]);
     if (!from) throw new BadRequestException('Wallet asal tidak ditemukan');
@@ -64,12 +64,13 @@ export class TransfersService {
           toWalletId: dto.toWalletId,
           amount,
           fee,
+          isMonthlyAllocation: dto.isMonthlyAllocation ?? true,
           note: dto.note,
           transferDate: new Date(dto.transferDate),
         },
         include: {
-          fromWallet: { select: { id: true, name: true } },
-          toWallet: { select: { id: true, name: true } },
+          fromWallet: { select: { id: true, name: true, type: true } },
+          toWallet: { select: { id: true, name: true, type: true } },
         },
       });
 
@@ -134,7 +135,8 @@ export class TransfersService {
     const transfer = await this.prisma.transfer.findFirst({
       where: { id, workspaceId },
       include: {
-        toWallet: { select: { name: true } },
+        fromWallet: { select: { name: true, type: true } },
+        toWallet: { select: { name: true, type: true } },
       },
     });
     if (!transfer) throw new NotFoundException('Transfer tidak ditemukan');

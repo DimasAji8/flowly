@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { Modal } from "@/components/ui/modal";
 import { ApiError } from "@/lib/api-client";
 import { savingsGoalsService } from "@/services/savings-goals.service";
+import { useWalletStore } from "@/store/wallets.store";
 import type { SavingsGoal } from "@/types/finance";
 import { formatCurrency } from "@/utils/format-currency";
 
@@ -27,16 +29,35 @@ function parseRupiah(formatted: string): number {
 }
 
 export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }: SavingsGoalContributionModalProps) {
+  const { wallets, fetch: fetchWallets, invalidate: invalidateWallets } = useWalletStore();
   const [amountDisplay, setAmountDisplay] = useState("");
+  const [fromWalletId, setFromWalletId] = useState("");
+  const [isMonthlyAllocation, setIsMonthlyAllocation] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"form" | "confirm">("form");
 
   useEffect(() => {
-    // setState di effect disengaja: reset form saat modal ditutup/dibuka (sync dari prop).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!open) { setAmountDisplay(""); setError(null); setStep("form"); }
-  }, [open]);
+    if (open) {
+      void fetchWallets();
+    } else {
+      setAmountDisplay("");
+      setFromWalletId("");
+      setIsMonthlyAllocation(true);
+      setError(null);
+      setStep("form");
+    }
+  }, [open, fetchWallets]);
+
+  useEffect(() => {
+    if (open && wallets.length > 0 && !fromWalletId) {
+      const defaultWallet = goal?.linkedWalletId && wallets.some((w) => w.id === goal.linkedWalletId)
+        ? goal.linkedWalletId
+        : wallets[0]?.id ?? "";
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFromWalletId(defaultWallet);
+    }
+  }, [open, wallets, goal, fromWalletId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +66,15 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
       setError("Nominal setoran harus lebih dari 0");
       return;
     }
+
+    if (fromWalletId) {
+      const wallet = wallets.find((w) => w.id === fromWalletId);
+      if (wallet && Number(wallet.balance) < contribution) {
+        setError(`Saldo ${wallet.name} tidak cukup (sisa: Rp ${formatRupiah(String(wallet.balance))})`);
+        return;
+      }
+    }
+
     setError(null);
     setStep("confirm");
   };
@@ -54,9 +84,9 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
     const contribution = parseRupiah(amountDisplay);
     try {
       setLoading(true);
-      await savingsGoalsService.addContribution(goal.id, contribution);
-      toast.success("Setoran tabungan ditambahkan");
-      // Dispatch event agar semua halaman refresh data
+      await savingsGoalsService.addContribution(goal.id, contribution, fromWalletId || undefined, isMonthlyAllocation);
+      toast.success("Setoran tabungan ditambahkan & saldo dompet terpotong");
+      invalidateWallets();
       window.dispatchEvent(new Event("flowly:transaction-added"));
       onClose();
       await onSuccess();
@@ -68,9 +98,15 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
     }
   };
 
+  const selectedWallet = wallets.find((w) => w.id === fromWalletId);
   const title = step === "confirm"
     ? "Konfirmasi setoran"
     : goal ? `Tambah setoran · ${goal.name}` : "Tambah setoran";
+
+  const walletOptions = wallets.map((w) => ({
+    value: w.id,
+    label: `${w.name} (Rp ${formatRupiah(String(w.balance))})`,
+  }));
 
   return (
     <Modal
@@ -98,6 +134,17 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
             </div>
           )}
 
+          {wallets.length > 0 && (
+            <Select
+              label="Dompet asal (Sumber Uang)"
+              options={walletOptions}
+              value={fromWalletId}
+              onChange={(e) => setFromWalletId(e.target.value)}
+              placeholder="Pilih dompet asal..."
+              required
+            />
+          )}
+
           <Input
             label="Nominal setoran"
             inputMode="numeric"
@@ -107,6 +154,23 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
             onChange={(e) => setAmountDisplay(formatRupiah(e.target.value))}
             required
           />
+
+          <label className="flex items-start gap-2.5 rounded-xl border border-border-subtle bg-card-subtle/50 p-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={isMonthlyAllocation}
+              onChange={(e) => setIsMonthlyAllocation(e.target.checked)}
+              className="mt-0.5 size-4 rounded border-border-subtle text-accent focus:ring-accent accent-accent"
+            />
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs font-semibold text-foreground">
+                Potong dari Anggaran Bulan Ini
+              </span>
+              <span className="text-[11px] text-muted leading-tight">
+                Centang jika setoran ini adalah tabungan dari gaji/pemasukan bulan ini.
+              </span>
+            </div>
+          </label>
 
           {error && (
             <div className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger">
@@ -121,9 +185,14 @@ export function SavingsGoalContributionModal({ open, goal, onClose, onSuccess }:
         </form>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl border border-border-subtle bg-card-subtle px-4 py-3 text-sm text-foreground">
+          <div className="rounded-xl border border-border-subtle bg-card-subtle px-4 py-3 text-sm text-foreground space-y-1">
             <p className="font-medium">{goal?.name}</p>
-            <p className="mt-1 text-success font-semibold">+ Rp {amountDisplay}</p>
+            <p className="text-success font-semibold">+ Rp {amountDisplay}</p>
+            {selectedWallet && (
+              <p className="text-xs text-muted">
+                Dipotong dari: <span className="font-medium text-foreground">{selectedWallet.name}</span>
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-3 pt-1">

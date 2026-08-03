@@ -49,11 +49,15 @@ export const savingsGoalsService = {
     });
   },
 
-  addContribution(id: string, amount: number) {
-    return apiClient.post<SavingsGoal>(`/savings-goals/${id}/contributions`, { amount }, {
-      auth: true,
-      workspaceScoped: true,
-    });
+  addContribution(id: string, amount: number, fromWalletId?: string, isMonthlyAllocation?: boolean) {
+    return apiClient.post<SavingsGoal>(
+      `/savings-goals/${id}/contributions`,
+      { amount, fromWalletId, isMonthlyAllocation },
+      {
+        auth: true,
+        workspaceScoped: true,
+      }
+    );
   },
 
   listContributions(id: string) {

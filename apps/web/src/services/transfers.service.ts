@@ -7,6 +7,7 @@ export interface CreateTransferPayload {
   amount: number;
   note?: string;
   fee?: number;
+  isMonthlyAllocation?: boolean;
   transferDate: string;
 }
 

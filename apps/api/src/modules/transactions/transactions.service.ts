@@ -216,17 +216,56 @@ export class TransactionsService {
     const start = new Date(Date.UTC(year, month - 1, 1));
     const end = new Date(Date.UTC(year, month, 1));
 
-    const grouped = await this.prisma.transaction.groupBy({
-      by: ['type'],
-      where: {
-        workspaceId,
-        transactionDate: {
-          gte: start,
-          lt: end,
+    const [grouped, savingsTransfersSum, contributionsSum] = await Promise.all([
+      this.prisma.transaction.groupBy({
+        by: ['type'],
+        where: {
+          workspaceId,
+          transactionDate: {
+            gte: start,
+            lt: end,
+          },
         },
-      },
-      _sum: { amount: true },
-    });
+        _sum: { amount: true },
+      }),
+      this.prisma.transfer.aggregate({
+        where: {
+          workspaceId,
+          isMonthlyAllocation: true,
+          transferDate: { gte: start, lt: end },
+          toWallet: {
+            OR: [
+              { type: 'savings' },
+              { name: { contains: 'Tabungan', mode: 'insensitive' } },
+              { name: { contains: 'Savings', mode: 'insensitive' } },
+            ],
+          },
+        },
+        _sum: { amount: true },
+      }),
+      this.prisma.savingsGoalContribution.aggregate({
+        where: {
+          isMonthlyAllocation: true,
+          createdAt: { gte: start, lt: end },
+          savingsGoal: {
+            workspaceId,
+            OR: [
+              { linkedWalletId: null },
+              {
+                linkedWallet: {
+                  type: { not: 'savings' },
+                  NOT: [
+                    { name: { contains: 'Tabungan', mode: 'insensitive' } },
+                    { name: { contains: 'Savings', mode: 'insensitive' } },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+        _sum: { amount: true },
+      }),
+    ]);
 
     const income =
       grouped.find((g) => g.type === TransactionType.income)?._sum.amount ??
@@ -234,12 +273,17 @@ export class TransactionsService {
     const expense =
       grouped.find((g) => g.type === TransactionType.expense)?._sum.amount ??
       new Prisma.Decimal(0);
-    const net = income.minus(expense);
+    const savingsAllocation = (
+      savingsTransfersSum._sum.amount ?? new Prisma.Decimal(0)
+    ).add(contributionsSum._sum.amount ?? new Prisma.Decimal(0));
+
+    const net = income.minus(expense).minus(savingsAllocation);
 
     return {
       period: { year, month },
       income: income.toString(),
       expense: expense.toString(),
+      savingsAllocation: savingsAllocation.toString(),
       net: net.toString(),
     };
   }

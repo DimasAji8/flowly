@@ -28,7 +28,9 @@ import { SavingsGoalResponse } from './dto/savings-goal-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard';
 import { CurrentWorkspace } from '../../common/decorators/current-workspace.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { WorkspaceContext } from '../../common/types/workspace';
+import type { AuthUser } from '../../common/types/auth';
 
 @ApiTags('savings-goals')
 @ApiBearerAuth('access-token')
@@ -103,10 +105,11 @@ export class SavingsGoalsController {
   @ApiResponse({ status: 201, type: SavingsGoalResponse })
   addContribution(
     @CurrentWorkspace() ws: WorkspaceContext,
+    @CurrentUser() user: AuthUser,
     @Param('id') id: string,
     @Body() dto: CreateContributionDto,
   ) {
-    return this.service.addContribution(ws.id, id, dto);
+    return this.service.addContribution(ws.id, user.id, id, dto);
   }
 
   @Get(':id/contributions')

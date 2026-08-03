@@ -7,6 +7,7 @@ type HeroTab = "assets" | "monthly";
 interface SummaryCardsProps {
   income: string;
   expense: string;
+  savingsAllocation?: string;
   net: string;
   month: string;
   totalBalance?: number;
@@ -15,7 +16,7 @@ interface SummaryCardsProps {
 const STORAGE_KEY_HIDDEN = "teman-kas.balance-hidden";
 const STORAGE_KEY_TAB = "teman-kas.hero-tab";
 
-export function SummaryCards({ income, expense, net, month, totalBalance }: SummaryCardsProps) {
+export function SummaryCards({ income, expense, savingsAllocation, net, month, totalBalance }: SummaryCardsProps) {
   const isLowBalance = totalBalance !== undefined && totalBalance < 500_000;
   const [hidden, setHidden] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
@@ -56,6 +57,8 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
   const heroValue = activeTab === "assets"
     ? (totalBalance !== undefined ? formatCurrency(totalBalance) : "—")
     : formatCurrency(net);
+
+  const hasSavings = savingsAllocation !== undefined && Number(savingsAllocation) > 0;
 
   return (
     <div className="flex flex-col gap-3 dashboard-summary">
@@ -123,23 +126,30 @@ export function SummaryCards({ income, expense, net, month, totalBalance }: Summ
           {hidden ? mask : heroValue}
         </p>
 
-        {/* Income / Expense detail — tetap tampil di kedua tab */}
+        {/* Income / Expense / Savings detail — tetap tampil di kedua tab */}
         <div className="mt-5 border-t border-white/10 pt-4">
           <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-white/40 mb-2.5 text-center">{month}</p>
-          <div className="flex gap-4">
+          <div className="flex gap-3 divide-x divide-white/10">
             <div className="flex flex-1 flex-col gap-0.5">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pemasukan</p>
-              <p className="text-base font-semibold tabular-nums text-white/90">
+              <p className="text-[10px] font-medium uppercase tracking-wide text-white/50">Pemasukan</p>
+              <p className="text-sm md:text-base font-semibold tabular-nums text-white/90 truncate">
                 {hidden ? mask : formatCurrency(income)}
               </p>
             </div>
-            <div className="w-px bg-white/10" aria-hidden />
-            <div className="flex flex-1 flex-col gap-0.5">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Pengeluaran</p>
-              <p className="text-base font-semibold tabular-nums text-white/90">
+            <div className="flex flex-1 flex-col gap-0.5 pl-3">
+              <p className="text-[10px] font-medium uppercase tracking-wide text-white/50">Pengeluaran</p>
+              <p className="text-sm md:text-base font-semibold tabular-nums text-white/90 truncate">
                 {hidden ? mask : formatCurrency(expense)}
               </p>
             </div>
+            {hasSavings && (
+              <div className="flex flex-1 flex-col gap-0.5 pl-3">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-blue-200/70">Tabungan</p>
+                <p className="text-sm md:text-base font-semibold tabular-nums text-blue-100 truncate">
+                  {hidden ? mask : formatCurrency(savingsAllocation!)}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -204,10 +204,11 @@ model SavingsGoal {
 }
 
 model SavingsGoalContribution {
-  id            String      @id @default(cuid())
-  savingsGoalId String      @map("savings_goal_id")
-  amount        Decimal     @map("amount") @db.Decimal(18, 2)
-  createdAt     DateTime    @default(now()) @map("created_at")
+  id                  String   @id @default(cuid())
+  savingsGoalId       String   @map("savings_goal_id")
+  amount              Decimal  @map("amount") @db.Decimal(18, 2)
+  isMonthlyAllocation Boolean  @default(true) @map("is_monthly_allocation")
+  createdAt           DateTime @default(now()) @map("created_at")
 
   savingsGoal SavingsGoal @relation(fields: [savingsGoalId], references: [id], onDelete: Cascade)
 
@@ -250,15 +251,16 @@ model Transaction {
 // =====================================================
 
 model Transfer {
-  id              String   @id @default(cuid())
-  workspaceId     String   @map("workspace_id")
-  fromWalletId    String   @map("from_wallet_id")
-  toWalletId      String   @map("to_wallet_id")
-  amount          Decimal  @db.Decimal(18, 2)
-  fee             Decimal  @default(0) @db.Decimal(18, 2) @map("fee")
-  note            String?
-  transferDate    DateTime @map("transfer_date") @db.Date
-  createdAt       DateTime @default(now()) @map("created_at")
+  id                  String   @id @default(cuid())
+  workspaceId         String   @map("workspace_id")
+  fromWalletId        String   @map("from_wallet_id")
+  toWalletId          String   @map("to_wallet_id")
+  amount              Decimal  @db.Decimal(18, 2)
+  fee                 Decimal  @default(0) @db.Decimal(18, 2) @map("fee")
+  isMonthlyAllocation Boolean  @default(true) @map("is_monthly_allocation")
+  note                String?
+  transferDate        DateTime @map("transfer_date") @db.Date
+  createdAt           DateTime @default(now()) @map("created_at")
 
   workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   fromWallet Wallet    @relation("TransferFrom", fields: [fromWalletId], references: [id], onDelete: Restrict)

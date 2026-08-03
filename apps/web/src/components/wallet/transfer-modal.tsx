@@ -97,6 +97,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
     amountValue: 0,
     feeDisplay: "",
     feeValue: 0,
+    isMonthlyAllocation: true,
     note: "",
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -110,6 +111,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
       amountValue: 0,
       feeDisplay: "",
       feeValue: 0,
+      isMonthlyAllocation: true,
       note: "",
     });
     onClose();
@@ -132,6 +134,7 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
         toWalletId: form.toId,
         amount: form.amountValue,
         fee: form.feeValue || undefined,
+        isMonthlyAllocation: form.isMonthlyAllocation,
         note: form.note || undefined,
         transferDate: isoToday(),
       });
@@ -226,6 +229,23 @@ export function TransferModal({ open, onClose, onSuccess, wallets, defaultFromId
           value={form.note}
           onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
         />
+
+        <label className="flex items-start gap-2.5 rounded-xl border border-border-subtle bg-card-subtle/50 p-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={form.isMonthlyAllocation}
+            onChange={(e) => setForm((f) => ({ ...f, isMonthlyAllocation: e.target.checked }))}
+            className="mt-0.5 size-4 rounded border-border-subtle text-accent focus:ring-accent accent-accent"
+          />
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs font-semibold text-foreground">
+              Potong dari Anggaran Bulan Ini
+            </span>
+            <span className="text-[11px] text-muted leading-tight">
+              Centang jika transfer ini adalah tabungan dari gaji/pemasukan bulan ini.
+            </span>
+          </div>
+        </label>
 
         <div className="flex items-center gap-3 pt-1">
           <Button type="button" variant="secondary" className="flex-1" onClick={handleClose}>

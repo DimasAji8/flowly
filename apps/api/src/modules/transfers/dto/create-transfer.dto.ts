@@ -51,6 +51,13 @@ export class CreateTransferDto {
   @Min(0)
   fee?: number;
 
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Apakah transfer ini dialokasikan dari pemasukan bulan ini (mengurangi Sisa Bulan Ini)?',
+  })
+  @IsOptional()
+  isMonthlyAllocation?: boolean;
+
   @ApiProperty({ example: '2026-05-26' })
   @IsDateString()
   @IsNotEmpty()

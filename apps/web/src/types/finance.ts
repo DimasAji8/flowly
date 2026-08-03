@@ -65,6 +65,7 @@ export interface MonthlySummary {
   period: { year: number; month: number };
   income: string;
   expense: string;
+  savingsAllocation?: string;
   net: string;
 }
 
